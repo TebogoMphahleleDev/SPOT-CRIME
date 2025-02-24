@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Thusang#Help</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    </head>
+    <body>
+        <div class="container">
+            <h2>Thusang Community Safety Platform</h2>
+            <p>Empowering Communities in South Africa , Ensuring Safety For All</p>
+            <form action="/login" method="POST">
+                <input type="email" name="email" placeholder="Email/Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p><a href="/signup">Don't have an account? Sign Up</a></p>
+    </div>
+</html>
