@@ -9,22 +9,23 @@ app = Flask(__name__)
 app.template_folder = "E:/School/flask-react-auth/SWP Project/Templates"
 app.static_folder = "E:/School/flask-react-auth/SWP Project/Styling side"
 
-# Configure  Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# Configure Database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///login_details.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# This is the database , not running fully yet
+# Database Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-# start the  Database* Please run it only once
+# Create the database (run only once)
 with app.app_context():
     db.create_all()
 
+# Routes
 @app.route('/')
 def home():
     return redirect(url_for('login'))
@@ -64,5 +65,11 @@ def signup():
 
     return render_template('signup.html')
 
+@app.route('/view_users')
+def view_users():
+    users = User.query.all()
+    return render_template('view_users.html', users=users)
+
+# Run the application
 if __name__ == '__main__':
     app.run(debug=True)
