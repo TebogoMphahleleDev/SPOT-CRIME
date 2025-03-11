@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Rewards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff; 
+      color: #333333; 
+    }
+    header {
+      background-color: #007bff; 
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+    }
+    .back-button {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: transparent;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .back-button:hover {
+      text-decoration: underline;
+    }
+    .main-section {
+      padding: 20px;
+    }
+    .points-balance {
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #007bff; 
+    }
+    .redeem-options {
+      margin-bottom: 30px;
+    }
+    .redeem-options h2, .history h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #007bff; 
+    }
+    .redeem-options button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #f8f9fa; 
+      border: 1px solid #dddddd; 
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: left;
+      color: #333333; 
+    }
+    .redeem-options button:hover {
+      background-color: #e9ecef; 
+    }
+    .history ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .history ul li {
+      background-color: #f8f9fa; 
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 1px solid #dddddd; 
+      border-radius: 8px;
+      color: #333333; 
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #007bff; 
+      color: white;
+    }
+    footer a {
+      color: #ffffff; 
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="back-button" onclick="window.location.href='/dashboard'">← Back</button>
+    Your Rewards
+  </header>
+
+  <div class="main-section">
+    <div class="points-balance">
+      You have <span>0 points</span>
+    </div>
+
+    <div class="redeem-options">
+      <h2>Redeem Options</h2>
+      <button>Redeem R100 voucher for Shoprite</button>
+      <button>Redeem R200 voucher for Takealot</button>
+      <button>Redeem R50 cash</button>
+      <button>Redeem R100 cash</button>
+    </div>
+
+    <div class="history">
+      <h2>History</h2>
+      <ul>
+        <li>No rewards earned or redeemed yet.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <a href="#">How to earn more points</a>
+  </footer>
+</body>
+</html>

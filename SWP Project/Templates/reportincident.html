@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Crime</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .report-crime-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+      margin: 20px;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+    }
+
+    #preview-section {
+      margin-top: 10px;
+    }
+
+    #preview-section img,
+    #preview-section video,
+    #preview-section audio {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .submit-button,
+    .cancel-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 48%;
+    }
+
+    .submit-button {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .submit-button:hover {
+      background-color: #218838;
+    }
+
+    .cancel-button {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .cancel-button:hover {
+      background-color: #c82333;
+    }
+
+    .voice-note-section {
+      margin-top: 20px;
+    }
+
+    .voice-note-section button {
+      margin-right: 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .voice-note-section button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .other-crime-input {
+      margin-top: 10px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .report-crime-container {
+        padding: 15px;
+        margin: 10px;
+      }
+
+      header h1 {
+        font-size: 20px;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        font-size: 14px;
+        padding: 8px;
+      }
+
+      .submit-button,
+      .cancel-button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .report-crime-container {
+        padding: 10px;
+        margin: 5px;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        font-size: 12px;
+        padding: 6px;
+      }
+
+      .submit-button,
+      .cancel-button {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .form-buttons {
+        flex-direction: column;
+      }
+
+      .submit-button,
+      .cancel-button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-crime-container">
+    <header>
+      <h1>Report a Crime</h1>
+    </header>
+
+    <div class="report-incident-container">
+    <header>
+      <h1>Report a Suspicious Activity or Crime</h1>
+    </header>
+
+    <form id="report-incident-form" method="POST" enctype="multipart/form-data">
+      <!-- Incident Type -->
+      <div class="form-group">
+        <label for="incident-type">Incident Type</label>
+        <select id="incident-type" name="incident-type" required>
+          <option value="">Select an incident type</option>
+          <option value="gbv">Gender-Based Violence (GBV)</option>
+          <option value="theft">Theft</option>
+          <option value="burglary">Burglary</option>
+          <option value="assault">Assault</option>
+          <option value="vandalism">Vandalism</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Other Crime Input -->
+      <div class="form-group other-crime-input" id="other-crime-input" style="display: none;">
+        <label for="other-crime">Specify Other Crime</label>
+        <input type="text" id="other-crime" name="other-crime" placeholder="Enter the crime">
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" placeholder="Auto-filled using GPS" required>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4" placeholder="Provide additional details about the incident" required></textarea>
+      </div>
+
+      <!-- Witness Information -->
+      <div class="form-group">
+        <label for="witness-info">Witness Information (if any)</label>
+        <textarea id="witness-info" name="witness-info" rows="3" placeholder="Provide witness details"></textarea>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="form-group">
+        <label for="contact-info">Your Contact Information</label>
+        <input type="text" id="contact-info" name="contact-info" placeholder="Enter your phone number or email" required>
+      </div>
+
+      <!-- Vehicle Details (Optional) -->
+      <div class="form-group">
+        <label for="vehicle-make">Vehicle Make (if applicable)</label>
+        <input type="text" id="vehicle-make" name="vehicle-make" placeholder="Enter vehicle make">
+      </div>
+      <div class="form-group">
+        <label for="vehicle-model">Vehicle Model (if applicable)</label>
+        <input type="text" id="vehicle-model" name="vehicle-model" placeholder="Enter vehicle model">
+      </div>
+      <div class="form-group">
+        <label for="vehicle-color">Vehicle Color (if applicable)</label>
+        <input type="text" id="vehicle-color" name="vehicle-color" placeholder="Enter vehicle color">
+      </div>
+      <div class="form-group">
+        <label for="license-plate">License Plate (if applicable)</label>
+        <input type="text" id="license-plate" name="license-plate" placeholder="Enter license plate">
+      </div>
+
+      <!-- Upload Evidence -->
+      <div class="form-group">
+        <label for="evidence-upload">Upload Evidence</label>
+        <input type="file" id="evidence-upload" name="evidence-upload" accept="image/*, video/*, audio/*" multiple>
+        <div id="preview-section">
+          <!-- Preview of uploaded files will appear here -->
+        </div>
+      </div>
+
+      <!-- Voice Note Section -->
+      <div class="form-group voice-note-section">
+        <label for="voice-note">Voice Note</label>
+        <input type="file" id="voice-note" name="voice-note" accept="audio/*">
+        <p>Or record a voice note:</p>
+        <button type="button" id="start-record">Start Recording</button>
+        <button type="button" id="stop-record" disabled>Stop Recording</button>
+        <audio id="audio-playback" controls style="display: none;"></audio>
+      </div>
+
+      <!-- Buttons -->
+      <div class="form-buttons">
+        <button type="submit" class="submit-button">Submit Report</button>
+        <button type="button" class="cancel-button" onclick="window.location.href='/dashboard'"> Back to dashboard</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    // JavaScript for Voice Recording
+    let mediaRecorder;
+    let audioChunks = [];
+
+    const startRecordButton = document.getElementById('start-record');
+    const stopRecordButton = document.getElementById('stop-record');
+    const audioPlayback = document.getElementById('audio-playback');
+
+    // Start Recording
+    startRecordButton.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          audioPlayback.src = URL.createObjectURL(audioBlob);
+          audioPlayback.style.display = 'block';
+
+          // Create a file input for the recorded audio
+          const fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.name = 'recorded-voice';
+          fileInput.files = new File([audioBlob], 'recorded-voice.wav', { type: 'audio/wav' });
+          document.getElementById('report-crime-form').appendChild(fileInput);
+        };
+
+        startRecordButton.disabled = true;
+        stopRecordButton.disabled = false;
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+        alert('Error accessing microphone. Please allow microphone access.');
+      }
+    });
+
+    // Stop Recording
+    stopRecordButton.addEventListener('click', () => {
+      mediaRecorder.stop();
+      startRecordButton.disabled = false;
+      stopRecordButton.disabled = true;
+    });
+
+    // Show/Hide Other Crime Input
+    const incidentType = document.getElementById('incident-type');
+    const otherCrimeInput = document.getElementById('other-crime-input');
+
+    incidentType.addEventListener('change', () => {
+      if (incidentType.value === 'other') {
+        otherCrimeInput.style.display = 'block';
+      } else {
+        otherCrimeInput.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
