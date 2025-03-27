@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #1a1a1a;
+      color: #f0f0f0;
+    }
+
+    .dark-mode .sidebar {
+      background-color: #222;
+    }
+
+    .dark-mode .card {
+      background-color: #2a2a2a;
+      color: #f0f0f0;
+    }
+
+    .dark-mode table, .dark-mode th, .dark-mode td {
+      border-color: #444;
+    }
+
+    .dark-mode th {
+      background-color: #333;
+      color: #f0f0f0;
+    }
+
+    .dark-mode tr:nth-child(even) {
+      background-color: #333;
+    }
+
+    .dark-mode tr:hover {
+      background-color: #444;
+    }
+
+    .dark-mode button {
+      background-color: #333;
+      color: #f0f0f0;
+      border-color: #444;
+    }
+
+    .dark-mode button:hover {
+      background-color: #444;
+    }
+
+    .dark-mode .graph-placeholder {
+      background-color: #333;
+      color: #888;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 80px;
+      background-color: #fff;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar .logo {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 40px;
+      color: #333;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+    }
+
+    .sidebar ul li {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .sidebar ul li a {
+      color: #666;
+      text-decoration: none;
+      font-size: 18px;
+      display: block;
+      padding: 10px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .sidebar ul li a i {
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar ul li a:hover i {
+      transform: scale(1.2);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 80px;
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .header {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header button {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .header button:hover {
+      background-color: #555;
+    }
+
+    /* Cards */
+    .card {
+      background-color: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h2 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #e0e0e0;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8f9fa;
+      font-weight: 500;
+      color: #666;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+    tr:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Buttons */
+    button {
+      padding: 8px 16px;
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #f0f0f0;
+      border-color: #ccc;
+    }
+
+    /* Graphs Placeholder */
+    .graph-placeholder {
+      background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border-radius: 15px;
+      color: #888;
+      font-size: 18px;
+    }
+
+    .loader {
+      border: 4px solid #f0f0f0;
+      border-top: 4px solid #333;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+      }
+      .sidebar .logo {
+        font-size: 20px;
+      }
+      .sidebar ul li a {
+        font-size: 16px;
+      }
+      .main-content {
+        margin-left: 60px;
+        padding: 15px;
+      }
+      .header {
+        font-size: 24px;
+      }
+      .card {
+        padding: 15px;
+      }
+      table, th, td {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">A</div>
+    <ul>
+      <li><a href="#" title="Verified Reports"><i class="fas fa-check-circle"></i></a></li>
+      <li><a href="#" title="Pending Reports"><i class="fas fa-clock"></i></a></li>
+      <li><a href="#" title="Crime Map"><i class="fas fa-map"></i></a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header">
+      Admin Dashboard
+      <button onclick="window.location.href='login.html'">Back to Login</button>
+    </div>
+
+    <!-- Reported Incidents -->
+    <div class="card">
+      <h2>Reported Incidents</h2>
+      <table id="incidents-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Location</th>
+            <th>Crime Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Crime Analytics -->
+    <div class="card">
+      <h2>Crime Analytics</h2>
+      <canvas id="crimeChart"></canvas>
+    </div>
+
+    <!-- User Management -->
+    <div class="card">
+      <h2>User Management</h2>
+      <table id="user-table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Rewards Management -->
+    <div class="card">
+      <h2>Rewards Management</h2>
+      <table id="rewards-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Reward Amount</th>
+            <th>Incident Details</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Dark Mode Toggle
+    const themeToggle = document.getElementById("theme-toggle");
+    const body = document.body;
+
+    themeToggle.addEventListener("click", () => {
+      body.classList.toggle("dark-mode");
+      themeToggle.innerHTML = body.classList.contains("dark-mode") ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    // Sample Data
+    const incidents = [
+      { user: "John Doe", location: "New York", crimeType: "Theft", status: "Verified" },
+      { user: "Jane Smith", location: "Los Angeles", crimeType: "Burglary", status: "Pending" },
+      { user: "Alice Johnson", location: "Chicago", crimeType: "Assault", status: "Verified" }
+    ];
+
+    const users = [
+      { id: 1, email: "john.doe@example.com", status: "Active" },
+      { id: 2, email: "jane.smith@example.com", status: "Inactive" }
+    ];
+
+    const rewards = [
+      { user: "John Doe", amount: "$500", details: "Theft reported on 5th Street", status: "Pending" },
+      { user: "Jane Smith", amount: "$300", details: "Burglary reported on 10th Avenue", status: "Approved" }
+    ];
+
+    // Populate Reported Incidents Table
+    const incidentsTable = document.querySelector("#incidents-table tbody");
+    incidents.forEach(incident => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${incident.user}</td>
+        <td>${incident.location}</td>
+        <td>${incident.crimeType}</td>
+        <td>${incident.status}</td>
+        <td><button onclick="viewIncident('${incident.user}')">View</button></td>
+      `;
+      incidentsTable.appendChild(row);
+    });
+
+    // Populate User Management Table
+    const userTable = document.querySelector("#user-table tbody");
+    users.forEach(user => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.email}</td>
+        <td>${user.status}</td>
+        <td>
+          <button onclick="editUser(${user.id})">Edit</button>
+          <button onclick="deleteUser(${user.id})">Delete</button>
+        </td>
+      `;
+      userTable.appendChild(row);
+    });
+
+    // Populate Rewards Management Table
+    const rewardsTable = document.querySelector("#rewards-table tbody");
+    rewards.forEach(reward => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${reward.user}</td>
+        <td>${reward.amount}</td>
+        <td>${reward.details}</td>
+        <td>${reward.status}</td>
+        <td>
+          <button onclick="approveReward('${reward.user}')">Approve</button>
+          <button onclick="rejectReward('${reward.user}')">Reject</button>
+        </td>
+      `;
+      rewardsTable.appendChild(row);
+    });
+
+    // Button Actions
+    function viewIncident(user) {
+      alert(`Viewing incident reported by ${user}`);
+    }
+
+    function editUser(id) {
+      alert(`Editing user with ID: ${id}`);
+    }
+
+    function deleteUser(id) {
+      if (confirm(`Are you sure you want to delete user with ID: ${id}?`)) {
+        alert(`User with ID: ${id} deleted`);
+      }
+    }
+
+    function approveReward(user) {
+      alert(`Reward for ${user} approved`);
+    }
+
+    function rejectReward(user) {
+      alert(`Reward for ${user} rejected`);
+    }
+
+    // Chart.js for Crime Analytics
+    const ctx = document.getElementById('crimeChart').getContext('2d');
+    const crimeChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Theft', 'Burglary', 'Assault', 'Vandalism', 'Fraud'],
+        datasets: [{
+          label: 'Incidents Reported',
+          data: [12, 19, 8, 5, 3],
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

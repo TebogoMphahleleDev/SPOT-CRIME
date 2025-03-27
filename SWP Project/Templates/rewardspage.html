@@ -3,128 +3,502 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Rewards</title>
+  <title>Your Rewards | Thusang Safety</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --gray: #64748b;
+      --light-gray: #e2e8f0;
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      background-color: #ffffff; 
-      color: #333333; 
+      box-sizing: border-box;
     }
-    header {
-      background-color: #007bff; 
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .reward-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: white;
-      padding: 20px;
+      padding: 1.5rem;
       text-align: center;
-      font-size: 24px;
-      font-weight: bold;
       position: relative;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
+    .reward-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
     .back-button {
       position: absolute;
-      left: 20px;
+      left: 1.5rem;
       top: 50%;
       transform: translateY(-50%);
-      background-color: transparent;
+      background: rgba(255, 255, 255, 0.2);
       border: none;
       color: white;
-      font-size: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
+
     .back-button:hover {
-      text-decoration: underline;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-50%) scale(1.05);
     }
-    .main-section {
-      padding: 20px;
+
+    /* Main Content */
+    .reward-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1.5rem;
     }
-    .points-balance {
-      font-size: 28px;
-      font-weight: bold;
+
+    /* Points Balance */
+    .points-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
       text-align: center;
-      margin-bottom: 30px;
-      color: #007bff; 
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
     }
-    .redeem-options {
-      margin-bottom: 30px;
-    }
-    .redeem-options h2, .history h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
-      color: #007bff; 
-    }
-    .redeem-options button {
-      display: block;
+
+    .points-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      padding: 15px;
-      margin-bottom: 10px;
-      background-color: #f8f9fa; 
-      border: 1px solid #dddddd; 
-      border-radius: 8px;
-      font-size: 16px;
+      height: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+    }
+
+    .points-balance {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 1rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .points-balance i {
+      margin-right: 0.5rem;
+      color: var(--accent);
+    }
+
+    .points-label {
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    .progress-container {
+      margin-top: 1.5rem;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--light-gray);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 30%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      border-radius: 4px;
+    }
+
+    /* Reward Options */
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 0.5rem;
+      color: var(--primary);
+    }
+
+    .reward-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .reward-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
       cursor: pointer;
-      text-align: left;
-      color: #333333; 
-    }
-    .redeem-options button:hover {
-      background-color: #e9ecef; 
-    }
-    .history ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    .history ul li {
-      background-color: #f8f9fa; 
-      padding: 15px;
-      margin-bottom: 10px;
-      border: 1px solid #dddddd; 
-      border-radius: 8px;
-      color: #333333; 
-    }
-    footer {
+      border: 1px solid var(--light-gray);
       text-align: center;
-      padding: 20px;
-      background-color: #007bff; 
+    }
+
+    .reward-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+
+    .reward-card.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reward-card.disabled::after {
+      content: 'Need 1000 points';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .reward-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .reward-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .reward-points {
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .reward-description {
+      color: var(--gray);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .redeem-btn {
+      background: var(--primary);
       color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
     }
-    footer a {
-      color: #ffffff; 
+
+    .redeem-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .redeem-btn:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+    }
+
+    /* Reward History */
+    .history-list {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .history-item {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--light-gray);
+      display: flex;
+      align-items: center;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      color: var(--success);
+    }
+
+    .history-content {
+      flex: 1;
+    }
+
+    .history-title {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .history-date {
+      color: var(--gray);
+      font-size: 0.75rem;
+    }
+
+    .history-points {
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray);
+    }
+
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--light-gray);
+    }
+
+    /* Footer */
+    .reward-footer {
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      color: var(--gray);
+      font-size: 0.875rem;
+    }
+
+    .reward-footer a {
+      color: var(--primary);
       text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
     }
-    footer a:hover {
+
+    .reward-footer a:hover {
       text-decoration: underline;
+    }
+
+    .reward-footer i {
+      margin-right: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .points-balance {
+        font-size: 2rem;
+      }
+      
+      .reward-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <button class="back-button" onclick="window.location.href='/dashboard'">← Back</button>
-    Your Rewards
+  <header class="reward-header">
+    <button class="back-button" onclick="window.location.href='/dashboard'">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1>Your Rewards</h1>
   </header>
 
-  <div class="main-section">
-    <div class="points-balance">
-      You have <span>0 points</span>
+  <div class="reward-container">
+    <!-- Points Balance -->
+    <div class="points-card">
+      <p class="points-label">Your current balance</p>
+      <div class="points-balance">
+        <i class="fas fa-coins"></i>
+        <span>1,350</span>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-label">
+          <span>0 points</span>
+          <span>2,000 points for next reward</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="redeem-options">
-      <h2>Redeem Options</h2>
-      <button>Redeem R100 voucher for Shoprite</button>
-      <button>Redeem R200 voucher for Takealot</button>
-      <button>Redeem R50 cash</button>
-      <button>Redeem R100 cash</button>
+    <!-- Redeem Options -->
+    <h2 class="section-title">
+      <i class="fas fa-gift"></i>
+      <span>Available Rewards</span>
+    </h2>
+    
+    <div class="reward-grid">
+      <div class="reward-card">
+        <div class="reward-icon">
+          <i class="fas fa-shopping-bag"></i>
+        </div>
+        <h3 class="reward-title">Shoprite Voucher</h3>
+        <div class="reward-points">1,000 points</div>
+        <p class="reward-description">R100 shopping voucher redeemable at any Shoprite store</p>
+        <button class="redeem-btn">Redeem Now</button>
+      </div>
+      
+      <div class="reward-card">
+        <div class="reward-icon">
+          <i class="fas fa-box"></i>
+        </div>
+        <h3 class="reward-title">Takealot Voucher</h3>
+        <div class="reward-points">2,000 points</div>
+        <p class="reward-description">R200 voucher for online shopping at Takealot</p>
+        <button class="redeem-btn" disabled>Not Enough Points</button>
+      </div>
+      
+      <div class="reward-card">
+        <div class="reward-icon">
+          <i class="fas fa-rand-sign"></i>
+        </div>
+        <h3 class="reward-title">Cash Reward</h3>
+        <div class="reward-points">500 points</div>
+        <p class="reward-description">R50 cash transfer to your bank account</p>
+        <button class="redeem-btn">Redeem Now</button>
+      </div>
+      
+      <div class="reward-card disabled">
+        <div class="reward-icon">
+          <i class="fas fa-money-bill-wave"></i>
+        </div>
+        <h3 class="reward-title">Cash Reward</h3>
+        <div class="reward-points">1,000 points</div>
+        <p class="reward-description">R100 cash transfer to your bank account</p>
+        <button class="redeem-btn">Redeem Now</button>
+      </div>
     </div>
 
-    <div class="history">
-      <h2>History</h2>
-      <ul>
-        <li>No rewards earned or redeemed yet.</li>
-      </ul>
+    <!-- Reward History -->
+    <h2 class="section-title">
+      <i class="fas fa-history"></i>
+      <span>Reward History</span>
+    </h2>
+    
+    <div class="history-list">
+      <div class="history-item">
+        <div class="history-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="history-content">
+          <h4 class="history-title">Points Earned</h4>
+          <p class="history-date">Today, 10:45 AM</p>
+        </div>
+        <div class="history-points">+50</div>
+      </div>
+      
+      <div class="history-item">
+        <div class="history-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <div class="history-content">
+          <h4 class="history-title">Shoprite Voucher</h4>
+          <p class="history-date">Yesterday, 3:22 PM</p>
+        </div>
+        <div class="history-points">-1,000</div>
+      </div>
+      
+      <div class="history-item">
+        <div class="history-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="history-content">
+          <h4 class="history-title">Points Earned</h4>
+          <p class="history-date">Monday, 9:15 AM</p>
+        </div>
+        <div class="history-points">+100</div>
+      </div>
+      
+      <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>No more history to show</p>
+      </div>
     </div>
   </div>
 
-  <footer>
-    <a href="#">How to earn more points</a>
+  <footer class="reward-footer">
+    <a href="#">
+      <i class="fas fa-question-circle"></i>
+      How to earn more points
+    </a>
   </footer>
+
+  <script>
+    // Simple confirmation for redemption
+    document.querySelectorAll('.redeem-btn').forEach(button => {
+      if (!button.disabled) {
+        button.addEventListener('click', function(e) {
+          if (confirm('Are you sure you want to redeem this reward?')) {
+            alert('Reward redeemed successfully!');
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>

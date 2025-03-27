@@ -1,0 +1,161 @@
+<!-- emergency.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Panic Button</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .emergency-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        .panic-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px auto;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .panic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(220,53,69,0.5);
+        }
+        .countdown {
+            font-size: 48px;
+            color: #dc3545;
+            margin: 20px 0;
+            display: none;
+        }
+        .instructions {
+            margin: 20px 0;
+            color: #6c757d;
+        }
+        .cancel-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency-container">
+        <h1>Emergency Panic Button</h1>
+        <div class="instructions">
+            <p>In case of emergency, press the button below. Your trusted contacts and local authorities will be notified.</p>
+            <p>If you don't cancel within 10 seconds, emergency services will be alerted with your location.</p>
+        </div>
+        <button class="panic-button" id="panicButton">EMERGENCY</button>
+        <div class="countdown" id="countdown">10</div>
+        <button class="cancel-button" id="cancelButton">CANCEL</button>
+    </div>
+
+    <script>
+        const panicButton = document.getElementById('panicButton');
+        const countdown = document.getElementById('countdown');
+        const cancelButton = document.getElementById('cancelButton');
+        let countdownInterval;
+        let seconds = 10;
+
+        panicButton.addEventListener('click', () => {
+            // Start emergency sequence
+            panicButton.style.display = 'none';
+            countdown.style.display = 'block';
+            cancelButton.style.display = 'inline-block';
+            
+            // Get user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        // Store location for emergency services
+                        localStorage.setItem('emergencyLocation', JSON.stringify({
+                            lat: latitude,
+                            lng: longitude
+                        }));
+                    },
+                    (error) => {
+                        console.error("Error getting location:", error);
+                    }
+                );
+            }
+
+            // Start countdown
+            countdownInterval = setInterval(() => {
+                seconds--;
+                countdown.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    triggerEmergency();
+                }
+            }, 1000);
+        });
+
+        cancelButton.addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            resetEmergencyUI();
+        });
+
+        function triggerEmergency() {
+            // Send emergency alert to server
+            const location = JSON.parse(localStorage.getItem('emergencyLocation') || null;
+            
+            fetch('/trigger_emergency', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    location: location,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Emergency services have been notified!');
+                resetEmergencyUI();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Emergency signal sent! Help is on the way.');
+                resetEmergencyUI();
+            });
+        }
+
+        function resetEmergencyUI() {
+            clearInterval(countdownInterval);
+            seconds = 10;
+            countdown.textContent = seconds;
+            panicButton.style.display = 'block';
+            countdown.style.display = 'none';
+            cancelButton.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

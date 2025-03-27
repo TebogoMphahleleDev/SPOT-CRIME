@@ -6,178 +6,260 @@
     <title>Login - Thusang Community Safety Platform</title>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #4a90e2, #1453a3);
+        /* Modern Reset */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            padding: 20px;
         }
 
-        /* Container Styles */
-        .container {
-            width: 300px;
+        /* Card Container */
+        .login-card {
+            width: 100%;
+            max-width: 380px;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Header Section */
+        .card-header {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 24px;
             text-align: center;
         }
 
-        .container h2 {
-            margin-bottom: 20px;
-            color: #4a90e2;
+        .card-header h2 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 4px;
         }
 
-        /* Form Styles */
+        .card-header p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Form Section */
+        .card-body {
+            padding: 28px;
+        }
+
+        /* Form Elements */
         .form-group {
-            margin-bottom: 15px;
-            text-align: left;
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
-            margin-bottom: 5px;
-            color: #333;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #334155;
         }
 
-        .form-group input {
+        .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box; /* Ensure padding doesn't affect width */
+            padding: 12px 16px 12px 40px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
         }
 
-        .form-group input:focus {
+        .form-control:focus {
             outline: none;
-            border-color: #4a90e2;
-            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: white;
         }
 
-        /* Button Styles */
-        button {
+        .form-icon {
+            position: absolute;
+            left: 14px;
+            top: 38px;
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        /* Button */
+        .btn {
             width: 100%;
-            padding: 10px;
-            background: #4a90e2;
+            padding: 12px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             border: none;
             color: white;
-            font-size: 16px;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            margin-top: 8px;
         }
 
-        button:hover {
-            background: #1453a3;
+        .btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
         }
 
-        /* Minimalistic Link Styles */
-        .back-to-signup {
-            display: inline-block;
-            margin-top: 15px;
-            color: #4a90e2;
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Links */
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.8125rem;
+        }
+
+        .auth-link {
+            color: #3b82f6;
             text-decoration: none;
-            font-size: 14px;
-            position: relative;
-            transition: color 0.3s;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s ease;
         }
 
-        .back-to-signup::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: #4a90e2;
-            bottom: -2px;
-            left: 0;
-            transform: scaleX(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease;
+        .auth-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
         }
 
-        .back-to-signup:hover {
-            color: #1453a3;
+        .auth-link i {
+            margin-right: 6px;
+            font-size: 0.75rem;
         }
 
-        .back-to-signup:hover::after {
-            transform: scaleX(1);
-            transform-origin: bottom left;
+        /* Flash Messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
         }
 
-        /* Icon Styles */
-        .back-to-signup i {
-            margin-right: 5px;
+        .alert i {
+            margin-right: 10px;
+            font-size: 1rem;
         }
 
-        /* Flash Message Styles */
-        .flash {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-size: 14px;
+        .alert-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
         }
 
-        .flash.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
         }
 
-        .flash.danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
         }
 
-        .flash.warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .login-card {
+                border-radius: 0;
+                box-shadow: none;
+            }
+            
+            body {
+                padding: 0;
+                background: white;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>LOGIN</h2>
+    <div class="login-card">
+        <div class="card-header">
+            <h2>Welcome Back</h2>
+            <p>Login to your Thusang account</p>
+        </div>
 
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        <div class="card-body">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}exclamation-triangle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        <form action="/login" method="POST">
-            <div class="form-group">
-                <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <i class="fas fa-envelope form-icon"></i>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <i class="fas fa-lock form-icon"></i>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user-type" class="form-label">Account Type</label>
+                    <i class="fas fa-user form-icon"></i>
+                    <select id="user-type" name="user-type" class="form-control" required>
+                        <option value="user">Community Member</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <div class="auth-links">
+                <a href="/signup" class="auth-link">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </a>
+                <a href="/reset_password" class="auth-link">
+                    <i class="fas fa-key"></i> Forgot Password?
+                </a>
             </div>
-            <div class="form-group">
-                <label for="password"><i class="fas fa-lock"></i> Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-
-        <!-- Minimalistic "Sign Up" Link with Icon -->
-        <a href="/signup" class="back-to-signup">
-            <i class="fas fa-user-plus"></i> Sign Up
-        </a>
-
-        <!-- Minimalistic "Forgot Password" Link with Icon -->
-        <a href="/reset_password" class="back-to-signup">
-            <i class="fas fa-key"></i> Forgot Password
-        </a>
+        </div>
     </div>
 </body>
 </html>
