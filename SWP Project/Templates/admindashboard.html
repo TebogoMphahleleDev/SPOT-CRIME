@@ -5,73 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Global Styles */
+    :root {
+      --primary-color: #4361ee;
+      --primary-light: #e0e7ff;
+      --secondary-color: #3f37c9;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --dark-color: #1e293b;
+      --light-color: #f8fafc;
+      --gray-color: #94a3b8;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f8f9fa;
-      color: #333;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      background-color: #f1f5f9;
+      color: var(--dark-color);
+      transition: all 0.3s ease;
     }
 
     /* Dark Mode */
     .dark-mode {
-      background-color: #1a1a1a;
-      color: #f0f0f0;
+      background-color: #0f172a;
+      color: #f8fafc;
     }
 
     .dark-mode .sidebar {
-      background-color: #222;
+      background-color: #1e293b;
+      border-right: 1px solid #334155;
     }
 
     .dark-mode .card {
-      background-color: #2a2a2a;
-      color: #f0f0f0;
+      background-color: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
     }
 
-    .dark-mode table, .dark-mode th, .dark-mode td {
-      border-color: #444;
+    .dark-mode table, 
+    .dark-mode th, 
+    .dark-mode td {
+      border-color: #334155;
     }
 
     .dark-mode th {
-      background-color: #333;
-      color: #f0f0f0;
+      background-color: #334155;
+      color: #f8fafc;
     }
 
     .dark-mode tr:nth-child(even) {
-      background-color: #333;
+      background-color: #1e293b;
     }
 
     .dark-mode tr:hover {
-      background-color: #444;
+      background-color: #334155;
     }
 
     .dark-mode button {
-      background-color: #333;
-      color: #f0f0f0;
-      border-color: #444;
+      background-color: #334155;
+      color: #f8fafc;
+      border-color: #475569;
     }
 
     .dark-mode button:hover {
-      background-color: #444;
-    }
-
-    .dark-mode .graph-placeholder {
-      background-color: #333;
-      color: #888;
+      background-color: #475569;
     }
 
     /* Sidebar */
     .sidebar {
       width: 80px;
-      background-color: #fff;
+      background-color: white;
       height: 100vh;
       position: fixed;
       top: 0;
@@ -80,15 +99,23 @@
       flex-direction: column;
       align-items: center;
       padding: 20px 0;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-      transition: background-color 0.3s ease;
+      box-shadow: var(--card-shadow);
+      z-index: 100;
+      transition: all 0.3s ease;
     }
 
     .sidebar .logo {
       font-size: 24px;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 40px;
-      color: #333;
+      color: var(--primary-color);
+      background-color: var(--primary-light);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
     }
 
     .sidebar ul {
@@ -99,31 +126,69 @@
     }
 
     .sidebar ul li {
-      margin: 20px 0;
+      margin: 12px 0;
       text-align: center;
+      position: relative;
     }
 
     .sidebar ul li a {
-      color: #666;
+      color: var(--gray-color);
       text-decoration: none;
       font-size: 18px;
       display: block;
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
       transition: all 0.3s ease;
+      position: relative;
     }
 
+    .sidebar ul li a.active,
     .sidebar ul li a:hover {
-      background-color: #f0f0f0;
-      color: #333;
+      background-color: var(--primary-light);
+      color: var(--primary-color);
+    }
+
+    .sidebar ul li a:hover i {
+      transform: scale(1.2);
+    }
+
+    .sidebar ul li a.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 60%;
+      background-color: var(--primary-color);
+      border-radius: 0 4px 4px 0;
     }
 
     .sidebar ul li a i {
       transition: transform 0.3s ease;
     }
 
-    .sidebar ul li a:hover i {
-      transform: scale(1.2);
+    .sidebar ul li .tooltip {
+      position: absolute;
+      left: 90px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: var(--dark-color);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    .sidebar ul li:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
     }
 
     /* Main Content */
@@ -133,50 +198,109 @@
       transition: margin-left 0.3s ease;
     }
 
+    /* Header */
     .header {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #333;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
     }
 
-    .header button {
-      background-color: #333;
-      color: #fff;
-      border: none;
+    .dark-mode .header {
+      border-bottom-color: #334155;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    .dark-mode .header h1 {
+      color: #f8fafc;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-actions button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       padding: 8px 16px;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-weight: 500;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
-    .header button:hover {
-      background-color: #555;
+    .header-actions .logout-btn {
+      background-color: var(--danger-color);
+      color: white;
+      border: none;
+    }
+
+    .header-actions .logout-btn:hover {
+      background-color: #dc2626;
+    }
+
+    .header-actions .theme-toggle {
+      background-color: var(--light-color);
+      color: var(--dark-color);
+      border: 1px solid #e2e8f0;
+    }
+
+    .dark-mode .header-actions .theme-toggle {
+      background-color: #334155;
+      color: #f8fafc;
+      border-color: #475569;
+    }
+
+    .header-actions .theme-toggle:hover {
+      background-color: #e2e8f0;
+    }
+
+    .dark-mode .header-actions .theme-toggle:hover {
+      background-color: #475569;
     }
 
     /* Cards */
     .card {
-      background-color: #fff;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      background-color: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--card-shadow);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #e2e8f0;
     }
 
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--card-shadow-hover);
     }
 
     .card h2 {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 15px;
-      color: #333;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--dark-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dark-mode .card h2 {
+      color: #f8fafc;
+    }
+
+    .card h2 i {
+      color: var(--primary-color);
     }
 
     /* Tables */
@@ -184,71 +308,131 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
+      font-size: 14px;
     }
 
     table, th, td {
-      border: 1px solid #e0e0e0;
+      border: 1px solid #e2e8f0;
     }
 
     th, td {
-      padding: 12px;
+      padding: 12px 16px;
       text-align: left;
     }
 
     th {
-      background-color: #f8f9fa;
-      font-weight: 500;
-      color: #666;
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
     }
 
     tr:nth-child(even) {
-      background-color: #f8f9fa;
+      background-color: #f8fafc;
     }
 
     tr:hover {
-      background-color: #f0f0f0;
+      background-color: #f1f5f9;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-verified {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-active {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background-color: #fee2e2;
+      color: #92400e;
+    }
+
+    .status-approved {
+      background-color: #d1fae5;
+      color: #065f46;
     }
 
     /* Buttons */
     button {
       padding: 8px 16px;
-      background-color: #fff;
-      color: #333;
-      border: 1px solid #e0e0e0;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 500;
       transition: all 0.3s ease;
+      border: none;
     }
 
-    button:hover {
-      background-color: #f0f0f0;
-      border-color: #ccc;
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
     }
 
-    /* Graphs Placeholder */
-    .graph-placeholder {
-      background-color: #f8f9fa;
-      padding: 20px;
-      text-align: center;
-      border-radius: 15px;
-      color: #888;
-      font-size: 18px;
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
     }
 
-    .loader {
-      border: 4px solid #f0f0f0;
-      border-top: 4px solid #333;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .btn-success:hover {
+      background-color: #059669;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background-color: #d97706;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Charts */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
     }
 
     /* Responsive Design */
@@ -256,24 +440,22 @@
       .sidebar {
         width: 60px;
       }
-      .sidebar .logo {
-        font-size: 20px;
-      }
-      .sidebar ul li a {
-        font-size: 16px;
-      }
       .main-content {
         margin-left: 60px;
         padding: 15px;
       }
-      .header {
-        font-size: 24px;
+      .header h1 {
+        font-size: 20px;
       }
       .card {
-        padding: 15px;
+        padding: 16px;
       }
-      table, th, td {
-        font-size: 14px;
+      th, td {
+        padding: 8px 12px;
+      }
+      .btn-group {
+        flex-direction: column;
+        gap: 6px;
       }
     }
   </style>
@@ -283,9 +465,42 @@
   <div class="sidebar">
     <div class="logo">A</div>
     <ul>
-      <li><a href="#" title="Verified Reports"><i class="fas fa-check-circle"></i></a></li>
-      <li><a href="#" title="Pending Reports"><i class="fas fa-clock"></i></a></li>
-      <li><a href="#" title="Crime Map"><i class="fas fa-map"></i></a></li>
+      <li>
+        <a href="#" title="Dashboard" class="active">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="tooltip">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" title="Verified Reports">
+          <i class="fas fa-check-circle"></i>
+          <span class="tooltip">Verified Reports</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" title="Pending Reports">
+          <i class="fas fa-clock"></i>
+          <span class="tooltip">Pending Reports</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" title="Crime Map">
+          <i class="fas fa-map"></i>
+          <span class="tooltip">Crime Map</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" title="Users">
+          <i class="fas fa-users"></i>
+          <span class="tooltip">User Management</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" title="Rewards">
+          <i class="fas fa-award"></i>
+          <span class="tooltip">Rewards</span>
+        </a>
+      </li>
     </ul>
   </div>
 
@@ -293,13 +508,20 @@
   <div class="main-content">
     <!-- Header -->
     <div class="header">
-      Admin Dashboard
-      <button onclick="window.location.href='login.html'">Back to Login</button>
+      <h1>Admin Dashboard</h1>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="toggleDarkMode()">
+          <i class="fas fa-moon"></i> Dark Mode
+        </button>
+        <button class="logout-btn" onclick="window.location.href='/logout'">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
     </div>
 
     <!-- Reported Incidents -->
     <div class="card">
-      <h2>Reported Incidents</h2>
+      <h2><i class="fas fa-exclamation-triangle"></i> Reported Incidents</h2>
       <table id="incidents-table">
         <thead>
           <tr>
@@ -311,20 +533,69 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Rows will be populated by JavaScript -->
+          <tr>
+            <td>John Doe</td>
+            <td>New York</td>
+            <td>Theft</td>
+            <td><span class="status-badge status-verified">Verified</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-primary btn-sm" onclick="viewIncident('John Doe')">
+                  <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn-danger btn-sm" onclick="deleteIncident('1')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Jane Smith</td>
+            <td>Los Angeles</td>
+            <td>Burglary</td>
+            <td><span class="status-badge status-pending">Pending</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-primary btn-sm" onclick="viewIncident('Jane Smith')">
+                  <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn-success btn-sm" onclick="verifyIncident('2')">
+                  <i class="fas fa-check"></i> Verify
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Alice Johnson</td>
+            <td>Chicago</td>
+            <td>Assault</td>
+            <td><span class="status-badge status-verified">Verified</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-primary btn-sm" onclick="viewIncident('Alice Johnson')">
+                  <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn-danger btn-sm" onclick="deleteIncident('3')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Crime Analytics -->
     <div class="card">
-      <h2>Crime Analytics</h2>
-      <canvas id="crimeChart"></canvas>
+      <h2><i class="fas fa-chart-bar"></i> Crime Analytics</h2>
+      <div class="chart-container">
+        <canvas id="crimeChart"></canvas>
+      </div>
     </div>
 
     <!-- User Management -->
     <div class="card">
-      <h2>User Management</h2>
+      <h2><i class="fas fa-users"></i> User Management</h2>
       <table id="user-table">
         <thead>
           <tr>
@@ -335,14 +606,43 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Rows will be populated by JavaScript -->
+          <tr>
+            <td>1</td>
+            <td>john.doe@example.com</td>
+            <td><span class="status-badge status-active">Active</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-primary btn-sm" onclick="editUser('1')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-danger btn-sm" onclick="deleteUser('1')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>jane.smith@example.com</td>
+            <td><span class="status-badge status-inactive">Inactive</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-primary btn-sm" onclick="editUser('2')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-success btn-sm" onclick="activateUser('2')">
+                  <i class="fas fa-check"></i> Activate
+                </button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Rewards Management -->
     <div class="card">
-      <h2>Rewards Management</h2>
+      <h2><i class="fas fa-award"></i> Rewards Management</h2>
       <table id="rewards-table">
         <thead>
           <tr>
@@ -354,7 +654,38 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Rows will be populated by JavaScript -->
+          <tr>
+            <td>John Doe</td>
+            <td>$500</td>
+            <td>Theft reported on 5th Street</td>
+            <td><span class="status-badge status-pending">Pending</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-success btn-sm" onclick="approveReward('John Doe')">
+                  <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-danger btn-sm" onclick="rejectReward('John Doe')">
+                  <i class="fas fa-times"></i> Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Jane Smith</td>
+            <td>$300</td>
+            <td>Burglary reported on 10th Avenue</td>
+            <td><span class="status-badge status-approved">Approved</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn-primary btn-sm" onclick="viewReward('Jane Smith')">
+                  <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn-danger btn-sm" onclick="revokeReward('Jane Smith')">
+                  <i class="fas fa-undo"></i> Revoke
+                </button>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -363,99 +694,22 @@
   <!-- JavaScript -->
   <script>
     // Dark Mode Toggle
-    const themeToggle = document.getElementById("theme-toggle");
-    const body = document.body;
-
-    themeToggle.addEventListener("click", () => {
-      body.classList.toggle("dark-mode");
-      themeToggle.innerHTML = body.classList.contains("dark-mode") ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
-
-    // Sample Data
-    const incidents = [
-      { user: "John Doe", location: "New York", crimeType: "Theft", status: "Verified" },
-      { user: "Jane Smith", location: "Los Angeles", crimeType: "Burglary", status: "Pending" },
-      { user: "Alice Johnson", location: "Chicago", crimeType: "Assault", status: "Verified" }
-    ];
-
-    const users = [
-      { id: 1, email: "john.doe@example.com", status: "Active" },
-      { id: 2, email: "jane.smith@example.com", status: "Inactive" }
-    ];
-
-    const rewards = [
-      { user: "John Doe", amount: "$500", details: "Theft reported on 5th Street", status: "Pending" },
-      { user: "Jane Smith", amount: "$300", details: "Burglary reported on 10th Avenue", status: "Approved" }
-    ];
-
-    // Populate Reported Incidents Table
-    const incidentsTable = document.querySelector("#incidents-table tbody");
-    incidents.forEach(incident => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${incident.user}</td>
-        <td>${incident.location}</td>
-        <td>${incident.crimeType}</td>
-        <td>${incident.status}</td>
-        <td><button onclick="viewIncident('${incident.user}')">View</button></td>
-      `;
-      incidentsTable.appendChild(row);
-    });
-
-    // Populate User Management Table
-    const userTable = document.querySelector("#user-table tbody");
-    users.forEach(user => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${user.id}</td>
-        <td>${user.email}</td>
-        <td>${user.status}</td>
-        <td>
-          <button onclick="editUser(${user.id})">Edit</button>
-          <button onclick="deleteUser(${user.id})">Delete</button>
-        </td>
-      `;
-      userTable.appendChild(row);
-    });
-
-    // Populate Rewards Management Table
-    const rewardsTable = document.querySelector("#rewards-table tbody");
-    rewards.forEach(reward => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${reward.user}</td>
-        <td>${reward.amount}</td>
-        <td>${reward.details}</td>
-        <td>${reward.status}</td>
-        <td>
-          <button onclick="approveReward('${reward.user}')">Approve</button>
-          <button onclick="rejectReward('${reward.user}')">Reject</button>
-        </td>
-      `;
-      rewardsTable.appendChild(row);
-    });
-
-    // Button Actions
-    function viewIncident(user) {
-      alert(`Viewing incident reported by ${user}`);
-    }
-
-    function editUser(id) {
-      alert(`Editing user with ID: ${id}`);
-    }
-
-    function deleteUser(id) {
-      if (confirm(`Are you sure you want to delete user with ID: ${id}?`)) {
-        alert(`User with ID: ${id} deleted`);
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      const themeToggle = document.querySelector(".theme-toggle");
+      if (document.body.classList.contains("dark-mode")) {
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+        localStorage.setItem('darkMode', 'disabled');
       }
     }
 
-    function approveReward(user) {
-      alert(`Reward for ${user} approved`);
-    }
-
-    function rejectReward(user) {
-      alert(`Reward for ${user} rejected`);
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add("dark-mode");
+      document.querySelector(".theme-toggle").innerHTML = '<i class="fas fa-sun"></i> Light Mode';
     }
 
     // Chart.js for Crime Analytics
@@ -467,19 +721,125 @@
         datasets: [{
           label: 'Incidents Reported',
           data: [12, 19, 8, 5, 3],
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: [
+            'rgba(59, 130, 246, 0.7)',
+            'rgba(16, 185, 129, 0.7)',
+            'rgba(239, 68, 68, 0.7)',
+            'rgba(245, 158, 11, 0.7)',
+            'rgba(139, 92, 246, 0.7)'
+          ],
+          borderColor: [
+            'rgba(59, 130, 246, 1)',
+            'rgba(16, 185, 129, 1)',
+            'rgba(239, 68, 68, 1)',
+            'rgba(245, 158, 11, 1)',
+            'rgba(139, 92, 246, 1)'
+          ],
           borderWidth: 1
         }]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            titleColor: '#f8fafc',
+            bodyColor: '#f8fafc',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 12,
+            usePointStyle: true
+          }
+        },
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            grid: {
+              color: '#e2e8f0',
+              drawBorder: false
+            },
+            ticks: {
+              color: '#64748b'
+            }
+          },
+          x: {
+            grid: {
+              display: false,
+              drawBorder: false
+            },
+            ticks: {
+              color: '#64748b'
+            }
           }
         }
       }
     });
+
+    // Button Actions
+    function viewIncident(user) {
+      alert(`Viewing incident reported by ${user}`);
+    }
+
+    function verifyIncident(id) {
+      if (confirm(`Verify incident ID: ${id}?`)) {
+        alert(`Incident ID: ${id} verified`);
+        // Update UI here
+      }
+    }
+
+    function deleteIncident(id) {
+      if (confirm(`Delete incident ID: ${id}?`)) {
+        alert(`Incident ID: ${id} deleted`);
+        // Update UI here
+      }
+    }
+
+    function editUser(id) {
+      alert(`Editing user with ID: ${id}`);
+    }
+
+    function deleteUser(id) {
+      if (confirm(`Delete user with ID: ${id}?`)) {
+        alert(`User with ID: ${id} deleted`);
+        // Update UI here
+      }
+    }
+
+    function activateUser(id) {
+      if (confirm(`Activate user with ID: ${id}?`)) {
+        alert(`User with ID: ${id} activated`);
+        // Update UI here
+      }
+    }
+
+    function approveReward(user) {
+      if (confirm(`Approve reward for ${user}?`)) {
+        alert(`Reward for ${user} approved`);
+        // Update UI here
+      }
+    }
+
+    function rejectReward(user) {
+      if (confirm(`Reject reward for ${user}?`)) {
+        alert(`Reward for ${user} rejected`);
+        // Update UI here
+      }
+    }
+
+    function viewReward(user) {
+      alert(`Viewing reward for ${user}`);
+    }
+
+    function revokeReward(user) {
+      if (confirm(`Revoke reward for ${user}?`)) {
+        alert(`Reward for ${user} revoked`);
+        // Update UI here
+      }
+    }
   </script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-<!-- emergency.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,18 +81,27 @@
         let countdownInterval;
         let seconds = 10;
 
+        // Get CSRF token from Flask
+        function getCSRFToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrf_token') {
+                    return value;
+                }
+            }
+            return '';
+        }
+
         panicButton.addEventListener('click', () => {
-            // Start emergency sequence
             panicButton.style.display = 'none';
             countdown.style.display = 'block';
             cancelButton.style.display = 'inline-block';
             
-            // Get user's location
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const { latitude, longitude } = position.coords;
-                        // Store location for emergency services
                         localStorage.setItem('emergencyLocation', JSON.stringify({
                             lat: latitude,
                             lng: longitude
@@ -105,7 +113,6 @@
                 );
             }
 
-            // Start countdown
             countdownInterval = setInterval(() => {
                 seconds--;
                 countdown.textContent = seconds;
@@ -123,22 +130,32 @@
         });
 
         function triggerEmergency() {
-            // Send emergency alert to server
-            const location = JSON.parse(localStorage.getItem('emergencyLocation') || null;
+            const location = JSON.parse(localStorage.getItem('emergencyLocation') || '{}');
+            const csrfToken = getCSRFToken();
             
-            fetch('/trigger_emergency', {
+            fetch('/emergency', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({
-                    location: location,
-                    timestamp: new Date().toISOString()
+                    latitude: location.lat,
+                    longitude: location.lng
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                alert('Emergency services have been notified!');
+                if (data.success) {
+                    alert('Emergency alert triggered successfully!');
+                } else {
+                    alert('Error: ' + data.message);
+                }
                 resetEmergencyUI();
             })
             .catch(error => {
