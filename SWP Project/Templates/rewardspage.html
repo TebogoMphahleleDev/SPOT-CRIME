@@ -345,6 +345,30 @@
     .reward-footer i {
       margin-right: 0.5rem;
     }
+    
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-verified {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-approved {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
 
     /* Responsive */
     @media (max-width: 480px) {
@@ -368,11 +392,11 @@
 
   <div class="reward-container">
     <!-- Points Balance -->
-    <div class="points-card">
+  <div class="points-card">
       <p class="points-label">Your current balance</p>
       <div class="points-balance">
         <i class="fas fa-coins"></i>
-        <span>1,350</span>
+        <span>{{ user.points if user and user.points else 0 }}</span>
       </div>
       
       <div class="progress-container">
@@ -381,7 +405,7 @@
           <span>2,000 points for next reward</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill"></div>
+          <div class="progress-fill" style="width: {{ (user.points / 2000) * 100 if user and user.points else 0 }}%"></div>
         </div>
       </div>
     </div>
@@ -393,91 +417,66 @@
     </h2>
     
     <div class="reward-grid">
-      <div class="reward-card">
+      {% for reward in reward_options %}
+      <div class="reward-card {% if user.points < reward.points %}disabled{% endif %}">
         <div class="reward-icon">
+          {% if 'Shoprite' in reward.title %}
           <i class="fas fa-shopping-bag"></i>
-        </div>
-        <h3 class="reward-title">Shoprite Voucher</h3>
-        <div class="reward-points">1,000 points</div>
-        <p class="reward-description">R100 shopping voucher redeemable at any Shoprite store</p>
-        <button class="redeem-btn">Redeem Now</button>
-      </div>
-      
-      <div class="reward-card">
-        <div class="reward-icon">
+          {% elif 'Takealot' in reward.title %}
           <i class="fas fa-box"></i>
-        </div>
-        <h3 class="reward-title">Takealot Voucher</h3>
-        <div class="reward-points">2,000 points</div>
-        <p class="reward-description">R200 voucher for online shopping at Takealot</p>
-        <button class="redeem-btn" disabled>Not Enough Points</button>
-      </div>
-      
-      <div class="reward-card">
-        <div class="reward-icon">
-          <i class="fas fa-rand-sign"></i>
-        </div>
-        <h3 class="reward-title">Cash Reward</h3>
-        <div class="reward-points">500 points</div>
-        <p class="reward-description">R50 cash transfer to your bank account</p>
-        <button class="redeem-btn">Redeem Now</button>
-      </div>
-      
-      <div class="reward-card disabled">
-        <div class="reward-icon">
+          {% else %}
           <i class="fas fa-money-bill-wave"></i>
+          {% endif %}
         </div>
-        <h3 class="reward-title">Cash Reward</h3>
-        <div class="reward-points">1,000 points</div>
-        <p class="reward-description">R100 cash transfer to your bank account</p>
-        <button class="redeem-btn">Redeem Now</button>
+        <h3 class="reward-title">{{ reward.title }}</h3>
+        <div class="reward-points">{{ reward.points }} points</div>
+        <p class="reward-description">{{ reward.description }}</p>
+        <button class="redeem-btn" 
+                data-reward-id="{{ reward.id }}" 
+                data-title="{{ reward.title }}" 
+                data-points="{{ reward.points }}"
+                {% if user.points < reward.points %}disabled{% endif %}>
+          {% if user.points < reward.points %}Not Enough Points{% else %}Redeem Now{% endif %}
+        </button>
       </div>
+      {% endfor %}
     </div>
 
     <!-- Reward History -->
     <h2 class="section-title">
       <i class="fas fa-history"></i>
-      <span>Reward History</span>
+      <span>Your Vouchers</span>
     </h2>
     
     <div class="history-list">
-      <div class="history-item">
-        <div class="history-icon">
-          <i class="fas fa-coins"></i>
+      {% if vouchers %}
+        {% for voucher in vouchers %}
+        <div class="history-item" style="cursor: pointer;">
+          <div class="history-icon">
+            <i class="fas fa-gift"></i>
+          </div>
+          <div class="history-content">
+            <h4 class="history-title" data-reward-type="{{ voucher.reward_type }}">{{ voucher.reward_type }} 
+              {% if voucher.is_approved %}
+                <span class="status-badge status-approved" data-status="Approved">Approved</span>
+              {% elif voucher.is_redeemed %}
+                <span class="status-badge status-verified" data-status="Redeemed">Redeemed</span>
+              {% else %}
+                <span class="status-badge status-pending" data-status="Pending">Pending</span>
+              {% endif %}
+            </h4>
+            <p class="history-date">{{ voucher.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+            <p data-voucher-code="{{ voucher.voucher_code }}"><strong>Voucher Code:</strong> {{ voucher.voucher_code }}</p>
+          </div>
+          <div class="history-points">-{{ voucher.points_cost }}</div>
         </div>
-        <div class="history-content">
-          <h4 class="history-title">Points Earned</h4>
-          <p class="history-date">Today, 10:45 AM</p>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>No vouchers redeemed yet</p>
         </div>
-        <div class="history-points">+50</div>
-      </div>
-      
-      <div class="history-item">
-        <div class="history-icon">
-          <i class="fas fa-gift"></i>
-        </div>
-        <div class="history-content">
-          <h4 class="history-title">Shoprite Voucher</h4>
-          <p class="history-date">Yesterday, 3:22 PM</p>
-        </div>
-        <div class="history-points">-1,000</div>
-      </div>
-      
-      <div class="history-item">
-        <div class="history-icon">
-          <i class="fas fa-coins"></i>
-        </div>
-        <div class="history-content">
-          <h4 class="history-title">Points Earned</h4>
-          <p class="history-date">Monday, 9:15 AM</p>
-        </div>
-        <div class="history-points">+100</div>
-      </div>
-      
-      <div class="empty-state">
-        <i class="fas fa-inbox"></i>
-        <p>No more history to show</p>
-      </div>
+      {% endif %}
     </div>
   </div>
 
@@ -489,15 +488,174 @@
   </footer>
 
   <script>
-    // Simple confirmation for redemption
-    document.querySelectorAll('.redeem-btn').forEach(button => {
-      if (!button.disabled) {
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle redemption
+      document.querySelectorAll('.redeem-btn:not([disabled])').forEach(button => {
         button.addEventListener('click', function(e) {
-          if (confirm('Are you sure you want to redeem this reward?')) {
-            alert('Reward redeemed successfully!');
+          const rewardId = this.dataset.rewardId;
+          const rewardTitle = this.dataset.title;
+          const pointsCost = parseInt(this.dataset.points, 10);
+          
+          if (confirm(`Are you sure you want to redeem ${rewardTitle} for ${pointsCost} points?`)) {
+            // Display loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            this.disabled = true;
+            
+            // Make API call to redeem reward
+            fetch('/redeem_reward', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                reward_id: rewardId,
+                reward_title: rewardTitle,
+                points_cost: pointsCost
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                // Show success message with voucher code
+                const successMessage = `
+                  <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success); margin-bottom: 15px;"></i>
+                    <h2 style="margin-bottom: 15px;">Congratulations!</h2>
+                    <p>You've successfully redeemed ${rewardTitle}.</p>
+                    <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                      <p style="margin-bottom: 5px; font-weight: bold;">Your Voucher Code:</p>
+                      <h3 style="letter-spacing: 2px; font-family: monospace;">${data.voucher_code}</h3>
+                    </div>
+                    <p>Your new balance: <strong>${data.remaining_points} points</strong></p>
+                    <button onclick="window.location.reload()" style="margin-top: 15px; background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                      Continue
+                    </button>
+                  </div>
+                `;
+                
+                // Create modal to display success message
+                const modal = document.createElement('div');
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100%';
+                modal.style.height = '100%';
+                modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                modal.style.display = 'flex';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                modal.style.zIndex = '1000';
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.backgroundColor = 'white';
+                modalContent.style.borderRadius = '8px';
+                modalContent.style.width = '90%';
+                modalContent.style.maxWidth = '500px';
+                modalContent.style.maxHeight = '90vh';
+                modalContent.style.overflow = 'auto';
+                modalContent.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+                
+                modalContent.innerHTML = successMessage;
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+                
+                // Close modal on clicking outside
+                modal.addEventListener('click', function(e) {
+                  if (e.target === modal) {
+                    document.body.removeChild(modal);
+                    window.location.reload();
+                  }
+                });
+              } else {
+                alert(`Error: ${data.error}`);
+                this.innerHTML = 'Redeem Now';
+                this.disabled = false;
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('An error occurred. Please try again later.');
+              this.innerHTML = 'Redeem Now';
+              this.disabled = false;
+            });
           }
         });
-      }
+      });
+      
+      // Show voucher details when clicked
+      document.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const voucherCode = this.querySelector('[data-voucher-code]')?.dataset.voucherCode;
+          const rewardType = this.querySelector('[data-reward-type]')?.dataset.rewardType;
+          const status = this.querySelector('[data-status]')?.dataset.status;
+          
+          if (voucherCode) {
+            // Show voucher details modal
+            const detailsHtml = `
+              <div style="text-align: center; padding: 20px;">
+                <h2 style="margin-bottom: 15px;">Voucher Details</h2>
+                <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                  <p style="margin-bottom: 5px; font-weight: bold;">Voucher Code:</p>
+                  <h3 style="letter-spacing: 2px; font-family: monospace;">${voucherCode}</h3>
+                </div>
+                <p><strong>Type:</strong> ${rewardType}</p>
+                <p><strong>Status:</strong> <span class="status-badge status-${status.toLowerCase()}">${status}</span></p>
+                <p style="margin-top: 15px; font-size: 0.9em;">Present this code when redeeming your reward</p>
+                <button id="copyVoucherBtn" data-code="${voucherCode}" style="margin-top: 15px; background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                  <i class="fas fa-copy"></i> Copy Code
+                </button>
+              </div>
+            `;
+            
+            // Create and show modal
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = '1000';
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.backgroundColor = 'white';
+            modalContent.style.borderRadius = '8px';
+            modalContent.style.width = '90%';
+            modalContent.style.maxWidth = '500px';
+            modalContent.style.maxHeight = '90vh';
+            modalContent.style.overflow = 'auto';
+            modalContent.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+            
+            modalContent.innerHTML = detailsHtml;
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Set up copy button functionality
+            const copyBtn = modalContent.querySelector('#copyVoucherBtn');
+            if (copyBtn) {
+              copyBtn.addEventListener('click', function() {
+                const code = this.dataset.code;
+                navigator.clipboard.writeText(code).then(() => {
+                  this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                  setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+                  }, 2000);
+                });
+              });
+            }
+            
+            // Close modal on clicking outside
+            modal.addEventListener('click', function(e) {
+              if (e.target === modal) {
+                document.body.removeChild(modal);
+              }
+            });
+          }
+        });
+      });
     });
   </script>
 </body>

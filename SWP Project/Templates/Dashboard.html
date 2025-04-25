@@ -378,7 +378,7 @@
         <!-- Sidebar Navigation -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <img src="https://via.placeholder.com/40" alt="Logo">
+                <img src="logo.png" alt="Logo">
                 <h2>Thusang Safety</h2>
             </div>
             
@@ -425,54 +425,97 @@
         <!-- Main Content Area -->
         <div class="main-content">
             <!-- Top Bar -->
-            <div class="top-bar">
+    <div class="top-bar">
                 <div class="page-title">
                     <h1>Dashboard</h1>
-                    <p>Welcome back, Shots! Here's what's happening in your community.</p>
+                    {% if user and user.name %}
+                    <p>Welcome back, {{ user.name }}! Here's what's happening in your community.</p>
+                    {% else %}
+                    <p>Welcome back! Please log in to see your dashboard.</p>
+                    {% endif %}
                 </div>
                 
-                <div class="user-profile">
-                    <img src="https://via.placeholder.com/40" alt="User Profile">
+<div class="user-profile">
+                    {% if user and user.profile_pic %}
+                    <img src="{{ user.profile_pic }}" alt="User Profile">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/profile-placeholder.png') }}" alt="User Profile">
+                    {% endif %}
                     <div class="user-info">
-                        <h4>Shots M.</h4>
-                        <p>Community Member</p>
+                    {% if user and user.name %}
+                    <h4>{{ user.name }}</h4>
+                    {% else %}
+                    <h4>Guest</h4>
+                    {% endif %}
+                    <p>{{ user.email if user and user.email else 'Community Member' }}</p>
                     </div>
+                    <a href="{{ url_for('logout') }}" class="logout-btn" style="margin-left: 20px; padding: 8px 16px; background: var(--danger); color: white; border-radius: 4px; text-decoration: none;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
                 </div>
             </div>
 
-            <!-- Stats Cards -->
+            <!-- Profile and Safety Information -->
             <div class="card-grid">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Reports This Month</h3>
+                        <h3 class="card-title">Your Profile</h3>
                         <div class="card-icon primary">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="profile-info" id="profile-info-section">
+                        {% if user %}
+                            <p><strong>Name:</strong> <span id="profile-name">{{ user.name if user.name else 'Not set' }}</span></p>
+                            <p><strong>Phone:</strong> <span id="profile-phone">{{ user.phone if user.phone else 'Not set' }}</span></p>
+                            <p><strong>Address:</strong> <span id="profile-address">{{ user.address if user.address else 'Not set' }}</span></p>
+                        {% else %}
+                            <p>Please log in to view your profile</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Emergency Contacts</h3>
+                        <div class="card-icon danger">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                    </div>
+                    <div class="emergency-contacts">
+                        {% if primary_contact %}
+                            <p><strong>Primary Contact:</strong></p>
+                            <p>{{ primary_contact.name }} ({{ primary_contact.relationship }})</p>
+                            <p>{{ primary_contact.phone }}</p>
+                        {% else %}
+                            <p>No primary contact set</p>
+                        {% endif %}
+                        {% if contacts and contacts|length > 1 %}
+                            <p class="mt-2"><strong>Other Contacts:</strong> {{ contacts|length - 1 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Reports This Month</h3>
+                        <div class="card-icon secondary">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                     </div>
-                    <h2 class="card-value">24</h2>
-                    <p class="card-description">5% increase from last month</p>
+                    <h2 class="card-value">{{ reports_this_month }}</h2>
+                    <p class="card-description">Community reports this month</p>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Active Patrols</h3>
-                        <div class="card-icon secondary">
+                        <div class="card-icon accent">
                             <i class="fas fa-shield-alt"></i>
                         </div>
                     </div>
-                    <h2 class="card-value">8</h2>
-                    <p class="card-description">In your neighborhood</p>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Community Score</h3>
-                        <div class="card-icon accent">
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                    <h2 class="card-value">92%</h2>
-                    <p class="card-description">Safety rating</p>
+                    <h2 class="card-value">{{ active_patrols }}</h2>
+                    <p class="card-description">Active safety patrols</p>
                 </div>
                 
                 <div class="card">
@@ -482,7 +525,7 @@
                             <i class="fas fa-award"></i>
                         </div>
                     </div>
-                    <h2 class="card-value">350</h2>
+                    <h2 class="card-value">{{ user.points if user and user.points else 0 }}</h2>
                     <p class="card-description">Points available</p>
                 </div>
             </div>
@@ -521,46 +564,57 @@
                     <a href="#" class="view-all">View All</a>
                 </div>
                 
+                {% if recent_incidents %}
+                {% for incident in recent_incidents %}
                 <div class="activity-item">
                     <div class="activity-icon">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-exclamation-circle"></i>
                     </div>
                     <div class="activity-content">
-                        <h4>Report Verified</h4>
-                        <p>Your report about suspicious activity has been verified by the community</p>
-                        <div class="activity-time">2 hours ago</div>
+                        <h4>Reported: {{ incident.crime_type }}</h4>
+                        <p>Status: {{ incident.status|capitalize }}</p>
+                        <div class="activity-time">{{ incident.created_at.strftime('%d %b %Y') }}</div>
                     </div>
                 </div>
-                
+                {% endfor %}
+                {% else %}
                 <div class="activity-item">
                     <div class="activity-icon">
-                        <i class="fas fa-bell"></i>
+                        <i class="fas fa-info-circle"></i>
                     </div>
                     <div class="activity-content">
-                        <h4>New Patrol</h4>
-                        <p>Safety patrol has been increased in your area</p>
-                        <div class="activity-time">1 day ago</div>
+                        <h4>No Recent Activity</h4>
+                        <p>You haven't reported any incidents yet</p>
                     </div>
                 </div>
-                
-                <div class="activity-item">
-                    <div class="activity-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="activity-content">
-                        <h4>Community Meeting</h4>
-                        <p>Neighborhood watch meeting scheduled for Friday</p>
-                        <div class="activity-time">3 days ago</div>
-                    </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <script>
-        // Simple function for demonstration
-        function showAlert(message) {
-            alert(message);
+        // Basic initialization with profile update check
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard initialized');
+            
+            // Check for profile updates every 5 seconds
+            setInterval(checkProfileUpdates, 5000);
+        });
+
+        function checkProfileUpdates() {
+            fetch('/api/check-profile-updates')
+                .then(function(response) { 
+                    return response.json(); 
+                })
+                .then(function(data) {
+                    if (data.updated) {
+                        // Reload only the profile section if updates are detected
+                        document.getElementById('profile-info-section').innerHTML = data.html;
+                    }
+                })
+                .catch(function(error) { 
+                    console.error('Error checking for updates:', error); 
+                });
         }
     </script>
 </body>

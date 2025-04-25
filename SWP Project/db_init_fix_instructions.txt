@@ -1,0 +1,83 @@
+INSTRUCTIONS TO FIX DATABASE INITIALIZATION INDENTATION:
+
+1. Locate the initialize_database() function in app.py
+2. The current incorrect structure shows:
+```python
+def initialize_database():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
+            # Create admin user from .env
+            admin_email = os.getenv('ADMIN_EMAIL')  # Wrong indentation
+```
+
+3. Correct structure should be:
+```python
+def initialize_database():
+    with app.app_context():
+        try:
+            db.create_all()
+            db.session.commit()
+
+            # Create admin user from .env
+            admin_email = os.getenv('ADMIN_EMAIL')  # 4 space indent
+            admin_password = bcrypt.generate_password_hash(
+                os.getenv('ADMIN_PASSWORD')
+            ).decode('utf-8')
+            
+            # Create admin user in admin database
+            admin_engine = db.get_engine(bind='admin')
+            with db.session(bind=admin_engine) as admin_session:
+                if not admin_session.query(Admin).first():
+                    admin = Admin(email=admin_email, password=admin_password)
+                    admin_session.add(admin)
+                    admin_session.commit()
+            
+            # Create default police user
+            officer_email = 'police@yourdomain.com'
+            officer_password = bcrypt.generate_password_hash('SecurePolicePassword123').decode('utf-8')
+            
+            police_engine = db.get_engine(bind='police')
+            with db.session(bind=police_engine) as police_session:
+                if not police_session.query(LawEnforcement).first():
+                    officer = LawEnforcement(
+                        email=officer_email,
+                        password=officer_password,
+                        station='Headquarters',
+                        badge_number='OFFICER001'
+                    )
+                    police_session.add(officer)
+                    police_session.commit()
+            
+            print("Database initialization successful!")
+            
+        except Exception as e:
+            print(f"Error during initialization: {e}")
+            # Fallback to SQLite
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///community_safety.db'
+            app.config['SQLALCHEMY_BINDS'] = {
+                'admin': 'sqlite:///admin.db',
+                'police': 'sqlite:///police.db'
+            }
+            db.create_all()
+            db.create_all(bind='admin')
+            db.create_all(bind='police')
+            print("Using SQLite as fallback database")
+```
+
+4. Key fixes needed:
+- Add missing `try:` block
+- Fix indentation of admin_email and subsequent lines (4 spaces)
+- Ensure all code blocks are properly aligned
+- Verify all closing brackets/braces
+
+5. After fixing:
+- Save the file
+- Run `flask run` to test
+- Check terminal for successful initialization message
+
+SAFETY NOTE:
+- Make changes incrementally
+- Keep backup of original file
+- Test after each major change

@@ -4,501 +4,224 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Font Awesome Icons -->
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Global Styles */
-    :root {
-      --primary-color: #4361ee;
-      --primary-light: #e0e7ff;
-      --secondary-color: #3f37c9;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --danger-color: #ef4444;
-      --dark-color: #1e293b;
-      --light-color: #f8fafc;
-      --gray-color: #94a3b8;
-      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f1f5f9;
-      color: var(--dark-color);
-      transition: all 0.3s ease;
+      background-color: #f8f9fa;
     }
-
-    /* Dark Mode */
-    .dark-mode {
-      background-color: #0f172a;
-      color: #f8fafc;
-    }
-
-    .dark-mode .sidebar {
-      background-color: #1e293b;
-      border-right: 1px solid #334155;
-    }
-
-    .dark-mode .card {
-      background-color: #1e293b;
-      color: #f8fafc;
-      border: 1px solid #334155;
-    }
-
-    .dark-mode table, 
-    .dark-mode th, 
-    .dark-mode td {
-      border-color: #334155;
-    }
-
-    .dark-mode th {
-      background-color: #334155;
-      color: #f8fafc;
-    }
-
-    .dark-mode tr:nth-child(even) {
-      background-color: #1e293b;
-    }
-
-    .dark-mode tr:hover {
-      background-color: #334155;
-    }
-
-    .dark-mode button {
-      background-color: #334155;
-      color: #f8fafc;
-      border-color: #475569;
-    }
-
-    .dark-mode button:hover {
-      background-color: #475569;
-    }
-
-    /* Sidebar */
     .sidebar {
-      width: 80px;
-      background-color: white;
       height: 100vh;
       position: fixed;
       top: 0;
       left: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 0;
-      box-shadow: var(--card-shadow);
-      z-index: 100;
-      transition: all 0.3s ease;
+      background-color: #212529;
+      padding-top: 20px;
     }
-
-    .sidebar .logo {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 40px;
-      color: var(--primary-color);
-      background-color: var(--primary-light);
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 10px;
     }
-
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      width: 100%;
-    }
-
-    .sidebar ul li {
-      margin: 12px 0;
-      text-align: center;
-      position: relative;
-    }
-
-    .sidebar ul li a {
-      color: var(--gray-color);
-      text-decoration: none;
-      font-size: 18px;
-      display: block;
-      padding: 12px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .sidebar ul li a.active,
-    .sidebar ul li a:hover {
-      background-color: var(--primary-light);
-      color: var(--primary-color);
-    }
-
-    .sidebar ul li a:hover i {
-      transform: scale(1.2);
-    }
-
-    .sidebar ul li a.active::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 60%;
-      background-color: var(--primary-color);
-      border-radius: 0 4px 4px 0;
-    }
-
-    .sidebar ul li a i {
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar ul li .tooltip {
-      position: absolute;
-      left: 90px;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: var(--dark-color);
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      z-index: 100;
+      background-color: rgba(255, 255, 255, 0.1);
     }
-
-    .sidebar ul li:hover .tooltip {
-      opacity: 1;
-      visibility: visible;
+    .sidebar .nav-link i {
+      margin-right: 10px;
     }
-
-    /* Main Content */
     .main-content {
-      margin-left: 80px;
-      padding: 30px;
-      transition: margin-left 0.3s ease;
+      margin-left: 250px;
+      padding: 20px;
     }
-
-    /* Header */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .dark-mode .header {
-      border-bottom-color: #334155;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--dark-color);
-    }
-
-    .dark-mode .header h1 {
-      color: #f8fafc;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .header-actions button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .header-actions .logout-btn {
-      background-color: var(--danger-color);
-      color: white;
-      border: none;
-    }
-
-    .header-actions .logout-btn:hover {
-      background-color: #dc2626;
-    }
-
-    .header-actions .theme-toggle {
-      background-color: var(--light-color);
-      color: var(--dark-color);
-      border: 1px solid #e2e8f0;
-    }
-
-    .dark-mode .header-actions .theme-toggle {
-      background-color: #334155;
-      color: #f8fafc;
-      border-color: #475569;
-    }
-
-    .header-actions .theme-toggle:hover {
-      background-color: #e2e8f0;
-    }
-
-    .dark-mode .header-actions .theme-toggle:hover {
-      background-color: #475569;
-    }
-
-    /* Cards */
     .card {
-      background-color: white;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: var(--card-shadow);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 1px solid #e2e8f0;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--card-shadow-hover);
-    }
-
-    .card h2 {
-      font-size: 18px;
-      font-weight: 600;
       margin-bottom: 20px;
-      color: var(--dark-color);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-
-    .dark-mode .card h2 {
-      color: #f8fafc;
-    }
-
-    .card h2 i {
-      color: var(--primary-color);
-    }
-
-    /* Tables */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-
-    table, th, td {
-      border: 1px solid #e2e8f0;
-    }
-
-    th, td {
-      padding: 12px 16px;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f8fafc;
+    .card-header {
+      background-color: #f8f9fa;
       font-weight: 600;
-      color: #64748b;
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.5px;
     }
-
-    tr:nth-child(even) {
-      background-color: #f8fafc;
-    }
-
-    tr:hover {
-      background-color: #f1f5f9;
-    }
-
-    /* Status Badges */
     .status-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
+      padding: 6px 10px;
+      border-radius: 50px;
       font-size: 12px;
-      font-weight: 500;
     }
-
-    .status-pending {
-      background-color: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-verified {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
-
     .status-active {
-      background-color: #d1fae5;
-      color: #065f46;
+      background-color: #d1e7dd;
+      color: #0f5132;
     }
-
     .status-inactive {
-      background-color: #fee2e2;
-      color: #92400e;
+      background-color: #f8d7da;
+      color: #842029;
     }
-
+    .status-pending {
+      background-color: #fff3cd;
+      color: #664d03;
+    }
+    .status-verified {
+      background-color: #cfe2ff;
+      color: #084298;
+    }
     .status-approved {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
-
-    /* Buttons */
-    button {
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      border: none;
-    }
-
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--secondary-color);
-    }
-
-    .btn-success {
-      background-color: var(--success-color);
-      color: white;
-    }
-
-    .btn-success:hover {
-      background-color: #059669;
-    }
-
-    .btn-danger {
-      background-color: var(--danger-color);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background-color: #dc2626;
-    }
-
-    .btn-warning {
-      background-color: var(--warning-color);
-      color: white;
-    }
-
-    .btn-warning:hover {
-      background-color: #d97706;
-    }
-
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 13px;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Charts */
-    .chart-container {
-      position: relative;
-      height: 300px;
-      width: 100%;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 60px;
-      }
-      .main-content {
-        margin-left: 60px;
-        padding: 15px;
-      }
-      .header h1 {
-        font-size: 20px;
-      }
-      .card {
-        padding: 16px;
-      }
-      th, td {
-        padding: 8px 12px;
-      }
-      .btn-group {
-        flex-direction: column;
-        gap: 6px;
-      }
+      background-color: #d1e7dd;
+      color: #0f5132;
     }
   </style>
 </head>
 <body>
+  <!-- Modal for Create/Edit Incident -->
+  <div class="modal fade" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="incidentModalLabel">Create New Incident</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="incidentForm">
+            <input type="hidden" id="incident_id" name="incident_id">
+            <div class="mb-3">
+              <label for="crime_type" class="form-label">Crime Type</label>
+              <select class="form-select" id="crime_type" name="crime_type" required>
+                <option value="">Select Crime Type</option>
+                <option value="Theft">Theft</option>
+                <option value="Burglary">Burglary</option>
+                <option value="Assault">Assault</option>
+                <option value="Vandalism">Vandalism</option>
+                <option value="Fraud">Fraud</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="latitude" class="form-label">Latitude</label>
+                <input type="number" class="form-control" id="latitude" name="latitude" step="0.000001">
+              </div>
+              <div class="col">
+                <label for="longitude" class="form-label">Longitude</label>
+                <input type="number" class="form-control" id="longitude" name="longitude" step="0.000001">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="address" name="address" required>
+            </div>
+            <div class="mb-3">
+              <label for="user_id" class="form-label">User ID (optional)</label>
+              <input type="number" class="form-control" id="user_id" name="user_id">
+            </div>
+            <div class="mb-3">
+              <label for="status" class="form-label">Status</label>
+              <select class="form-select" id="status" name="status" required>
+                <option value="reported">Reported</option>
+                <option value="verified">Verified</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="false_alarm">False Alarm</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveIncidentBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for User Edit -->
+  <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userModalLabel">Edit User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="userForm">
+            <input type="hidden" id="edit_user_id" name="user_id">
+            <div class="mb-3">
+              <label for="edit_name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="edit_name" name="name">
+            </div>
+            <div class="mb-3">
+              <label for="edit_email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="edit_email" name="email">
+            </div>
+            <div class="mb-3">
+              <label for="edit_phone" class="form-label">Phone</label>
+              <input type="text" class="form-control" id="edit_phone" name="phone">
+            </div>
+            <div class="mb-3">
+              <label for="edit_address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="edit_address" name="address">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveUserBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this item? This action cannot be undone.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="logo">A</div>
-    <ul>
-      <li>
-        <a href="#" title="Dashboard" class="active">
-          <i class="fas fa-tachometer-alt"></i>
-          <span class="tooltip">Dashboard</span>
+  <div class="col-md-2 d-md-block sidebar">
+    <div class="text-center mb-4">
+      <h3 class="text-white">Admin</h3>
+    </div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
         </a>
       </li>
-      <li>
-        <a href="#" title="Verified Reports">
-          <i class="fas fa-check-circle"></i>
-          <span class="tooltip">Verified Reports</span>
+      <li class="nav-item">
+        <a class="nav-link" href="#incidents" data-bs-toggle="tab">
+          <i class="fas fa-exclamation-triangle"></i> Incidents
         </a>
       </li>
-      <li>
-        <a href="#" title="Pending Reports">
-          <i class="fas fa-clock"></i>
-          <span class="tooltip">Pending Reports</span>
+      <li class="nav-item">
+        <a class="nav-link" href="#users" data-bs-toggle="tab">
+          <i class="fas fa-users"></i> Users
         </a>
       </li>
-      <li>
-        <a href="#" title="Crime Map">
-          <i class="fas fa-map"></i>
-          <span class="tooltip">Crime Map</span>
+      <li class="nav-item">
+        <a class="nav-link" href="#rewards" data-bs-toggle="tab">
+          <i class="fas fa-award"></i> Rewards
         </a>
       </li>
-      <li>
-        <a href="#" title="Users">
-          <i class="fas fa-users"></i>
-          <span class="tooltip">User Management</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" title="Rewards">
-          <i class="fas fa-award"></i>
-          <span class="tooltip">Rewards</span>
+      <li class="nav-item mt-5">
+        <a class="nav-link" href="/logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
         </a>
       </li>
     </ul>
@@ -506,340 +229,675 @@
 
   <!-- Main Content -->
   <div class="main-content">
-    <!-- Header -->
-    <div class="header">
-      <h1>Admin Dashboard</h1>
-      <div class="header-actions">
-        <button class="theme-toggle" onclick="toggleDarkMode()">
-          <i class="fas fa-moon"></i> Dark Mode
-        </button>
-        <button class="logout-btn" onclick="window.location.href='/logout'">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
+    <div class="tab-content">
+      <!-- Dashboard Tab -->
+      <div class="tab-pane fade show active" id="dashboard">
+        <h2 class="mb-4">Admin Dashboard</h2>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card text-white bg-primary">
+              <div class="card-body">
+                <h5 class="card-title">Total Incidents</h5>
+                <p class="card-text display-4">{{ incident_count if incident_count else 0 }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-white bg-success">
+              <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <p class="card-text display-4">{{ user_count if user_count else 0 }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-white bg-warning">
+              <div class="card-body">
+                <h5 class="card-title">Pending Rewards</h5>
+                <p class="card-text display-4">{{ pending_rewards if pending_rewards else 0 }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h5>Recent Incidents</h5>
+              </div>
+              <div class="card-body">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Crime Type</th>
+                      <th>Location</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for incident, user in incidents[:5] %}
+                    <tr>
+                      <td>{{ incident.id }}</td>
+                      <td>{{ incident.crime_type }}</td>
+                      <td>{{ incident.address if incident.address else 'Unknown location' }}</td>
+                      <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+                      <td>
+                        <span class="status-badge status-{{ incident.status }}">
+                          {{ incident.status|capitalize }}
+                        </span>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not incidents %}
+                    <tr>
+                      <td colspan="5" class="text-center">No incidents to display</td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Reported Incidents -->
-    <div class="card">
-      <h2><i class="fas fa-exclamation-triangle"></i> Reported Incidents</h2>
-      <table id="incidents-table">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Location</th>
-            <th>Crime Type</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>John Doe</td>
-            <td>New York</td>
-            <td>Theft</td>
-            <td><span class="status-badge status-verified">Verified</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-primary btn-sm" onclick="viewIncident('John Doe')">
-                  <i class="fas fa-eye"></i> View
-                </button>
-                <button class="btn-danger btn-sm" onclick="deleteIncident('1')">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>Jane Smith</td>
-            <td>Los Angeles</td>
-            <td>Burglary</td>
-            <td><span class="status-badge status-pending">Pending</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-primary btn-sm" onclick="viewIncident('Jane Smith')">
-                  <i class="fas fa-eye"></i> View
-                </button>
-                <button class="btn-success btn-sm" onclick="verifyIncident('2')">
-                  <i class="fas fa-check"></i> Verify
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>Alice Johnson</td>
-            <td>Chicago</td>
-            <td>Assault</td>
-            <td><span class="status-badge status-verified">Verified</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-primary btn-sm" onclick="viewIncident('Alice Johnson')">
-                  <i class="fas fa-eye"></i> View
-                </button>
-                <button class="btn-danger btn-sm" onclick="deleteIncident('3')">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Crime Analytics -->
-    <div class="card">
-      <h2><i class="fas fa-chart-bar"></i> Crime Analytics</h2>
-      <div class="chart-container">
-        <canvas id="crimeChart"></canvas>
+      <!-- Incidents Tab -->
+      <div class="tab-pane fade" id="incidents">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Incident Management</h2>
+          <button type="button" class="btn btn-primary" id="createIncidentBtn">
+            <i class="fas fa-plus"></i> Create New Incident
+          </button>
+        </div>
+        
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-striped" id="incidents-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Crime Type</th>
+                  <th>Location</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for incident, user in incidents %}
+                <tr data-incident-id="{{ incident.id }}">
+                  <td>{{ incident.id }}</td>
+                  <td>{{ user.name if user.name else 'Unknown' }} ({{ user.email }})</td>
+                  <td>{{ incident.crime_type }}</td>
+                  <td>{{ incident.address if incident.address else 'Unknown location' }}</td>
+                  <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+                  <td>
+                    <span class="status-badge status-{{ incident.status }}">
+                      {{ incident.status|capitalize }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-sm btn-warning edit-incident-btn">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-danger delete-incident-btn">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      {% if incident.status == 'reported' %}
+                      <button type="button" class="btn btn-sm btn-success verify-incident-btn">
+                        <i class="fas fa-check"></i>
+                      </button>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+                {% if not incidents %}
+                <tr>
+                  <td colspan="7" class="text-center">No incidents to display</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- User Management -->
-    <div class="card">
-      <h2><i class="fas fa-users"></i> User Management</h2>
-      <table id="user-table">
-        <thead>
-          <tr>
-            <th>User ID</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>john.doe@example.com</td>
-            <td><span class="status-badge status-active">Active</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-primary btn-sm" onclick="editUser('1')">
-                  <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-danger btn-sm" onclick="deleteUser('1')">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>jane.smith@example.com</td>
-            <td><span class="status-badge status-inactive">Inactive</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-primary btn-sm" onclick="editUser('2')">
-                  <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-success btn-sm" onclick="activateUser('2')">
-                  <i class="fas fa-check"></i> Activate
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <!-- Users Tab -->
+      <div class="tab-pane fade" id="users">
+        <h2 class="mb-4">User Management</h2>
+        
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-striped" id="users-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in users %}
+                <tr data-user-id="{{ user.id }}">
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.phone }}</td>
+                  <td>{{ user.address }}</td>
+                  <td>
+                    <span class="status-badge status-active">
+                      Active
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-sm btn-warning edit-user-btn">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-danger delete-user-btn">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-secondary toggle-user-status-btn">
+                        <i class="fas fa-power-off"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+                {% if not users %}
+                <tr>
+                  <td colspan="7" class="text-center">No users to display</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    <!-- Rewards Management -->
-    <div class="card">
-      <h2><i class="fas fa-award"></i> Rewards Management</h2>
-      <table id="rewards-table">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Reward Amount</th>
-            <th>Incident Details</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>John Doe</td>
-            <td>$500</td>
-            <td>Theft reported on 5th Street</td>
-            <td><span class="status-badge status-pending">Pending</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-success btn-sm" onclick="approveReward('John Doe')">
-                  <i class="fas fa-check"></i> Approve
-                </button>
-                <button class="btn-danger btn-sm" onclick="rejectReward('John Doe')">
-                  <i class="fas fa-times"></i> Reject
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>Jane Smith</td>
-            <td>$300</td>
-            <td>Burglary reported on 10th Avenue</td>
-            <td><span class="status-badge status-approved">Approved</span></td>
-            <td>
-              <div class="btn-group">
-                <button class="btn-primary btn-sm" onclick="viewReward('Jane Smith')">
-                  <i class="fas fa-eye"></i> View
-                </button>
-                <button class="btn-danger btn-sm" onclick="revokeReward('Jane Smith')">
-                  <i class="fas fa-undo"></i> Revoke
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Rewards Tab -->
+      <div class="tab-pane fade" id="rewards">
+        <h2 class="mb-4">Rewards Management</h2>
+        
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-striped" id="rewards-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User</th>
+                  <th>Reward Type</th>
+                  <th>Points Cost</th>
+                  <th>Voucher Code</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for voucher in vouchers %}
+                <tr data-voucher-id="{{ voucher.id }}">
+                  <td>{{ voucher.id }}</td>
+                  <td>{{ voucher.user.name if voucher.user and voucher.user.name else 'Unknown' }} ({{ voucher.user.email if voucher.user else 'N/A' }})</td>
+                  <td>{{ voucher.reward_type }}</td>
+                  <td>{{ voucher.points_cost }}</td>
+                  <td>{{ voucher.voucher_code }}</td>
+                  <td>
+                    {% if voucher.is_approved %}
+                      <span class="status-badge status-approved">Approved</span>
+                    {% elif voucher.is_redeemed %}
+                      <span class="status-badge status-active">Redeemed</span>
+                    {% else %}
+                      <span class="status-badge status-pending">Pending</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      {% if not voucher.is_approved and not voucher.is_redeemed %}
+                      <button type="button" class="btn btn-sm btn-success approve-reward-btn">
+                        <i class="fas fa-check"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-danger reject-reward-btn">
+                        <i class="fas fa-times"></i>
+                      </button>
+                      {% else %}
+                      <button type="button" class="btn btn-sm btn-secondary" disabled>
+                        <i class="fas fa-check"></i> Processed
+                      </button>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+                {% if not vouchers %}
+                <tr>
+                  <td colspan="7" class="text-center">No vouchers to display</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- JavaScript -->
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Dark Mode Toggle
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-      const themeToggle = document.querySelector(".theme-toggle");
-      if (document.body.classList.contains("dark-mode")) {
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-        localStorage.setItem('darkMode', 'enabled');
-      } else {
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
-        localStorage.setItem('darkMode', 'disabled');
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toast notification system
+      function showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+          <div class="d-flex">
+            <div class="toast-body">
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Auto-remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+          toast.remove();
+        });
       }
-    }
+      
+      function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(container);
+        return container;
+      }
 
-    // Check for saved dark mode preference
-    if (localStorage.getItem('darkMode') === 'enabled') {
-      document.body.classList.add("dark-mode");
-      document.querySelector(".theme-toggle").innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-    }
-
-    // Chart.js for Crime Analytics
-    const ctx = document.getElementById('crimeChart').getContext('2d');
-    const crimeChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Theft', 'Burglary', 'Assault', 'Vandalism', 'Fraud'],
-        datasets: [{
-          label: 'Incidents Reported',
-          data: [12, 19, 8, 5, 3],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.7)',
-            'rgba(16, 185, 129, 0.7)',
-            'rgba(239, 68, 68, 0.7)',
-            'rgba(245, 158, 11, 0.7)',
-            'rgba(139, 92, 246, 0.7)'
-          ],
-          borderColor: [
-            'rgba(59, 130, 246, 1)',
-            'rgba(16, 185, 129, 1)',
-            'rgba(239, 68, 68, 1)',
-            'rgba(245, 158, 11, 1)',
-            'rgba(139, 92, 246, 1)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            backgroundColor: '#1e293b',
-            titleColor: '#f8fafc',
-            bodyColor: '#f8fafc',
-            borderColor: '#334155',
-            borderWidth: 1,
-            padding: 12,
-            usePointStyle: true
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: '#e2e8f0',
-              drawBorder: false
-            },
-            ticks: {
-              color: '#64748b'
-            }
-          },
-          x: {
-            grid: {
-              display: false,
-              drawBorder: false
-            },
-            ticks: {
-              color: '#64748b'
-            }
-          }
+      // Create Incident Modal Handler
+      const incidentModal = new bootstrap.Modal(document.getElementById('incidentModal'));
+      const userModal = new bootstrap.Modal(document.getElementById('userModal'));
+      const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+      
+      // Create New Incident Button
+      document.getElementById('createIncidentBtn').addEventListener('click', function() {
+        // Reset form
+        document.getElementById('incidentForm').reset();
+        document.getElementById('incident_id').value = '';
+        document.getElementById('incidentModalLabel').textContent = 'Create New Incident';
+        
+        // Change save button handler
+        document.getElementById('saveIncidentBtn').onclick = createIncident;
+        
+        // Show modal
+        incidentModal.show();
+      });
+      
+      // Create Incident Function
+      function createIncident() {
+        const formData = {
+          crime_type: document.getElementById('crime_type').value,
+          description: document.getElementById('description').value,
+          latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
+          longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
+          address: document.getElementById('address').value,
+          status: document.getElementById('status').value
+        };
+        
+        // Add user_id if provided
+        const userId = document.getElementById('user_id').value;
+        if (userId) {
+          formData.user_id = parseInt(userId);
         }
+        
+        fetch('/admin/create_incident', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            incidentModal.hide();
+            showToast('Incident created successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast('Error creating incident: ' + data.message, 'danger');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error creating incident', 'danger');
+        });
       }
+      
+      // Edit Incident Buttons
+      document.querySelectorAll('.edit-incident-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const incidentId = row.getAttribute('data-incident-id');
+          
+          fetch(`/admin/get_incident/${incidentId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Populate form
+              document.getElementById('incident_id').value = data.incident.id;
+              document.getElementById('crime_type').value = data.incident.crime_type;
+              document.getElementById('description').value = data.incident.description;
+              document.getElementById('latitude').value = data.incident.latitude;
+              document.getElementById('longitude').value = data.incident.longitude;
+              document.getElementById('address').value = data.incident.address;
+              document.getElementById('status').value = data.incident.status;
+              
+              // Change modal title and save button handler
+              document.getElementById('incidentModalLabel').textContent = 'Edit Incident';
+              document.getElementById('saveIncidentBtn').onclick = updateIncident;
+              
+              // Show modal
+              incidentModal.show();
+            } else {
+              showToast('Error fetching incident: ' + data.message, 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showToast('Error fetching incident details', 'danger');
+          });
+        });
+      });
+      
+      // Update Incident Function
+      function updateIncident() {
+        const incidentId = document.getElementById('incident_id').value;
+        const formData = {
+          crime_type: document.getElementById('crime_type').value,
+          description: document.getElementById('description').value,
+          latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
+          longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
+          address: document.getElementById('address').value,
+          status: document.getElementById('status').value
+        };
+        
+        fetch(`/admin/update_incident/${incidentId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            incidentModal.hide();
+            showToast('Incident updated successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast('Error updating incident: ' + data.message, 'danger');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error updating incident', 'danger');
+        });
+      }
+      
+      // Delete Incident Buttons
+      document.querySelectorAll('.delete-incident-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const incidentId = row.getAttribute('data-incident-id');
+          
+          // Setup delete confirmation
+          document.getElementById('deleteModalLabel').textContent = 'Delete Incident';
+          document.getElementById('confirmDeleteBtn').onclick = function() {
+            deleteIncident(incidentId);
+          };
+          
+          // Show delete confirmation modal
+          deleteModal.show();
+        });
+      });
+      
+      // Delete Incident Function
+      function deleteIncident(id) {
+        fetch(`/admin/delete_incident/${id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            deleteModal.hide();
+            showToast('Incident deleted successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast('Error deleting incident: ' + (data.error || data.message), 'danger');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error deleting incident', 'danger');
+        });
+      }
+      
+      // Verify Incident Buttons
+      document.querySelectorAll('.verify-incident-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const incidentId = row.getAttribute('data-incident-id');
+          
+          fetch(`/admin/verify_incident/${incidentId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showToast('Incident verified successfully', 'success');
+              setTimeout(() => location.reload(), 1000);
+            } else {
+              showToast('Error verifying incident: ' + (data.error || data.message), 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showToast('Error verifying incident', 'danger');
+          });
+        });
+      });
+      
+      // Edit User Buttons
+      document.querySelectorAll('.edit-user-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const userId = row.getAttribute('data-user-id');
+          
+          // Populate form from table row data
+          document.getElementById('edit_user_id').value = userId;
+          document.getElementById('edit_name').value = row.cells[1].textContent;
+          document.getElementById('edit_email').value = row.cells[2].textContent;
+          document.getElementById('edit_phone').value = row.cells[3].textContent;
+          document.getElementById('edit_address').value = row.cells[4].textContent;
+          
+          // Show modal
+          userModal.show();
+        });
+      });
+      
+      // Save User Button
+      document.getElementById('saveUserBtn').addEventListener('click', function() {
+        const userId = document.getElementById('edit_user_id').value;
+        const formData = {
+          name: document.getElementById('edit_name').value,
+          email: document.getElementById('edit_email').value,
+          phone: document.getElementById('edit_phone').value,
+          address: document.getElementById('edit_address').value
+        };
+        
+        fetch(`/admin/users/${userId}/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            userModal.hide();
+            showToast('User updated successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast('Error updating user: ' + data.message, 'danger');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error updating user', 'danger');
+        });
+      });
+      
+      // Delete User Buttons
+      document.querySelectorAll('.delete-user-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const userId = row.getAttribute('data-user-id');
+          
+          // Setup delete confirmation
+          document.getElementById('deleteModalLabel').textContent = 'Delete User';
+          document.getElementById('confirmDeleteBtn').onclick = function() {
+            deleteUser(userId);
+          };
+          
+          // Show delete confirmation modal
+          deleteModal.show();
+        });
+      });
+      
+      // Delete User Function
+      function deleteUser(userId) {
+        fetch(`/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            deleteModal.hide();
+            showToast('User deleted successfully', 'success');
+            setTimeout(() => location.reload(), 1000);
+          } else {
+            showToast('Error deleting user: ' + data.message, 'danger');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Error deleting user', 'danger');
+        });
+      }
+      
+      // Toggle User Status Buttons
+      document.querySelectorAll('.toggle-user-status-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const userId = row.getAttribute('data-user-id');
+          
+          fetch(`/admin/users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showToast('User status updated', 'success');
+              setTimeout(() => location.reload(), 1000);
+            } else {
+              showToast('Error updating user status: ' + data.message, 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showToast('Error updating user status', 'danger');
+          });
+        });
+      });
+      
+      // Approve Reward Buttons
+      document.querySelectorAll('.approve-reward-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const voucherId = row.getAttribute('data-voucher-id');
+          
+          fetch(`/admin/approve_voucher/${voucherId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showToast('Reward approved successfully', 'success');
+              // Update the row status
+              const statusCell = row.querySelector('td:nth-child(6)');
+              statusCell.innerHTML = '<span class="status-badge status-approved">Approved</span>';
+              
+              // Update action buttons
+              const actionCell = row.querySelector('td:nth-child(7)');
+              actionCell.innerHTML = '<div class="btn-group" role="group"><button type="button" class="btn btn-sm btn-secondary" disabled><i class="fas fa-check"></i> Processed</button></div>';
+            } else {
+              showToast('Error approving reward: ' + data.error, 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showToast('Error approving reward', 'danger');
+          });
+        });
+      });
+      
+      // Reject Reward Buttons
+      document.querySelectorAll('.reject-reward-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const voucherId = row.getAttribute('data-voucher-id');
+          
+          fetch(`/admin/reject_voucher/${voucherId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showToast('Reward rejected and points refunded', 'success');
+              // Remove the row
+              row.remove();
+            } else {
+              showToast('Error rejecting reward: ' + data.error, 'danger');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showToast('Error rejecting reward', 'danger');
+          });
+        });
+      });
     });
-
-    // Button Actions
-    function viewIncident(user) {
-      alert(`Viewing incident reported by ${user}`);
-    }
-
-    function verifyIncident(id) {
-      if (confirm(`Verify incident ID: ${id}?`)) {
-        alert(`Incident ID: ${id} verified`);
-        // Update UI here
-      }
-    }
-
-    function deleteIncident(id) {
-      if (confirm(`Delete incident ID: ${id}?`)) {
-        alert(`Incident ID: ${id} deleted`);
-        // Update UI here
-      }
-    }
-
-    function editUser(id) {
-      alert(`Editing user with ID: ${id}`);
-    }
-
-    function deleteUser(id) {
-      if (confirm(`Delete user with ID: ${id}?`)) {
-        alert(`User with ID: ${id} deleted`);
-        // Update UI here
-      }
-    }
-
-    function activateUser(id) {
-      if (confirm(`Activate user with ID: ${id}?`)) {
-        alert(`User with ID: ${id} activated`);
-        // Update UI here
-      }
-    }
-
-    function approveReward(user) {
-      if (confirm(`Approve reward for ${user}?`)) {
-        alert(`Reward for ${user} approved`);
-        // Update UI here
-      }
-    }
-
-    function rejectReward(user) {
-      if (confirm(`Reject reward for ${user}?`)) {
-        alert(`Reward for ${user} rejected`);
-        // Update UI here
-      }
-    }
-
-    function viewReward(user) {
-      alert(`Viewing reward for ${user}`);
-    }
-
-    function revokeReward(user) {
-      if (confirm(`Revoke reward for ${user}?`)) {
-        alert(`Reward for ${user} revoked`);
-        // Update UI here
-      }
-    }
   </script>
 </body>
 </html>

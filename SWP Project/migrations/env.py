@@ -28,8 +28,9 @@ def get_engine_url():
     try:
         return get_engine().url.render_as_string(hide_password=False).replace(
             '%', '%%')
-    except AttributeError:
-        return str(get_engine().url).replace('%', '%%')
+    except (AttributeError, TypeError):
+        from temp_config import TempConfig
+        return f"mysql://{TempConfig.DB_USER}:{TempConfig.DB_PASSWORD}@{TempConfig.DB_HOST}:{TempConfig.DB_PORT}/community_safety"
 
 
 # add your model's MetaData object here

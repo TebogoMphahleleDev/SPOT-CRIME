@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Profile | Community Safety</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
         :root {
             --primary: #3b82f6;
@@ -300,80 +303,41 @@
             box-shadow: var(--shadow);
         }
         
-        .settings-option {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .settings-option:last-child {
-            border-bottom: none;
-        }
-        
-        .option-info h3 {
-            font-size: 0.9375rem;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-        
-        .option-info p {
-            font-size: 0.8125rem;
-            color: var(--gray-700);
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--gray-300);
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--primary);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-        
         /* Footer */
         .footer {
             padding: 1.5rem;
             text-align: center;
             background-color: white;
             border-top: 1px solid var(--gray-200);
+        }
+        
+        /* Alert */
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .alert.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .alert-success {
+            background-color: var(--success);
+        }
+        
+        .alert-error {
+            background-color: var(--danger);
         }
         
         /* Responsive adjustments */
@@ -412,71 +376,147 @@
         <section class="profile-section">
             <div class="profile-header">
                 <div class="profile-pic">
-                    <img src="" alt="Profile picture" id="profileImage">
+                    <img src="{{ url_for('static', filename='images/profile-placeholder.png') }}" alt="Profile picture" id="profileImage">
                     <div class="upload-btn" onclick="document.getElementById('fileInput').click()">
                         <i class="fas fa-camera"></i>
                     </div>
                     <input type="file" id="fileInput" accept="image/*" style="display: none;">
                 </div>
                 <div class="profile-info">
-                    <h2 id="userName">Loading...</h2>
-                    <p>Member since <span id="joinDate">2023</span></p>
+                    <h2 id="userName">{{ user.name if user and user.name else 'No Name Set' }}</h2>
+                    <p>Member since <span id="joinDate">{{ user.created_at.strftime('%B %Y') if user and user.created_at else '2023' }}</span></p>
                 </div>
             </div>
             
-            <form id="profileForm">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" class="form-control" disabled>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" class="form-control" disabled>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" class="form-control" disabled>
-                </div>
-                
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" class="form-control" placeholder="Enter your address" disabled>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline" id="editBtn">
-                        <i class="fas fa-edit"></i> Edit Profile
-                    </button>
-                    <button type="button" class="btn btn-primary" id="saveBtn" style="display: none;">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                    <button type="button" class="btn btn-outline" id="cancelBtn" style="display: none;">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                </div>
-            </form>
+    <form id="profileForm">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" class="form-control" value="{{ user.name if user else '' }}" disabled>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" class="form-control" value="{{ user.email if user else '' }}" disabled>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" class="form-control" value="{{ user.phone if user else '' }}" disabled>
+        </div>
+        
+        <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" class="form-control" placeholder="Enter your address" value="{{ user.address if user else '' }}" disabled>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="editBtn">
+                <i class="fas fa-edit"></i> Edit Profile
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveBtn" style="display: none;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <button type="button" class="btn btn-outline" id="cancelBtn" style="display: none;">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </form>
+    
+    <section class="emergency-contacts">
+        <div class="section-title">
+            <span><i class="fas fa-address-book"></i> Emergency Contacts</span>
+            <span id="contactCount">{{ user.emergency_contacts|length if user and user.emergency_contacts else 0 }}/5</span>
+        </div>
+        
+        <ul class="contact-list" id="contactList">
+            {% if user and user.emergency_contacts %}
+                {% for contact in user.emergency_contacts %}
+                <li class="contact-item" data-contact-id="{{ contact.id }}">
+                    <div class="contact-info">
+                        <h3 class="contact-name">{{ contact.name }}</h3>
+                        <p class="contact-details">Phone: {{ contact.phone }}</p>
+                        <p class="contact-details">Relationship: {{ contact.relationship }}</p>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
+                        <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
+                    </div>
+                </li>
+                {% endfor %}
+            {% else %}
+            <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray-700);">
+                <div>No emergency contacts added yet</div>
+            </li>
+            {% endif %}
+        </ul>
+        
+        <button class="btn btn-primary" id="addContactBtn">
+            <i class="fas fa-plus"></i> Add Contact
+        </button>
+        
+        <div class="contact-form" id="contactForm" style="display: none;">
+            <input type="hidden" id="contactId" value="">
+            <div class="form-group">
+                <label for="contactName">Full Name</label>
+                <input type="text" id="contactName" class="form-control" placeholder="Contact's full name">
+            </div>
+            
+            <div class="form-group">
+                <label for="contactPhone">Phone Number</label>
+                <input type="tel" id="contactPhone" class="form-control" placeholder="Contact's phone number">
+            </div>
+            
+            <div class="form-group">
+                <label for="contactRelation">Relationship</label>
+                <input type="text" id="contactRelation" class="form-control" placeholder="e.g. Spouse, Friend">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" id="saveContactBtn">
+                    <i class="fas fa-save"></i> Save Contact
+                </button>
+                <button type="button" class="btn btn-outline" id="cancelContactBtn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </section>
         </section>
         
         <section class="emergency-contacts">
             <div class="section-title">
                 <span><i class="fas fa-address-book"></i> Emergency Contacts</span>
-                <span id="contactCount">0/5</span>
+                <span id="contactCount">{{ user.emergency_contacts|length if user and user.emergency_contacts else 0 }}/5</span>
             </div>
             
             <ul class="contact-list" id="contactList">
-                <!-- Contacts will be loaded here -->
+                {% if user and user.emergency_contacts %}
+                    {% for contact in user.emergency_contacts %}
+                    <li class="contact-item" data-contact-id="{{ contact.id }}">
+                        <div class="contact-info">
+                            <h3 class="contact-name">{{ contact.name }}</h3>
+                            <p class="contact-details">Phone: {{ contact.phone }}</p>
+                            <p class="contact-details">Relationship: {{ contact.relationship }}</p>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
+                            <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
+                        </div>
+                    </li>
+                    {% endfor %}
+                {% else %}
                 <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray-700);">
                     <div>No emergency contacts added yet</div>
                 </li>
+                {% endif %}
             </ul>
             
             <button class="btn btn-primary" id="addContactBtn">
                 <i class="fas fa-plus"></i> Add Contact
             </button>
             
-            <div class="contact-form" id="contactForm">
+            <div class="contact-form" id="contactForm" style="display: none;">
+                <input type="hidden" id="contactId" value="">
                 <div class="form-group">
                     <label for="contactName">Full Name</label>
                     <input type="text" id="contactName" class="form-control" placeholder="Contact's full name">
@@ -506,240 +546,376 @@
         <section class="settings">
             <h2 class="section-title"><i class="fas fa-cog"></i> Account Settings</h2>
             
-            <div class="settings-option">
-                <div class="option-info">
-                    <h3>Change Password</h3>
-                    <p>Update your account password</p>
-                </div>
-                <button class="btn btn-outline btn-sm" id="changePasswordBtn">
-                    <i class="fas fa-key"></i> Change
-                </button>
+            <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password">
             </div>
             
-            <div class="settings-option">
-                <div class="option-info">
-                    <h3>Two-Factor Authentication</h3>
-                    <p>Add an extra layer of security to your account</p>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="twoFactorToggle">
-                    <span class="slider"></span>
-                </label>
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
             </div>
             
-            <div class="settings-option">
-                <div class="option-info">
-                    <h3>Notification Preferences</h3>
-                    <p>Manage how you receive alerts</p>
-                </div>
-                <button class="btn btn-outline btn-sm" id="notificationSettingsBtn">
-                    <i class="fas fa-bell"></i> Settings
-                </button>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm new password">
             </div>
+            
+            <button class="btn btn-primary" id="changePasswordBtn">
+                <i class="fas fa-key"></i> Change Password
+            </button>
         </section>
     </main>
     
     <footer class="footer">
-        <button class="btn btn-danger" id="logoutBtn">
+        <button class="btn btn-danger" id="logoutBtn" onclick="window.location.href='{{ url_for('logout') }}'">
             <i class="fas fa-sign-out-alt"></i> Log Out
         </button>
     </footer>
 
+    <div id="alertContainer"></div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // DOM Elements
+            const profileForm = document.getElementById('profileForm');
             const editBtn = document.getElementById('editBtn');
             const saveBtn = document.getElementById('saveBtn');
             const cancelBtn = document.getElementById('cancelBtn');
-            const profileForm = document.getElementById('profileForm');
-            const inputs = profileForm.querySelectorAll('input');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const addressInput = document.getElementById('address');
+            const userName = document.getElementById('userName');
+            const joinDate = document.getElementById('joinDate');
+            const contactList = document.getElementById('contactList');
             const addContactBtn = document.getElementById('addContactBtn');
             const contactForm = document.getElementById('contactForm');
             const saveContactBtn = document.getElementById('saveContactBtn');
             const cancelContactBtn = document.getElementById('cancelContactBtn');
-            const contactList = document.getElementById('contactList');
+            const contactIdInput = document.getElementById('contactId');
+            const contactNameInput = document.getElementById('contactName');
+            const contactPhoneInput = document.getElementById('contactPhone');
+            const contactRelationInput = document.getElementById('contactRelation');
             const emptyContacts = document.getElementById('emptyContacts');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const fileInput = document.getElementById('fileInput');
-            const profileImage = document.getElementById('profileImage');
-            
-            // Load user data
-            function loadUserData() {
-                // In a real app, this would come from your API
-                const userData = {
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                    phone: "+1 (555) 123-4567",
-                    address: "123 Main St, Pretoria",
-                    joinDate: "June 2022",
-                    profilePic: "" // URL to profile picture
-                };
-                
-                document.getElementById('userName').textContent = userData.name;
-                document.getElementById('name').value = userData.name;
-                document.getElementById('email').value = userData.email;
-                document.getElementById('phone').value = userData.phone;
-                document.getElementById('address').value = userData.address;
-                document.getElementById('joinDate').textContent = userData.joinDate;
-                
-                if (userData.profilePic) {
-                    profileImage.src = userData.profilePic;
-                }
-            }
-            
-            // Toggle edit mode for profile
-            function toggleEditMode(edit) {
-                inputs.forEach(input => {
-                    input.disabled = !edit;
-                });
-                
-                editBtn.style.display = edit ? 'none' : 'inline-flex';
-                saveBtn.style.display = edit ? 'inline-flex' : 'none';
-                cancelBtn.style.display = edit ? 'inline-flex' : 'none';
-            }
-            
-            // Save profile changes
-            function saveProfile() {
-                // In a real app, you would send this to your API
-                const formData = {
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
-                    address: document.getElementById('address').value
-                };
-                
-                console.log('Saving profile:', formData);
-                
-                // Simulate API call
-                setTimeout(() => {
-                    alert('Profile updated successfully!');
-                    toggleEditMode(false);
-                }, 500);
-            }
-            
-            // Load emergency contacts
-            function loadContacts() {
-                // In a real app, this would come from your API
-                const contacts = [
-                    { id: 1, name: "Jane Smith", phone: "+1 (555) 987-6543", relationship: "Spouse" },
-                    { id: 2, name: "Mike Johnson", phone: "+1 (555) 456-7890", relationship: "Friend" }
-                ];
-                
-                contactList.innerHTML = '';
-                
-                if (contacts.length === 0) {
-                    contactList.appendChild(emptyContacts);
-                    emptyContacts.style.display = 'block';
+            const contactCount = document.getElementById('contactCount');
+
+            // Toggle profile form inputs disabled state
+            function toggleProfileForm(disabled) {
+                nameInput.disabled = disabled;
+                emailInput.disabled = disabled;
+                phoneInput.disabled = disabled;
+                addressInput.disabled = disabled;
+                if (disabled) {
+                    saveBtn.style.display = 'none';
+                    cancelBtn.style.display = 'none';
+                    editBtn.style.display = 'inline-block';
                 } else {
-                    emptyContacts.style.display = 'none';
-                    
-                    contacts.forEach(contact => {
-                        const li = document.createElement('li');
-                        li.className = 'contact-item';
-                        li.innerHTML = `
-                            <div class="contact-info">
-                                <div class="contact-name">${contact.name}</div>
-                                <div class="contact-details">
-                                    ${contact.phone} • ${contact.relationship}
-                                </div>
-                            </div>
-                            <div class="contact-actions">
-                                <button class="btn btn-outline btn-sm" onclick="editContact(${contact.id})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="deleteContact(${contact.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        `;
-                        contactList.appendChild(li);
-                    });
+                    saveBtn.style.display = 'inline-block';
+                    cancelBtn.style.display = 'inline-block';
+                    editBtn.style.display = 'none';
                 }
-                
-                document.getElementById('contactCount').textContent = `${contacts.length}/5`;
             }
-            
-            // Add new contact
-            function addContact() {
-                const name = document.getElementById('contactName').value.trim();
-                const phone = document.getElementById('contactPhone').value.trim();
-                const relation = document.getElementById('contactRelation').value.trim();
+
+            // Load user profile data
+            function loadUserProfile() {
+                fetch('/api/user/profile')
+                    .then((res) => {
+                        if (!res.ok) throw new Error('Unauthorized');
+                        return res.json();
+                    })
+                    .then((data) => {
+                        nameInput.value = data.name || '';
+                        emailInput.value = data.email || '';
+                        phoneInput.value = data.phone || '';
+                        addressInput.value = data.address || '';
+                        userName.textContent = data.name || 'No Name';
+                        joinDate.textContent = data.joinDate
+                            ? new Date(data.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+                            : '';
+                        toggleProfileForm(true);
+                    })
+                    .catch(() => {
+                        window.location.href = '/login';
+                    });
+            }
+
+            // Edit button click
+            editBtn.addEventListener('click', () => {
+                toggleProfileForm(false);
+            });
+
+            // Cancel button click
+            cancelBtn.addEventListener('click', () => {
+                loadUserProfile();
+            });
+
+            // Save profile form submit
+            profileForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const updatedData = {
+                    name: nameInput.value,
+                    email: emailInput.value,
+                    phone: phoneInput.value,
+                    address: addressInput.value,
+                };
+                fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData),
+                })
+                    .then((res) => {
+                        if (!res.ok)
+                            return res.json().then((err) => {
+                                throw new Error(err.error || 'Update failed');
+                            });
+                        return res.json();
+                    })
+                    .then(() => {
+                        showAlert('Profile updated successfully!', 'success');
+                        userName.textContent = updatedData.name;
+                        toggleProfileForm(true);
+                    })
+                    .catch((err) => {
+                        showAlert('Failed to update profile: ' + err.message, 'error');
+                    });
+            });
+
+            // Load emergency contacts
+            function loadEmergencyContacts() {
+                fetch('/api/emergency-contacts')
+                    .then((res) => {
+                        if (!res.ok) throw new Error('Failed to load contacts');
+                        return res.json();
+                    })
+                    .then((contacts) => {
+                        contactList.innerHTML = '';
+                        if (contacts.length === 0) {
+                            contactList.innerHTML = `
+                                <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray-700);">
+                                    <div>No emergency contacts added yet</div>
+                                </li>
+                            `;
+                        } else {
+                            contacts.forEach((contact) => {
+                                const li = document.createElement('li');
+                                li.className = 'contact-item';
+                                li.dataset.contactId = contact.id;
+                                li.innerHTML = `
+                                    <div class="contact-info">
+                                        <h3 class="contact-name">${contact.name}</h3>
+                                        <p class="contact-details">Phone: ${contact.phone}</p>
+                                        <p class="contact-details">Relationship: ${contact.relationship}</p>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
+                                    </div>
+                                `;
+                                contactList.appendChild(li);
+                            });
+                        }
+                        contactCount.textContent = `${contacts.length}/5`;
+                    })
+                    .catch(() => {
+                        showAlert('Failed to load emergency contacts.', 'error');
+                    });
+            }
+
+            // Show contact form for add/edit
+            function showContactForm(edit = false, contact = null) {
+                contactForm.style.display = 'block';
+                if (edit && contact) {
+                    contactIdInput.value = contact.id;
+                    contactNameInput.value = contact.name;
+                    contactPhoneInput.value = contact.phone;
+                    contactRelationInput.value = contact.relationship;
+                } else {
+                    contactIdInput.value = '';
+                    contactNameInput.value = '';
+                    contactPhoneInput.value = '';
+                    contactRelationInput.value = '';
+                }
+            }
+
+            // Hide contact form
+            function hideContactForm() {
+                contactForm.style.display = 'none';
+            }
+
+            // Add contact button click
+            addContactBtn.addEventListener('click', () => {
+                showContactForm(false);
+            });
+
+            // Cancel contact form button click
+            cancelContactBtn.addEventListener('click', () => {
+                hideContactForm();
+            });
+
+            // Save contact button click
+            saveContactBtn.addEventListener('click', () => {
+                const id = contactIdInput.value;
+                const method = id ? 'PUT' : 'POST';
+                const url = id
+                    ? `/api/emergency-contacts/${id}`
+                    : '/api/emergency-contacts';
+                const contactData = {
+                    name: contactNameInput.value,
+                    phone: contactPhoneInput.value,
+                    relationship: contactRelationInput.value,
+                };
+                fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(contactData),
+                })
+                    .then((res) => {
+                        if (!res.ok)
+                            return res.json().then((err) => {
+                                throw new Error(err.error || 'Operation failed');
+                            });
+                        return res.json();
+                    })
+                    .then(() => {
+                        showAlert(`Contact ${id ? 'updated' : 'added'} successfully!`, 'success');
+                        hideContactForm();
+                        loadEmergencyContacts();
+                    })
+                    .catch((err) => {
+                        showAlert('Failed to save contact: ' + err.message, 'error');
+                    });
+            });
+
+            // Contact list event delegation for edit and delete
+            contactList.addEventListener('click', (e) => {
+                const li = e.target.closest('li.contact-item');
+                if (!li) return;
+                const contactId = li.dataset.contactId;
+                if (e.target.classList.contains('edit-contact-btn')) {
+                    // Fetch contact details and show form
+                    fetch(`/api/emergency-contacts/${contactId}`)
+                        .then((res) => {
+                            if (!res.ok) throw new Error('Failed to fetch contact details');
+                            return res.json();
+                        })
+                        .then((contact) => {
+                            showContactForm(true, contact);
+                        })
+                        .catch(() => {
+                            showAlert('Failed to load contact for editing.', 'error');
+                        });
+                } else if (e.target.classList.contains('delete-contact-btn')) {
+                    if (!confirm('Are you sure you want to delete this contact?')) return;
+                    fetch(`/api/emergency-contacts/${contactId}`, { method: 'DELETE' })
+                        .then((res) => {
+                            if (!res.ok)
+                                return res.json().then((err) => {
+                                    throw new Error(err.error || 'Delete failed');
+                                });
+                            showAlert('Contact deleted successfully!', 'success');
+                            loadEmergencyContacts();
+                        })
+                        .catch((err) => {
+                            showAlert('Failed to delete contact: ' + err.message, 'error');
+                        });
+                }
+            });
+
+            // Show alert function
+            function showAlert(message, type) {
+                const alertContainer = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                alertContainer.appendChild(alert);
                 
-                if (!name || !phone || !relation) {
-                    alert('Please fill in all fields');
+                setTimeout(() => {
+                    alert.classList.add('show');
+                }, 10);
+                
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 300);
+                }, 3000);
+            }
+
+            // Change password button
+            document.getElementById('changePasswordBtn').addEventListener('click', function() {
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    showAlert('All password fields are required', 'error');
                     return;
                 }
                 
-                // In a real app, you would send this to your API
-                const newContact = {
-                    id: Date.now(), // Temporary ID
-                    name,
-                    phone,
-                    relationship: relation
-                };
-                
-                console.log('Adding contact:', newContact);
-                
-                // Simulate API call
-                setTimeout(() => {
-                    contactForm.style.display = 'none';
-                    document.getElementById('contactName').value = '';
-                    document.getElementById('contactPhone').value = '';
-                    document.getElementById('contactRelation').value = '';
-                    
-                    loadContacts();
-                }, 500);
-            }
-            
-            // Edit contact (placeholder)
-            window.editContact = function(id) {
-                alert(`Edit contact with ID: ${id}`);
-            };
-            
-            // Delete contact (placeholder)
-            window.deleteContact = function(id) {
-                if (confirm('Are you sure you want to delete this contact?')) {
-                    console.log(`Deleting contact with ID: ${id}`);
-                    // In a real app, you would call your API here
-                    loadContacts();
+                if (newPassword !== confirmPassword) {
+                    showAlert('New passwords do not match', 'error');
+                    return;
                 }
-            };
-            
-            // Handle profile picture upload
-            fileInput.addEventListener('change', (e) => {
+                
+                fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(err => { throw new Error(err.error || 'Password change failed'); });
+                    }
+                    return res.json();
+                })
+                .then(() => {
+                    showAlert('Password changed successfully!', 'success');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                })
+                .catch(err => {
+                    showAlert(err.message, 'error');
+                });
+            });
+
+            // Handle profile image upload
+            document.getElementById('fileInput').addEventListener('change', function(e) {
                 const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        profileImage.src = event.target.result;
-                        // In a real app, you would upload this to your server
-                    };
-                    reader.readAsDataURL(file);
-                }
+                if (!file) return;
+                
+                // Create form data for the file upload
+                const formData = new FormData();
+                formData.append('profile_image', file);
+                
+                // Send the file to the server
+                fetch('/api/upload-profile-image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(function(res) {
+                    if (!res.ok) {
+                        return res.json().then(function(err) { 
+                            throw new Error(err.error || 'Upload failed'); 
+                        });
+                    }
+                    return res.json();
+                })
+                .then(function(data) {
+                    document.getElementById('profileImage').src = data.image_url;
+                    showAlert('Profile image updated!', 'success');
+                })
+                .catch(function(err) {
+                    showAlert('Failed to upload image: ' + err.message, 'error');
+                });
             });
-            
-            // Event listeners
-            editBtn.addEventListener('click', () => toggleEditMode(true));
-            cancelBtn.addEventListener('click', () => toggleEditMode(false));
-            saveBtn.addEventListener('click', saveProfile);
-            addContactBtn.addEventListener('click', () => {
-                contactForm.style.display = 'block';
-            });
-            cancelContactBtn.addEventListener('click', () => {
-                contactForm.style.display = 'none';
-            });
-            saveContactBtn.addEventListener('click', addContact);
-            logoutBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to log out?')) {
-                    // In a real app, you would call your logout API
-                    window.location.href = '/login';
-                }
-            });
-            
-            // Initialize
-            loadUserData();
-            loadContacts();
-            toggleEditMode(false);
+
+            // Initial load
+            loadUserProfile();
+            loadEmergencyContacts();
         });
     </script>
 </body>

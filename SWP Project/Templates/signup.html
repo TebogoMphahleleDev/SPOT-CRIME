@@ -269,6 +269,7 @@
             {% endwith %}
 
             <form action="/signup" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
                     <label for="email" class="form-label">Email Address</label>
                     <i class="fas fa-envelope form-icon"></i>

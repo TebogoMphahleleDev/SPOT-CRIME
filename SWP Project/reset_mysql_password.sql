@@ -1,0 +1,2 @@
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Mokgaga.082';
+FLUSH PRIVILEGES;

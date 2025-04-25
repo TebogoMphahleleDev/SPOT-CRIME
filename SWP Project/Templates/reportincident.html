@@ -387,6 +387,7 @@
 
   <div class="report-container">
     <form id="incident-report-form" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <!-- Incident Details Section -->
       <div class="form-section">
         <h2 class="section-title">
