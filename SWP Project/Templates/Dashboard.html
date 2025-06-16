@@ -4,24 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Thusang Community Safety</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #1d4ed8;
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #e0e7ff;
             --secondary: #10b981;
             --accent: #f59e0b;
             --danger: #ef4444;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --light-gray: #e2e8f0;
+            --dark: #111827;
+            --light: #ffffff;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --transition: all 0.3s ease;
         }
 
-        /* Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -30,46 +35,53 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             color: var(--dark);
             line-height: 1.6;
+            min-height: 100vh;
+            animation: fadeInBackground 1s ease-out;
         }
 
-        /* Layout */
         .dashboard-container {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar */
         .sidebar {
-            width: 280px;
-            background: white;
-            padding: 2rem 1.5rem;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            width: 300px;
+            background: var(--light);
+            padding: 2rem;
+            box-shadow: var(--shadow);
             position: fixed;
             height: 100vh;
-            transition: all 0.3s ease;
-            z-index: 100;
+            transition: var(--transition);
+            z-index: 1000;
+            animation: slideInLeft 0.5s ease-out;
         }
 
         .sidebar-header {
             display: flex;
             align-items: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
             padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 1px solid var(--gray-light);
         }
 
         .sidebar-header img {
-            width: 40px;
-            margin-right: 12px;
+            width: 48px;
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
+
+        .sidebar-header img:hover {
+            transform: scale(1.1);
         }
 
         .sidebar-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: var(--primary);
+            letter-spacing: 0.025em;
         }
 
         .nav-menu {
@@ -77,152 +89,176 @@
         }
 
         .nav-item {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .nav-link {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
             color: var(--gray);
             text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: var(--radius);
+            transition: var(--transition);
         }
 
         .nav-link i {
-            margin-right: 12px;
-            width: 20px;
+            margin-right: 1rem;
+            width: 24px;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
         }
 
         .nav-link:hover {
-            background-color: var(--light);
-            color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateX(5px);
         }
 
         .nav-link.active {
-            background-color: rgba(59, 130, 246, 0.1);
-            color: var(--primary);
-            font-weight: 500;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--light);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 280px;
-            padding: 2rem;
+            margin-left: 300px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
         }
 
-        /* Header */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            animation: slideInDown 0.5s ease-out;
         }
 
         .page-title h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
+            font-size: 2rem;
+            font-weight: 700;
             color: var(--dark);
         }
 
         .page-title p {
             color: var(--gray);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
+            font-size: 1rem;
+            margin-top: 0.5rem;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
+            gap: 1rem;
         }
 
         .user-profile img {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            margin-right: 12px;
             object-fit: cover;
+            border: 2px solid var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .user-profile img:hover {
+            transform: scale(1.1);
         }
 
         .user-info h4 {
-            font-size: 0.9375rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
         }
 
         .user-info p {
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             color: var(--gray);
         }
 
-        /* Dashboard Cards */
-        .card-grid {
+        .logout-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--danger);
+            color: var(--light);
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .overview-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
         }
 
         .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            transition: var(--transition);
+            animation: zoomIn 0.5s ease-out;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-md);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .card-title {
-            font-size: 1rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: var(--dark);
         }
 
         .card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--light);
+            font-size: 1.5rem;
+            transition: var(--transition);
         }
 
-        .card-icon.primary {
-            background-color: var(--primary);
+        .card-icon:hover {
+            transform: rotate(10deg);
         }
 
-        .card-icon.secondary {
-            background-color: var(--secondary);
-        }
-
-        .card-icon.accent {
-            background-color: var(--accent);
-        }
-
-        .card-icon.danger {
-            background-color: var(--danger);
-        }
+        .card-icon.primary { background: var(--primary); }
+        .card-icon.secondary { background: var(--secondary); }
+        .card-icon.accent { background: var(--accent); }
+        .card-icon.danger { background: var(--danger); }
 
         .card-value {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--dark);
-            margin: 0.5rem 0;
+            margin: 0.75rem 0;
         }
 
         .card-description {
@@ -230,39 +266,45 @@
             color: var(--gray);
         }
 
-        /* Quick Actions */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
         }
 
         .action-btn {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--light), #f9fafb);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            animation: slideInUp 0.5s ease-out;
         }
 
         .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            background: var(--primary-light);
         }
 
         .action-btn i {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin-bottom: 1rem;
             color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.2);
         }
 
         .action-btn h3 {
-            font-size: 1rem;
+            font-size: 1.125rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: var(--dark);
         }
 
         .action-btn p {
@@ -270,12 +312,12 @@
             color: var(--gray);
         }
 
-        /* Activity Section */
         .activity-section {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            animation: slideInUp 0.5s ease-out;
         }
 
         .section-header {
@@ -286,27 +328,35 @@
         }
 
         .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
         }
 
         .view-all {
             color: var(--primary);
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: var(--transition);
         }
 
         .view-all:hover {
             color: var(--primary-dark);
             text-decoration: underline;
+            transform: translateX(5px);
         }
 
         .activity-item {
             display: flex;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--light-gray);
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--gray-light);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: var(--primary-light);
+            border-radius: var(--radius);
         }
 
         .activity-item:last-child {
@@ -314,61 +364,127 @@
         }
 
         .activity-icon {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background-color: rgba(59, 130, 246, 0.1);
+            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 1rem;
             color: var(--primary);
+            font-size: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .activity-item:hover .activity-icon {
+            background: var(--primary);
+            color: var(--light);
+            transform: rotate(10deg);
         }
 
         .activity-content h4 {
-            font-size: 0.9375rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
             margin-bottom: 0.25rem;
+            color: var(--dark);
         }
 
         .activity-content p {
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             color: var(--gray);
         }
 
         .activity-time {
             font-size: 0.75rem;
             color: var(--gray);
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
         }
 
-        /* Responsive Design */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            color: var(--primary-dark);
+            transform: rotate(90deg);
+        }
+
+        @keyframes fadeInBackground {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         @media (max-width: 992px) {
             .sidebar {
-                width: 250px;
-                transform: translateX(-250px);
+                width: 280px;
+                transform: translateX(-280px);
             }
-            
+
             .sidebar.active {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
-            
+
             .menu-toggle {
                 display: block;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .user-profile {
+                width: 100%;
+                justify-content: space-between;
             }
         }
 
         @media (max-width: 768px) {
-            .card-grid {
+            .overview-section {
                 grid-template-columns: 1fr;
             }
-            
+
             .quick-actions {
                 grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .sidebar {
+                width: 100%;
+                z-index: 2000;
             }
         }
     </style>
@@ -376,12 +492,11 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar Navigation -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img src="logo.png" alt="Logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo" class="logo-img">
                 <h2>Thusang Safety</h2>
             </div>
-            
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="{{ url_for('dashboard') }}" class="nav-link active">
@@ -425,38 +540,62 @@
         <!-- Main Content Area -->
         <div class="main-content">
             <!-- Top Bar -->
-    <div class="top-bar">
+            <div class="top-bar">
+                <i class="fas fa-bars menu-toggle" id="menu-toggle"></i>
                 <div class="page-title">
                     <h1>Dashboard</h1>
                     {% if user and user.name %}
-                    <p>Welcome back, {{ user.name }}! Here's what's happening in your community.</p>
+                    <p>Welcome back, {{ user.name }}! Stay connected with your community.</p>
                     {% else %}
-                    <p>Welcome back! Please log in to see your dashboard.</p>
+                    <p>Welcome back! Log in to access your personalized dashboard.</p>
                     {% endif %}
                 </div>
-                
-<div class="user-profile">
-                    {% if user and user.profile_pic %}
-                    <img src="{{ user.profile_pic }}" alt="User Profile">
-                    {% else %}
-                    <img src="{{ url_for('static', filename='images/profile-placeholder.png') }}" alt="User Profile">
-                    {% endif %}
+                <div class="user-profile">
+                {% if user and user.profile_image %}
+                <img src="{{ url_for('uploaded_file', filename=user.profile_image) }}" alt="User Profile">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/profile-placeholder.png') }}" alt="User Profile">
+                {% endif %}
                     <div class="user-info">
-                    {% if user and user.name %}
-                    <h4>{{ user.name }}</h4>
-                    {% else %}
-                    <h4>Guest</h4>
-                    {% endif %}
-                    <p>{{ user.email if user and user.email else 'Community Member' }}</p>
+                        {% if user and user.name %}
+                        <h4>{{ user.name }}</h4>
+                        {% else %}
+                        <h4>Guest</h4>
+                        {% endif %}
+                        <p>{{ user.email if user and user.email else 'Community Member' }}</p>
                     </div>
-                    <a href="{{ url_for('logout') }}" class="logout-btn" style="margin-left: 20px; padding: 8px 16px; background: var(--danger); color: white; border-radius: 4px; text-decoration: none;">
+                    <a href="{{ url_for('logout') }}" class="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
             </div>
 
-            <!-- Profile and Safety Information -->
-            <div class="card-grid">
+            <!-- Quick Actions (Moved Up for Priority) -->
+            <div class="quick-actions">
+                <div class="action-btn" onclick="window.location.href='{{ url_for('report_incident') }}'">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Report Incident</h3>
+                    <p>Submit a new safety concern</p>
+                </div>
+                <div class="action-btn" onclick="window.location.href='{{ url_for('crime_map') }}'">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Crime Map</h3>
+                    <p>View recent incidents</p>
+                </div>
+                <div class="action-btn" onclick="window.location.href='{{ url_for('communitychat') }}'">
+                    <i class="fas fa-comments"></i>
+                    <h3>Community Chat</h3>
+                    <p>Connect with neighbors</p>
+                </div>
+                <div class="action-btn" onclick="window.location.href='{{ url_for('rewards') }}'">
+                    <i class="fas fa-gift"></i>
+                    <h3>Redeem Rewards</h3>
+                    <p>Use your safety points</p>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <div class="overview-section">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Your Profile</h3>
@@ -474,7 +613,36 @@
                         {% endif %}
                     </div>
                 </div>
-
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Reports This Month</h3>
+                        <div class="card-icon secondary">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <h2 class="card-value">{{ reports_this_month }}</h2>
+                    <p class="card-description">Community reports this month</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Active Patrols</h3>
+                        <div class="card-icon accent">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <h2 class="card-value">{{ active_patrols }}</h2>
+                    <p class="card-description">Active safety patrols</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Your Rewards</h3>
+                        <div class="card-icon danger">
+                            <i class="fas fa-award"></i>
+                        </div>
+                    </div>
+                    <h2 class="card-value">{{ user.points if user and user.points else 0 }}</h2>
+                    <p class="card-description">Points available</p>
+                </div>
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Emergency Contacts</h3>
@@ -491,69 +659,9 @@
                             <p>No primary contact set</p>
                         {% endif %}
                         {% if contacts and contacts|length > 1 %}
-                            <p class="mt-2"><strong>Other Contacts:</strong> {{ contacts|length - 1 }}</p>
+                            <p style="margin-top: 1rem;"><strong>Other Contacts:</strong> {{ contacts|length - 1 }}</p>
                         {% endif %}
                     </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Reports This Month</h3>
-                        <div class="card-icon secondary">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                    </div>
-                    <h2 class="card-value">{{ reports_this_month }}</h2>
-                    <p class="card-description">Community reports this month</p>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Active Patrols</h3>
-                        <div class="card-icon accent">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                    </div>
-                    <h2 class="card-value">{{ active_patrols }}</h2>
-                    <p class="card-description">Active safety patrols</p>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Your Rewards</h3>
-                        <div class="card-icon danger">
-                            <i class="fas fa-award"></i>
-                        </div>
-                    </div>
-                    <h2 class="card-value">{{ user.points if user and user.points else 0 }}</h2>
-                    <p class="card-description">Points available</p>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <div class="action-btn" onclick="window.location.href='{{ url_for('report_incident') }}'">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <h3>Report Incident</h3>
-                    <p>Submit a new safety concern</p>
-                </div>
-                
-                <div class="action-btn" onclick="window.location.href='{{ url_for('crime_map') }}'">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <h3>View Crime Map</h3>
-                    <p>See recent incidents</p>
-                </div>
-                
-                <div class="action-btn" onclick="window.location.href='{{ url_for('rewards') }}'">
-                    <i class="fas fa-gift"></i>
-                    <h3>Redeem Rewards</h3>
-                    <p>Use your safety points</p>
-                </div>
-                
-                <div class="action-btn" onclick="window.location.href='{{ url_for('communitychat') }}'">
-                    <i class="fas fa-comments"></i>
-                    <h3>Community Chat</h3>
-                    <p>Connect with neighbors</p>
                 </div>
             </div>
 
@@ -563,7 +671,6 @@
                     <h3 class="section-title">Recent Activity</h3>
                     <a href="#" class="view-all">View All</a>
                 </div>
-                
                 {% if recent_incidents %}
                 {% for incident in recent_incidents %}
                 <div class="activity-item">
@@ -593,29 +700,153 @@
     </div>
 
     <script>
-        // Basic initialization with profile update check
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Dashboard initialized');
-            
-            // Check for profile updates every 5 seconds
+
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
             setInterval(checkProfileUpdates, 5000);
         });
 
         function checkProfileUpdates() {
             fetch('/api/check-profile-updates')
-                .then(function(response) { 
-                    return response.json(); 
-                })
-                .then(function(data) {
+                .then(response => response.json())
+                .then(data => {
                     if (data.updated) {
-                        // Reload only the profile section if updates are detected
                         document.getElementById('profile-info-section').innerHTML = data.html;
                     }
                 })
-                .catch(function(error) { 
-                    console.error('Error checking for updates:', error); 
+                .catch(error => {
+                    console.error('Error checking for updates:', error);
                 });
         }
     </script>
+    <footer style="background: linear-gradient(135deg, #111827 0%, #1e3a8a 100%); color: white; padding: 40px 0; margin-top: 60px;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 40px;">
+            <!-- Company Info -->
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo" style="width: 50px; height: 50px; margin-right: 15px;">
+                    <h3 style="font-size: 1.5rem; font-weight: 600; color: #e5e7eb;">Thusang Community Safety</h3>
+                </div>
+                <p style="color: #9ca3af; line-height: 1.6; margin-bottom: 20px;">
+                    Empowering communities through collaborative safety initiatives and real-time incident reporting.
+                </p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="https://www.facebook.com/YourCompanyPage" target="_blank" style="color: white; font-size: 1.5rem; transition: all 0.3s ease;">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://twitter.com/YourCompanyPage" target="_blank" style="color: white; font-size: 1.5rem; transition: all 0.3s ease;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://www.instagram.com/YourCompanyPage" target="_blank" style="color: white; font-size: 1.5rem; transition: all 0.3s ease;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/company/YourCompanyPage" target="_blank" style="color: white; font-size: 1.5rem; transition: all 0.3s ease;">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; color: #e5e7eb; position: relative; padding-bottom: 10px;">
+                    Quick Links
+                    <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: #4a90e2;"></span>
+                </h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 10px;">
+                        <a href="{{ url_for('dashboard') }}" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-chevron-right" style="margin-right: 8px; font-size: 0.8rem;"></i> Dashboard
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <a href="{{ url_for('report_incident') }}" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-chevron-right" style="margin-right: 8px; font-size: 0.8rem;"></i> Report Incident
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <a href="{{ url_for('crime_map') }}" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-chevron-right" style="margin-right: 8px; font-size: 0.8rem;"></i> Crime Map
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <a href="{{ url_for('rewards') }}" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-chevron-right" style="margin-right: 8px; font-size: 0.8rem;"></i> Rewards
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Important Resources -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; color: #e5e7eb; position: relative; padding-bottom: 10px;">
+                    Resources
+                    <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: #4a90e2;"></span>
+                </h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 10px;">
+                        <a href="https://www.saps.gov.za/" target="_blank" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-external-link-alt" style="margin-right: 8px; font-size: 0.8rem;"></i> SAPS Official Site
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <a href="https://www.gov.za/" target="_blank" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-external-link-alt" style="margin-right: 8px; font-size: 0.8rem;"></i> Government Services
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <a href="{{ url_for('faq') }}" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-question-circle" style="margin-right: 8px; font-size: 0.8rem;"></i> FAQ
+                        </a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
+                        <a href="{{ url_for('privacy') }}" style="color: #9ca3af; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center;">
+                            <i class="fas fa-shield-alt" style="margin-right: 8px; font-size: 0.8rem;"></i> Privacy Policy
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Contact and Feedback -->
+            <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 20px; color: #e5e7eb; position: relative; padding-bottom: 10px;">
+                    Contact Us
+                    <span style="position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: #4a90e2;"></span>
+                </h4>
+                <div style="margin-bottom: 20px;">
+                    <button onclick="window.location.href='/contact'" style="background: linear-gradient(135deg, #4a90e2 0%, #1453a3 100%); border: none; padding: 12px 25px; color: white; font-size: 1rem; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-envelope"></i> Send Message
+                    </button>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="feedback" style="display: block; margin-bottom: 10px; color: #e5e7eb;">Your Feedback</label>
+                    <textarea id="feedback" name="feedback" rows="3" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #374151; background-color: #1f2937; color: white; resize: none;"></textarea>
+                </div>
+                
+                <button style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; padding: 12px 25px; color: white; font-size: 1rem; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                </button>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div style="border-top: 1px solid #374151; padding-top: 20px; text-align: center;">
+            <p style="color: #9ca3af; font-size: 0.875rem;">
+                &copy; 2023 Thusang Community Safety Platform. All rights reserved.
+            </p>
+            <p style="color: #6b7280; font-size: 0.75rem; margin-top: 10px;">
+                South African Police Service (SAPS) - Your safety is our priority.
+            </p>
+        </div>
+    </div>
+</footer>
 </body>
 </html>

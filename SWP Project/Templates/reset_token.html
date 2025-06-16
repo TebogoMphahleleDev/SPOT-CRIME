@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - Thusang Community Safety Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4a90e2, #1453a3);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+ 
+        /* Container Styles */
+        .container {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+ 
+        .container h2 {
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+ 
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+ 
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+ 
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+ 
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+ 
+        /* Button Styles */
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #4a90e2;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+ 
+        button:hover {
+            background: #1453a3;
+        }
+ 
+        /* Flash Message Styles */
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+ 
+        .flash.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+ 
+        .flash.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Reset Password</h2>
+ 
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+ 
+        <form action="{{ url_for('reset_password_token') }}?token={{ token }}" method="POST">
+             
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> New Password</label>
+                <input type="password" id="password" name="new_password" placeholder="Enter new password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password"><i class="fas fa-lock"></i> Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required>
+            </div>
+            <button type="submit">Reset Password</button>
+        </form>
+ 
+        <p><a href="/login">Back to Log In</a></p>
+    </div>
+</body>
+</html>

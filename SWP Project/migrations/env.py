@@ -1,7 +1,14 @@
 import logging
 from logging.config import fileConfig
+import sys
+import os
 
 from flask import current_app
+
+# Add root directory to sys.path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import app  # Import the app module
 
 from alembic import context
 
@@ -13,6 +20,9 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
+
+# Push application context for Flask app
+app.app.app_context().push()
 
 
 def get_engine():

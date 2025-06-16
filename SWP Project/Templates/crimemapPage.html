@@ -3,450 +3,687 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Crime Map</title>
+    <title>Crime Map - Thusang Community Safety</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #e0e7ff;
+            --secondary: #10b981;
+            --accent: #f59e0b;
             --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-            --info: #6366f1;
-            --dark: #1e293b;
-            --light: #f8fafc;
-            --gray: #94a3b8;
+            --dark: #111827;
+            --light: #ffffff;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --transition: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
             color: var(--dark);
-            line-height: 1.5;
+            line-height: 1.6;
+            min-height: 100vh;
         }
-        
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--light);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .sidebar-header img {
+            width: 48px;
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
+
+        .sidebar-header img:hover {
+            transform: scale(1.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.025em;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: var(--gray);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .nav-link i {
+            margin-right: 1rem;
+            width: 24px;
+            text-align: center;
+            font-size: 1.25rem;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--light);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 0;
+            position: relative;
+        }
+
+        /* Map Container */
         #map {
             height: 100vh;
             width: 100%;
+            z-index: 1;
         }
-        
-        /* Header with glass effect */
-        .map-header {
+
+        /* Map Controls */
+        .map-controls {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 1.5rem;
+            left: 1.5rem;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 320px;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 360px;
+            transition: var(--transition);
         }
-        
-        .map-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 8px;
+
+        .map-controls h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
             color: var(--dark);
         }
-        
-        .map-header p {
+
+        .map-controls p {
             font-size: 0.875rem;
             color: var(--gray);
-            margin-bottom: 12px;
+            margin-bottom: 1rem;
         }
-        
+
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
             font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition);
             border: none;
             text-decoration: none;
         }
-        
+
         .btn-primary {
-            background-color: var(--primary);
-            color: white;
+            background: var(--primary);
+            color: var(--light);
         }
-        
+
         .btn-primary:hover {
-            background-color: #2563eb;
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
-        
+
         .btn-outline {
-            background-color: transparent;
+            background: transparent;
             color: var(--primary);
             border: 1px solid var(--primary);
         }
-        
+
         .btn-outline:hover {
-            background-color: rgba(59, 130, 246, 0.1);
+            background: var(--primary-light);
+            color: var(--primary-dark);
         }
-        
+
         .btn-group {
             display: flex;
-            gap: 8px;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
-        
-        /* Legend with better styling */
-        .map-legend {
+
+        /* Map Filters */
+        .map-filters {
             position: absolute;
-            bottom: 30px;
-            right: 20px;
+            top: 1.5rem;
+            right: 1.5rem;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 200px;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 280px;
         }
-        
-        .map-legend h3 {
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-title {
             font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 0.75rem;
             color: var(--dark);
         }
-        
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-item input {
+            margin-right: 0.75rem;
+            accent-color: var(--primary);
+        }
+
+        .filter-item label {
+            font-size: 0.875rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* Map Legend */
+        .map-legend {
+            position: absolute;
+            bottom: 2rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            max-width: 240px;
+        }
+
+        .legend-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 6px 0;
+            margin-bottom: 0.75rem;
         }
-        
+
         .legend-color {
             width: 16px;
             height: 16px;
-            margin-right: 10px;
             border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-right: 0.75rem;
+            border: 2px solid var(--light);
         }
-        
+
         .legend-label {
-            font-size: 0.8125rem;
-            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--dark);
         }
-        
-        /* Crime report form */
+
+        /* Report Form */
         .report-form {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1001;
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            background: var(--light);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
             width: 90%;
-            max-width: 400px;
+            max-width: 480px;
             display: none;
         }
-        
+
         .report-form h3 {
-            font-size: 1.25rem;
-            margin-bottom: 16px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
             color: var(--dark);
         }
-        
+
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 1.5rem;
         }
-        
-        .form-group label {
+
+        .form-label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 0.5rem;
             font-size: 0.875rem;
             font-weight: 500;
+            color: var(--dark);
         }
-        
+
         .form-control {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
             font-size: 0.875rem;
-            transition: border-color 0.2s;
+            transition: var(--transition);
         }
-        
+
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
-        
+
         select.form-control {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 10px center;
+            background-position: right 0.75rem center;
             background-size: 16px;
         }
-        
-        /* Filter controls */
-        .map-filters {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 12px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Loading Indicator */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
-        
-        .filter-group {
-            display: flex;
-            flex-direction: column;
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
         }
-        
-        .filter-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 4px;
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 500;
             color: var(--dark);
         }
-        
-        .filter-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        
-        .filter-checkbox input {
-            accent-color: var(--primary);
+
+        /* Mobile Responsiveness */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
         }
-        
-        .filter-checkbox label {
-            font-size: 0.8125rem;
+
+        .menu-toggle:hover {
+            color: var(--primary-dark);
+            transform: rotate(90deg);
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .map-header {
-                top: 10px;
-                left: 10px;
-                right: 10px;
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 280px;
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: absolute;
+                top: 1.5rem;
+                left: 1.5rem;
+                z-index: 1001;
+            }
+
+            .map-controls {
+                top: 5rem;
+                left: 1.5rem;
+                right: 1.5rem;
                 max-width: none;
             }
-            
+
             .map-filters {
                 top: auto;
-                bottom: 80px;
-                right: 10px;
-                left: 10px;
-                flex-direction: row;
-                flex-wrap: wrap;
+                bottom: 10rem;
+                right: 1.5rem;
+                left: 1.5rem;
+                max-width: none;
             }
-            
+
             .map-legend {
-                bottom: 140px;
-                right: 10px;
+                bottom: 2rem;
+                right: 1.5rem;
+                left: 1.5rem;
+                max-width: none;
             }
         }
-        
-        /* Custom marker popup styling */
-        .leaflet-popup-content {
-            margin: 12px;
-            font-size: 0.875rem;
-        }
-        
-        .leaflet-popup-content h3 {
-            font-size: 1rem;
-            margin-bottom: 6px;
-            color: var(--dark);
-        }
-        
-        .leaflet-popup-content p {
-            margin-bottom: 4px;
-        }
-        
-        .leaflet-popup-content small {
-            color: var(--gray);
-            font-size: 0.75rem;
-        }
-        
-        /* Custom locate control */
-        .leaflet-control-locate a {
-            background-color: white !important;
-            color: var(--primary) !important;
-            border-radius: 8px !important;
-            width: 36px !important;
-            height: 36px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-            border: 1px solid #e2e8f0 !important;
+
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .report-form {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="map-header">
-        <h2>Community Crime Map</h2>
-        <p>View and report incidents in your area</p>
-        <div class="btn-group">
-            <button class="btn btn-primary" id="report-btn">Report Incident</button>
-            <button class="btn btn-outline" onclick="window.location.href='/dashboard'">Back to Dashboard</button>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo" class="logo-img">
+                <h2>Thusang Safety</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('report_incident') }}" class="nav-link">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Report Incident</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('crime_map') }}" class="nav-link active">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Crime Map</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('rewards') }}" class="nav-link">
+                        <i class="fas fa-award"></i>
+                        <span>Rewards</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('communitychat') }}" class="nav-link">
+                        <i class="fas fa-comments"></i>
+                        <span>Community Chat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('profile') }}" class="nav-link">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-    </div>
 
-    <div id="map"></div>
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <i class="fas fa-bars menu-toggle" id="menu-toggle"></i>
+            
+            <!-- Loading Indicator -->
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading Map...</p>
+            </div>
 
-    <div class="map-filters">
-        <div class="filter-group">
-            <span class="filter-label">Crime Types</span>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-theft" checked>
-                <label for="filter-theft">Theft</label>
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <h2>Community Crime Map</h2>
+                <p>View and report incidents in your neighborhood</p>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="report-btn">
+                        <i class="fas fa-exclamation-triangle"></i> Report Incident
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
             </div>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-burglary" checked>
-                <label for="filter-burglary">Burglary</label>
-            </div>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-assault" checked>
-                <label for="filter-assault">Assault</label>
-            </div>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-gbv" checked>
-                <label for="filter-gbv">GBV</label>
-            </div>
-        </div>
-        <div class="filter-group">
-            <span class="filter-label">Time Range</span>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-24h" checked>
-                <label for="filter-24h">Last 24h</label>
-            </div>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-week" checked>
-                <label for="filter-week">Last week</label>
-            </div>
-            <div class="filter-checkbox">
-                <input type="checkbox" id="filter-month" checked>
-                <label for="filter-month">Last month</label>
-            </div>
-        </div>
-    </div>
 
-    <div class="map-legend">
-        <h3>Crime Types</h3>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: var(--danger);"></div>
-            <span class="legend-label">Theft</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: var(--primary);"></div>
-            <span class="legend-label">Burglary</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: var(--warning);"></div>
-            <span class="legend-label">Assault</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: var(--info);"></div>
-            <span class="legend-label">GBV</span>
-        </div>
-    </div>
+            <!-- The Map -->
+            <div id="map"></div>
 
-    <div class="report-form" id="report-form">
-        <h3>Report a Crime</h3>
-        <form id="crime-report-form">
-            <div class="form-group">
-                <label for="crime-type">Crime Type</label>
-                <select class="form-control" id="crime-type" required>
-                    <option value="">Select crime type</option>
-                    <option value="theft">Theft</option>
-                    <option value="burglary">Burglary</option>
-                    <option value="assault">Assault</option>
-                    <option value="gbv">Gender-Based Violence</option>
-                    <option value="other">Other</option>
-                </select>
+            <!-- Map Filters -->
+            <div class="map-filters">
+                <div class="filter-group">
+                    <h3 class="filter-title">Crime Types</h3>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-theft" checked>
+                        <label for="filter-theft">Theft</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-burglary" checked>
+                        <label for="filter-burglary">Burglary</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-assault" checked>
+                        <label for="filter-assault">Assault</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-gbv" checked>
+                        <label for="filter-gbv">GBV</label>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3 class="filter-title">Time Range</h3>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-24h" checked>
+                        <label for="filter-24h">Last 24h</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-week" checked>
+                        <label for="filter-week">Last week</label>
+                    </div>
+                    <div class="filter-item">
+                        <input type="checkbox" id="filter-month" checked>
+                        <label for="filter-month">Last month</label>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="crime-description">Description</label>
-                <textarea class="form-control" id="crime-description" rows="3" required placeholder="Provide details about the incident"></textarea>
+
+            <!-- Map Legend -->
+            <div class="map-legend">
+                <h3 class="legend-title">Crime Types</h3>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--danger);"></div>
+                    <span class="legend-label">Theft</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--primary);"></div>
+                    <span class="legend-label">Burglary</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--accent);"></div>
+                    <span class="legend-label">Assault</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--secondary);"></div>
+                    <span class="legend-label">GBV</span>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="crime-location">Location</label>
-                <input type="text" class="form-control" id="crime-location" required placeholder="Address or landmark">
+
+            <!-- Report Form -->
+            <div class="report-form" id="report-form">
+                <h3>Report a Crime</h3>
+                <form id="crime-report-form">
+                    <div class="form-group">
+                        <label for="crime-type" class="form-label">Crime Type</label>
+                        <select class="form-control" id="crime-type" required>
+                            <option value="">Select crime type</option>
+                            <option value="theft">Theft</option>
+                            <option value="burglary">Burglary</option>
+                            <option value="assault">Assault</option>
+                            <option value="gbv">Gender-Based Violence</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="crime-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="crime-description" required placeholder="Provide details about the incident"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="crime-location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="crime-location" required placeholder="Address or landmark">
+                    </div>
+                    <div class="form-group">
+                        <label for="crime-date" class="form-label">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="crime-date" required>
+                    </div>
+                    <div class="btn-group" style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Report
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancel-report">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="crime-date">Date & Time</label>
-                <input type="datetime-local" class="form-control" id="crime-date" required>
-            </div>
-            <div class="btn-group" style="margin-top: 16px;">
-                <button type="submit" class="btn btn-primary">Submit Report</button>
-                <button type="button" class="btn btn-outline" id="cancel-report">Cancel</button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize map with better default view
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            
+            // Toggle mobile menu
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+            // Initialize the map
             const map = L.map('map').setView([-25.731340, 28.218370], 13);
             
-            // Add tile layer with different style option
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            // Add tile layer with loading event listeners
+            const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(map);
-            
-            // Store markers for filtering
+
+            // Hide loading overlay when tiles are loaded
+            tileLayer.on('load', () => {
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500); // Small delay for smoother transition
+            });
+
             let allMarkers = [];
             let currentLocationMarker = null;
-            
-            // Crime type colors
+
             const crimeColors = {
                 'theft': '#ef4444',
-                'burglary': '#3b82f6',
+                'burglary': '#4f46e5',
                 'assault': '#f59e0b',
-                'gbv': '#6366f1',
-                'other': '#94a3b8'
+                'gbv': '#10b981',
+                'other': '#6b7280'
             };
-            
-            // Fetch crime data from server
+
             function loadCrimeData() {
                 fetch('/get_crime_data')
                     .then(response => response.json())
                     .then(data => {
-                        // Clear existing markers
                         allMarkers.forEach(marker => map.removeLayer(marker));
                         allMarkers = [];
-                        
+
                         data.forEach(crime => {
                             const marker = L.marker([crime.latitude, crime.longitude], {
                                 crimeType: crime.crime_type.toLowerCase()
                             }).addTo(map);
-                            
+
                             allMarkers.push(marker);
-                            
-                            // Format date
+
                             const crimeDate = new Date(crime.timestamp);
                             const formattedDate = crimeDate.toLocaleDateString('en-US', {
                                 month: 'short',
@@ -455,43 +692,47 @@
                                 hour: '2-digit',
                                 minute: '2-digit'
                             });
-                            
+
                             marker.bindPopup(`
                                 <h3>${crime.crime_type}</h3>
                                 <p>${crime.description}</p>
                                 <p><small>Reported: ${formattedDate}</small></p>
                                 ${crime.address ? `<p><small>Location: ${crime.address}</small></p>` : ''}
                             `);
-                            
-                            // Set marker color based on crime type
+
                             const color = crimeColors[crime.crime_type.toLowerCase()] || crimeColors['other'];
-                            
                             marker.setIcon(L.divIcon({
                                 className: 'crime-marker',
-                                html: `<div style="background-color: ${color}; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>`,
-                                iconSize: [22, 22],
-                                iconAnchor: [11, 11]
+                                html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.3); transform: scale(1); transition: transform 0.2s ease;"></div>`,
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
                             }));
+
+                            marker.on('mouseover', () => {
+                                marker._icon.children[0].style.transform = 'scale(1.2)';
+                            });
+                            marker.on('mouseout', () => {
+                                marker._icon.children[0].style.transform = 'scale(1)';
+                            });
                         });
-                        
-                        // Apply initial filters
+
                         applyFilters();
                     })
                     .catch(error => {
                         console.error('Error loading crime data:', error);
+                        loadingOverlay.style.display = 'none';
                     });
             }
-            
-            // Filter markers based on UI selections
+
             function applyFilters() {
                 const theftChecked = document.getElementById('filter-theft').checked;
                 const burglaryChecked = document.getElementById('filter-burglary').checked;
                 const assaultChecked = document.getElementById('filter-assault').checked;
                 const gbvChecked = document.getElementById('filter-gbv').checked;
-                
+
                 allMarkers.forEach(marker => {
                     const crimeType = marker.options.crimeType;
-                    
+
                     if (
                         (crimeType === 'theft' && theftChecked) ||
                         (crimeType === 'burglary' && burglaryChecked) ||
@@ -508,56 +749,47 @@
                     }
                 });
             }
-            
-            // Add filter event listeners
+
             document.querySelectorAll('.map-filters input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', applyFilters);
             });
-            
-            // Report form handling
+
             const reportForm = document.getElementById('report-form');
             const reportBtn = document.getElementById('report-btn');
             const cancelReportBtn = document.getElementById('cancel-report');
-            
+
             reportBtn.addEventListener('click', () => {
                 reportForm.style.display = 'block';
             });
-            
+
             cancelReportBtn.addEventListener('click', () => {
                 reportForm.style.display = 'none';
             });
-            
-            // Handle form submission
+
             document.getElementById('crime-report-form').addEventListener('submit', (e) => {
                 e.preventDefault();
-                
-                // In a real app, you would send this data to your server
+
                 const formData = {
                     crime_type: document.getElementById('crime-type').value,
                     description: document.getElementById('crime-description').value,
                     location: document.getElementById('crime-location').value,
                     date: document.getElementById('crime-date').value
                 };
-                
+
                 console.log('Form submitted:', formData);
-                
-                // For demo purposes, we'll just show an alert
+
                 alert('Thank you for your report. Authorities have been notified.');
-                
-                // Reset and hide form
+
                 e.target.reset();
                 reportForm.style.display = 'none';
-                
-                // In a real app, you would reload the crime data
-                // loadCrimeData();
             });
-            
-            // Enhanced locate control
+
+            // Custom locate control
             const locateBtn = L.control({position: 'topleft'});
-            
+
             locateBtn.onAdd = function(map) {
                 const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-locate');
-                div.innerHTML = '<a href="#" title="Locate me"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 1.892.402 3.13 1.5 4.5L12 22l6.5-7.5c1.098-1.37 1.5-2.608 1.5-4.5a8 8 0 0 0-8-8z"/></svg></a>';
+                div.innerHTML = `<a href="#" title="Locate me"><i class="fas fa-location-crosshairs" style="font-size: 20px;"></i></a>`;
                 div.onclick = (e) => {
                     e.preventDefault();
                     map.locate({setView: true, maxZoom: 16});
@@ -565,38 +797,80 @@
                 };
                 return div;
             };
-            
+
             locateBtn.addTo(map);
-            
-            // Handle location found
+
             map.on('locationfound', (e) => {
                 if (currentLocationMarker) {
                     map.removeLayer(currentLocationMarker);
                 }
-                
+
                 const radius = e.accuracy / 2;
-                
+
                 currentLocationMarker = L.circleMarker(e.latlng, {
-                    radius: 8,
-                    fillColor: "#3b82f6",
+                    radius: 10,
+                    fillColor: "#4f46e5",
                     color: "#fff",
                     weight: 2,
                     opacity: 1,
-                    fillOpacity: 0.8
+                    fillOpacity: 0.9
                 }).addTo(map);
-                
+
                 currentLocationMarker.bindPopup(`You are within ${Math.round(radius)} meters of this point`).openPopup();
-                
-                L.circle(e.latlng, radius).addTo(map);
+
+                L.circle(e.latlng, {
+                    radius: radius,
+                    weight: 1,
+                    color: "#4f46e5",
+                    fillOpacity: 0.1
+                }).addTo(map);
             });
-            
-            // Handle location error
+
             map.on('locationerror', (e) => {
                 alert("Unable to determine your location: " + e.message);
             });
-            
-            // Load initial data
+
+            // Load crime data
             loadCrimeData();
+
+            // Handle any query parameters
+            function getQueryParams() {
+                const params = {};
+                window.location.search.substring(1).split("&").forEach(pair => {
+                    const [key, value] = pair.split("=");
+                    if (key && value) {
+                        params[decodeURIComponent(key)] = decodeURIComponent(value);
+                    }
+                });
+                return params;
+            }
+
+            const queryParams = getQueryParams();
+            if (queryParams.lat && queryParams.lng) {
+                const targetLat = parseFloat(queryParams.lat);
+                const targetLng = parseFloat(queryParams.lng);
+
+                setTimeout(() => {
+                    let closestMarker = null;
+                    let minDistance = Infinity;
+
+                    allMarkers.forEach(marker => {
+                        const markerLatLng = marker.getLatLng();
+                        const distance = map.distance(markerLatLng, L.latLng(targetLat, targetLng));
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestMarker = marker;
+                        }
+                    });
+
+                    if (closestMarker) {
+                        map.setView([targetLat, targetLng], 16);
+                        closestMarker.openPopup();
+                    } else {
+                        map.setView([targetLat, targetLng], 16);
+                    }
+                }, 1000);
+            }
         });
     </script>
 </body>

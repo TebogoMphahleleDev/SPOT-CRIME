@@ -8,70 +8,1681 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
+    :root {
+      --primary-color: #4f46e5;
+      --primary-light: #6366f1;
+      --primary-dark: #4338ca;
+      --secondary-color: #64748b;
+      --light-color: #f8fafc;
+      --dark-color: #1e293b;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --info-color: #06b6d4;
+      --sidebar-width: 280px;
+
+      /* Dark mode variables */
+      --bg-color: var(--light-color);
+      --text-color: var(--dark-color);
+      --sidebar-bg: white;
+      --card-bg: white;
+      --card-shadow: rgba(0, 0, 0, 0.05);
+      --nav-link-color: var(--secondary-color);
+      --nav-link-hover-bg: rgba(79, 70, 229, 0.1);
+      --nav-link-hover-color: var(--primary-color);
+      --badge-bg-primary: rgba(79, 70, 229, 0.1);
+      --badge-color-primary: var(--primary-color);
+      --badge-bg-success: rgba(16, 185, 129, 0.1);
+      --badge-color-success: var(--success-color);
+      --badge-bg-warning: rgba(245, 158, 11, 0.1);
+      --badge-color-warning: var(--warning-color);
+      --badge-bg-danger: rgba(239, 68, 68, 0.1);
+      --badge-color-danger: var(--danger-color);
+      --badge-bg-info: rgba(6, 182, 212, 0.1);
+      --badge-color-info: var(--info-color);
+      --table-hover-bg: rgba(248, 250, 252, 0.8);
     }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      --bg-color: #0f172a;
+      --text-color: #f8fafc;
+      --sidebar-bg: #1e293b;
+      --card-bg: #334155;
+      --card-shadow: rgba(0, 0, 0, 0.3);
+      --nav-link-color: #94a3b8;
+      --nav-link-hover-bg: rgba(79, 70, 229, 0.2);
+      --nav-link-hover-color: white;
+      --badge-bg-primary: var(--primary-color);
+      --badge-color-primary: white;
+      --badge-bg-success: var(--success-color);
+      --badge-color-success: white;
+      --badge-bg-warning: var(--warning-color);
+      --badge-color-warning: black;
+      --badge-bg-danger: var(--danger-color);
+      --badge-color-danger: white;
+      --badge-bg-info: var(--info-color);
+      --badge-color-info: white;
+      --table-hover-bg: rgba(30, 41, 59, 0.5);
+    }
+
+    /* Improved Sidebar */
     .sidebar {
+      width: var(--sidebar-width);
       height: 100vh;
       position: fixed;
       top: 0;
       left: 0;
-      background-color: #212529;
-      padding-top: 20px;
+      background: var(--sidebar-bg);
+      box-shadow: 4px 0 15px var(--card-shadow);
+      transition: all 0.3s;
+      z-index: 1050;
+      display: flex;
+      flex-direction: column;
     }
-    .sidebar .nav-link {
-      color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 10px;
-    }
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      color: white;
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-    .sidebar .nav-link i {
-      margin-right: 10px;
-    }
-    .main-content {
-      margin-left: 250px;
+
+    .sidebar-header {
       padding: 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      min-height: 80px;
     }
+
+    /* Dark mode sidebar header */
+    body.dark-mode .sidebar-header {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-left: 12px;
+      color: var(--primary-color);
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-menu {
+      padding: 15px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      margin-bottom: 8px;
+    }
+
+    .nav-link {
+      color: var(--nav-link-color);
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--nav-link-hover-color);
+      background-color: var(--nav-link-hover-bg);
+      transform: translateX(3px);
+    }
+
+    .nav-link i {
+      width: 24px;
+      text-align: center;
+      margin-right: 10px;
+      font-size: 1.1rem;
+      transition: transform 0.2s;
+    }
+
+    .nav-link:hover i,
+    .nav-link.active i {
+      transform: scale(1.1);
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 30px;
+      transition: all 0.3s;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode .header {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-color);
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .page-title i {
+      margin-right: 12px;
+      color: var(--primary-color);
+    }
+
+    /* Enhanced Card Styling */
     .card {
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px var(--card-shadow);
+      margin-bottom: 24px;
+      background: var(--card-bg);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px var(--card-shadow);
+    }
+    
     .card-header {
-      background-color: #f8f9fa;
+      background: var(--card-bg);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 18px 24px;
+      border-radius: 12px 12px 0 0 !important;
+      font-weight: 600;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .card-header h5 {
+      margin: 0;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-header h5 i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+    
+    .card-body {
+      padding: 24px;
+    }
+    
+    /* Dashboard Cards */
+    .dashboard-card {
+      border-left: none;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .dashboard-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-color);
+    }
+    
+    .dashboard-card.card-incidents::before {
+      background: var(--primary-color);
+    }
+    
+    .dashboard-card.card-users::before {
+      background: var(--success-color);
+    }
+    
+    .dashboard-card.card-rewards::before {
+      background: var(--warning-color);
+    }
+    
+    .dashboard-card .card-title {
+      font-size: 0.9rem;
+      color: var(--nav-link-color);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+    
+    .dashboard-card .card-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      color: var(--text-color);
+    }
+    
+    .dashboard-card .card-icon {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      font-size: 1.8rem;
+      opacity: 0.2;
+      color: var(--text-color);
+    }
+
+    /* Buttons */
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      padding: 10px 20px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    .btn-outline-primary {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+    }
+
+    /* Tables */
+    .table {
+      margin-bottom: 0;
+      color: var(--text-color);
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .table thead th {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      color: var(--nav-link-color);
+      padding: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .table tbody td {
+      padding: 15px;
+      vertical-align: middle;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--table-hover-bg);
+    }
+
+    /* Status Badges */
+    .badge {
+      padding: 6px 12px;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-primary {
+      background-color: var(--badge-bg-primary);
+      color: var(--badge-color-primary);
+    }
+
+    .badge-success {
+      background-color: var(--badge-bg-success);
+      color: var(--badge-color-success);
+    }
+
+    .badge-warning {
+      background-color: var(--badge-bg-warning);
+      color: var(--badge-color-warning);
+    }
+
+    .badge-danger {
+      background-color: var(--badge-bg-danger);
+      color: var(--badge-color-danger);
+    }
+
+    .badge-info {
+      background-color: var(--badge-bg-info);
+      color: var(--badge-color-info);
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin-right: 6px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-btn:last-child {
+      margin-right: 0;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      position: relative;
+      max-width: 250px;
+    }
+
+    .search-bar input {
+      padding-left: 40px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      height: 38px;
+      transition: all 0.2s;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+
+    .search-bar i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--nav-link-color);
+      font-size: 0.9rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: 50px 0;
+      text-align: center;
+      color: var(--nav-link-color);
+    }
+
+    .empty-state i {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      color: var(--nav-link-color);
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block !important;
+      }
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      margin-right: 15px;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal-content {
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 10px 25px var(--card-shadow);
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      color: var(--text-color);
+      padding: 16px 24px;
+    }
+
+    .modal-footer {
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 12px 24px;
+    }
+
+    /* Form Controls */
+    .form-control,
+    .form-select {
+      border-radius: 8px;
+      padding: 10px 15px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      height: 38px;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+      border-color: var(--primary-color);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark-mode ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark-mode ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    /* Tab Content Animation */
+    .tab-pane {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Loading Spinner */
+    .spinner-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(79, 70, 229, 0.1);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Community Chat Styles */
+    .chat-container {
+      display: flex;
+      height: calc(100vh - 200px);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px var(--card-shadow);
+      background: var(--card-bg);
+    }
+
+    .user-list {
+      width: 300px;
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-list-header {
+      padding: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-search {
+      padding: 10px 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .user-search input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: var(--card-bg);
+      color: var(--text-color);
+    }
+
+    .user-items {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .user-item {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .user-item:hover {
+      background-color: var(--nav-link-hover-bg);
+    }
+
+    .user-item.active {
+      background-color: var(--nav-link-hover-bg);
+      border-left: 3px solid var(--primary-color);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-right: 10px;
       font-weight: 600;
     }
-    .status-badge {
-      padding: 6px 10px;
-      border-radius: 50px;
-      font-size: 12px;
+
+    .user-info {
+      flex: 1;
     }
-    .status-active {
-      background-color: #d1e7dd;
-      color: #0f5132;
+
+    .user-name {
+      font-weight: 500;
+      margin-bottom: 2px;
     }
-    .status-inactive {
-      background-color: #f8d7da;
-      color: #842029;
+
+    .user-last-message {
+      font-size: 0.8rem;
+      color: var(--secondary-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .status-pending {
-      background-color: #fff3cd;
-      color: #664d03;
+
+    .user-time {
+      font-size: 0.7rem;
+      color: var(--secondary-color);
+      text-align: right;
     }
-    .status-verified {
-      background-color: #cfe2ff;
-      color: #084298;
+
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-    .status-approved {
-      background-color: #d1e7dd;
-      color: #0f5132;
+
+    .chat-header {
+      padding: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background-color: var(--bg-color);
+    }
+
+    .message {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message-incoming {
+      align-items: flex-start;
+    }
+
+    .message-outgoing {
+      align-items: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .message-incoming .message-bubble {
+      background-color: var(--light-color);
+      color: var(--dark-color);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-outgoing .message-bubble {
+      background-color: var(--primary-color);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-sender {
+      font-weight: 500;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      color: var(--secondary-color);
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .chat-input {
+      padding: 15px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: var(--card-bg);
+      color: var(--text-color);
+      margin-right: 10px;
+    }
+
+    .chat-input button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .chat-input button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .no-chat-selected {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--secondary-color);
+    }
+
+    .no-chat-selected i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.3;
+    }
+
+    .unread-badge {
+      background-color: var(--danger-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      margin-left: auto;
     }
   </style>
 </head>
 <body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="d-flex align-items-center">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo" class="logo-img">
+        <span class="logo-text">Thusang</span>
+      </div>
+      <button id="darkModeToggle" title="Toggle Dark Mode" style="background:none; border:none; color: var(--primary-color); font-size: 1.2rem; margin-left: auto; cursor: pointer;">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+    
+    <div class="sidebar-menu">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#incidents" data-bs-toggle="tab">
+            <i class="fas fa-exclamation-triangle"></i> Incidents
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#users" data-bs-toggle="tab">
+            <i class="fas fa-users"></i> Users
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#rewards" data-bs-toggle="tab">
+            <i class="fas fa-award"></i> Rewards
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#law_enforcement" data-bs-toggle="tab">
+            <i class="fas fa-user-shield"></i> Law Enforcement
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#admins" data-bs-toggle="tab">
+            <i class="fas fa-user-cog"></i> Admins
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#reports" data-bs-toggle="tab">
+            <i class="fas fa-chart-bar"></i> Reports
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#communitychat" data-bs-toggle="tab">
+            <i class="fas fa-comments"></i> Community Chat
+          </a>
+        </li>
+        <li class="nav-item mt-3">
+          <a class="nav-link" href="/logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1 class="page-title" id="pageTitle">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </h1>
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" class="form-control" placeholder="Search dashboard...">
+      </div>
+    </div>
+    
+    <div class="tab-content">
+      <!-- Dashboard Tab -->
+      <div class="tab-pane fade show active" id="dashboard">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card dashboard-card card-incidents fade-in">
+              <div class="card-body">
+                <h5 class="card-title">Total Incidents</h5>
+                <p class="card-value">{{ incident_count if incident_count else 0 }}</p>
+                <i class="fas fa-exclamation-triangle card-icon"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card dashboard-card card-users fade-in">
+              <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <p class="card-value">{{ user_count if user_count else 0 }}</p>
+                <i class="fas fa-users card-icon"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card dashboard-card card-rewards fade-in">
+              <div class="card-body">
+                <h5 class="card-title">Pending Rewards</h5>
+                <p class="card-value">{{ pending_rewards if pending_rewards else 0 }}</p>
+                <i class="fas fa-award card-icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card fade-in">
+              <div class="card-header">
+                <h5><i class="fas fa-exclamation-triangle"></i> Recent Incidents</h5>
+                <a href="#incidents" class="btn btn-sm btn-outline-primary" data-bs-toggle="tab">View All</a>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Crime Type</th>
+                        <th>Location</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for incident, user in incidents[:5] %}
+                      <tr>
+                        <td>#{{ incident.id }}</td>
+                        <td>{{ incident.crime_type }}</td>
+                        <td>{{ incident.address if incident.address else 'Unknown location' }}</td>
+                        <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                          <span class="badge 
+                            {% if incident.status == 'verified' %}badge-success
+                            {% elif incident.status == 'reported' %}badge-warning
+                            {% elif incident.status == 'resolved' %}badge-primary
+                            {% elif incident.status == 'false_alarm' %}badge-danger
+                            {% else %}badge-info{% endif %}">
+                            {{ incident.status|replace('_', ' ')|title }}
+                          </span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      {% if not incidents %}
+                      <tr>
+                        <td colspan="6" class="text-center py-4">
+                          <div class="empty-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>No incidents to display</p>
+                            <a href="#incidents" class="btn btn-primary" data-bs-toggle="tab">
+                              <i class="fas fa-plus me-2"></i>Report Incident
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community Chat Tab -->
+      <div class="tab-pane fade" id="communitychat">
+        <div class="chat-container">
+          <!-- User List Sidebar -->
+          <div class="user-list">
+            <div class="user-list-header">
+              <span>Community Chat</span>
+              <button class="btn btn-sm btn-outline-primary" id="refreshUsersBtn">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="user-search">
+              <input type="text" id="userSearchInput" placeholder="Search users...">
+            </div>
+            <div class="user-items" id="userList">
+              <!-- Users will be loaded here -->
+            </div>
+          </div>
+          
+          <!-- Chat Area -->
+          <div class="chat-area">
+            <div class="chat-header" id="chatHeader">
+              <span id="currentChatUser">Select a user to chat</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="no-chat-selected">
+                <i class="fas fa-comment-dots"></i>
+                <p>Select a user to start chatting</p>
+              </div>
+            </div>
+            <div class="chat-input">
+              <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+              <button id="sendMessageBtn" disabled>
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other tabs remain unchanged -->
+      <!-- Incidents Tab -->
+      <div class="tab-pane fade" id="incidents">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="page-title">
+            <i class="fas fa-exclamation-triangle"></i> Incident Management
+          </h2>
+          <div>
+            <button type="button" class="btn btn-primary" id="createIncidentBtn">
+              <i class="fas fa-plus me-2"></i>New Incident
+            </button>
+          </div>
+        </div>
+        
+        <div class="card fade-in">
+          <div class="card-header">
+            <h5><i class="fas fa-list"></i> All Incidents</h5>
+            <div class="d-flex">
+              <select class="form-select form-select-sm me-2" style="width: 150px;" aria-label="Filter by status">
+                <option value="">Filter by status</option>
+                <option value="reported">Reported</option>
+                <option value="verified">Verified</option>
+                <option value="resolved">Resolved</option>
+                <option value="false_alarm">False Alarm</option>
+              </select>
+              <select class="form-select form-select-sm" style="width: 150px;" aria-label="Sort by date">
+                <option value="">Sort by date</option>
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table" id="incidents-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Crime Type</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for incident, user in incidents %}
+                  <tr data-incident-id="{{ incident.id }}">
+                    <td>#{{ incident.id }}</td>
+                    <td>{{ user.name if user.name else 'Unknown' }} ({{ user.email }})</td>
+                    <td>{{ incident.crime_type }}</td>
+                    <td>{{ incident.address if incident.address else 'Unknown location' }}</td>
+                    <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                      <span class="badge 
+                        {% if incident.status == 'verified' %}badge-success
+                        {% elif incident.status == 'reported' %}badge-warning
+                        {% elif incident.status == 'resolved' %}badge-primary
+                        {% elif incident.status == 'false_alarm' %}badge-danger
+                        {% else %}badge-info{% endif %}">
+                        {{ incident.status|replace('_', ' ')|title }}
+                      </span>
+                    </td>
+<td>
+  <div class="d-flex">
+    <button class="btn btn-sm btn-outline-info action-btn view-incident-btn" title="View" data-incident-id="{{ incident.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="fas fa-eye"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-primary action-btn edit-incident-btn" title="Edit" data-incident-id="{{ incident.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="fas fa-edit"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-danger action-btn delete-incident-btn" title="Delete" data-incident-id="{{ incident.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="fas fa-trash"></i>
+    </button>
+    {% if incident.status == 'reported' %} 
+    <button class="btn btn-sm btn-outline-success action-btn verify-incident-btn" title="Verify" data-incient-id="{{ incident.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="fas fa-check"></i>
+    </button>
+    {% endif %}
+  </div>
+</td>
+                  </tr>
+                  <tr class="evidence-row" id="evidence-row-{{ incident.id }}" style="display: none;">
+                    <td colspan="7">
+                      <div class="evidence-container d-flex flex-wrap gap-3">
+                        {% for ev in incident.evidence %}
+                          {% if ev.file_type == 'image' %}
+                            <img src="{{ url_for('uploaded_file', filename=ev.file_path) }}" alt="Evidence Image" style="max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover;">
+                          {% elif ev.file_type == 'video' %}
+                            <video src="{{ url_for('uploaded_file', filename=ev.file_path) }}" controls style="max-width: 200px; max-height: 150px; border-radius: 8px;"></video>
+                          {% elif ev.file_type == 'audio' %}
+                            <audio src="{{ url_for('uploaded_file', filename=ev.file_path) }}" controls style="width: 100%;"></audio>
+                          {% else %}
+                            <a href="{{ url_for('uploaded_file', filename=ev.file_path) }}" target="_blank">Download file</a>
+                          {% endif %}
+                        {% else %}
+                          <p>No evidence available.</p>
+                        {% endfor %}
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% if not incidents %}
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>No incidents to display</p>
+                        <button type="button" class="btn btn-primary" id="createIncidentBtn2">
+                          <i class="fas fa-plus me-2"></i>Create Incident
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Tab -->
+      <div class="tab-pane fade" id="users">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="page-title">
+            <i class="fas fa-users"></i> User Management
+          </h2>
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search users...">
+          </div>
+        </div>
+        
+        <div class="card fade-in">
+          <div class="card-header">
+            <h5><i class="fas fa-list"></i> All Users</h5>
+            <div class="d-flex">
+              <select class="form-select form-select-sm me-2" style="width: 150px;" aria-label="Filter by status">
+                <option value="">Filter by status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <select class="form-select form-select-sm" style="width: 150px;" aria-label="Sort by">
+                <option value="">Sort by</option>
+                <option value="name">Name</option>
+                <option value="email">Email</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table" id="users-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in users %}
+                  <tr data-user-id="{{ user.id }}">
+                    <td>#{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>
+                      <span class="badge badge-success">Active</span>
+                    </td>
+                    <td>
+                      <div class="d-flex">
+                        <button class="btn btn-sm btn-outline-primary action-btn edit-user-btn" title="Edit" data-user-id="{{ user.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn delete-user-btn" title="Delete" data-user-id="{{ user.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary action-btn toggle-user-status-btn" title="Toggle Status" data-user-id="{{ user.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-power-off"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% if not users %}
+                  <tr>
+                    <td colspan="6" class="text-center py-4">
+                      <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <p>No users to display</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rewards Tab -->
+      <div class="tab-pane fade" id="rewards">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="page-title">
+            <i class="fas fa-award"></i> Rewards Management
+          </h2>
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" placeholder="Search rewards...">
+          </div>
+        </div>
+        
+        <div class="card fade-in">
+          <div class="card-header">
+            <h5><i class="fas fa-list"></i> Reward Vouchers</h5>
+            <div class="d-flex">
+              <select class="form-select form-select-sm me-2" style="width: 150px;" aria-label="Filter by status">
+                <option value="">Filter by status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="redeemed">Redeemed</option>
+              </select>
+              <select class="form-select form-select-sm" style="width: 150px;" aria-label="Sort by date">
+                <option value="">Sort by date</option>
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table" id="rewards-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Reward Type</th>
+                    <th>Points</th>
+                    <th>Code</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for voucher in vouchers %}
+                  <tr data-voucher-id="{{ voucher.id }}">
+                    <td>#{{ voucher.id }}</td>
+                    <td>{{ voucher.user.name if voucher.user and voucher.user.name else 'Unknown' }} ({{ voucher.user.email if voucher.user else 'N/A' }})</td>
+                    <td>{{ voucher.reward_type }}</td>
+                    <td>{{ voucher.points_cost }}</td>
+                    <td><code>{{ voucher.voucher_code }}</code></td>
+                    <td>
+                      {% if voucher.is_approved %}
+                        <span class="badge badge-success">Approved</span>
+                      {% elif voucher.is_redeemed %}
+                        <span class="badge badge-primary">Redeemed</span>
+                      {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="d-flex">
+                        {% if not voucher.is_approved and not voucher.is_redeemed %}
+                        <button class="btn btn-sm btn-outline-success action-btn approve-reward-btn" title="Approve" data-voucher-id="{{ voucher.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn reject-reward-btn" title="Reject" data-voucher-id="{{ voucher.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-times"></i>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-sm btn-outline-secondary action-btn" disabled title="Processed" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-check"></i>
+                        </button>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% if not vouchers %}
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div class="empty-state">
+                        <i class="fas fa-award"></i>
+                        <p>No rewards to display</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Law Enforcement Tab -->
+      <div class="tab-pane fade" id="law_enforcement">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="page-title">
+            <i class="fas fa-user-shield"></i> Law Enforcement Management
+          </h2>
+          <button type="button" class="btn btn-primary" id="createOfficerBtn">
+            <i class="fas fa-plus me-2"></i>Add Officer
+          </button>
+        </div>
+        <div class="card fade-in">
+          <div class="card-header">
+            <h5><i class="fas fa-list"></i> All Officers</h5>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" class="form-control" placeholder="Search officers...">
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table" id="law-enforcement-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Station</th>
+                    <th>Badge Number</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for officer in officers %}
+                  <tr data-officer-id="{{ officer.id }}">
+                    <td>#{{ officer.id }}</td>
+                    <td>{{ officer.email }}</td>
+                    <td>{{ officer.station }}</td>
+                    <td>{{ officer.badge_number }}</td>
+                    <td>{{ officer.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                      <div class="d-flex">
+                        <button class="btn btn-sm btn-outline-primary action-btn edit-officer-btn" title="Edit" data-officer-id="{{ officer.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn delete-officer-btn" title="Delete" data-officer-id="{{ officer.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% if not officers %}
+                  <tr>
+                    <td colspan="6" class="text-center py-4">
+                      <div class="empty-state">
+                        <i class="fas fa-user-shield"></i>
+                        <p>No law enforcement officers to display</p>
+                        <button type="button" class="btn btn-primary" id="createOfficerBtn2">
+                          <i class="fas fa-plus me-2"></i>Add Officer
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admins Tab -->
+      <!-- Admins Tab -->
+      <div class="tab-pane fade" id="admins">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="page-title">
+            <i class="fas fa-user-cog"></i> Admin Management
+          </h2>
+          <button type="button" class="btn btn-primary" id="createAdminBtn">
+            <i class="fas fa-plus me-2"></i>Add Admin
+          </button>
+        </div>
+        <div class="card fade-in">
+          <div class="card-header">
+            <h5><i class="fas fa-list"></i> All Admins</h5>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" class="form-control" placeholder="Search admins...">
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table" id="admins-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for admin in admins %}
+                  <tr data-admin-id="{{ admin.id }}">
+                    <td>#{{ admin.id }}</td>
+                    <td>{{ admin.email }}</td>
+                    <td>{{ admin.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                      <div class="d-flex">
+                        <button class="btn btn-sm btn-outline-primary action-btn edit-admin-btn" title="Edit" data-admin-id="{{ admin.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn delete-admin-btn" title="Delete" data-admin-id="{{ admin.id }}" data-bs-toggle="tooltip" data-bs-placement="top">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% if not admins %}
+                  <tr>
+                    <td colspan="4" class="text-center py-4">
+                      <div class="empty-state">
+                        <i class="fas fa-user-cog"></i>
+                        <p>No admins to display</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="reports">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 class="page-title">
+            <i class="fas fa-chart-bar"></i> Reports
+          </h2>
+          <button type="button" class="btn btn-primary" id="generateReportBtn" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+            <i class="fas fa-file-alt me-2"></i>Generate Report
+          </button>
+        </div>
+        <div class="card fade-in">
+          <div class="card-header">
+            <h5><i class="fas fa-chart-bar"></i> Incident Reports</h5>
+          </div>
+          <div class="card-body">
+            <form id="reportForm" class="row g-3">
+              <div class="col-md-4">
+                <label for="filterCaseType" class="form-label">Case Type</label>
+                <select class="form-select" id="filterCaseType" name="case_type">
+                  <option value="">All</option>
+                  <option value="Theft">Theft</option>
+                  <option value="Burglary">Burglary</option>
+                  <option value="Assault">Assault</option>
+                  <option value="Vandalism">Vandalism</option>
+                  <option value="Fraud">Fraud</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="filterUserId" class="form-label">User ID</label>
+                <input type="number" class="form-control" id="filterUserId" name="user_id" placeholder="Enter User ID">
+              </div>
+              <div class="col-md-4">
+                <label for="filterUserName" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="filterUserName" name="user_name" placeholder="Enter User Name">
+              </div>
+              <div class="col-md-4">
+                <label for="filterDateFrom" class="form-label">Date From</label>
+                <input type="date" class="form-control" id="filterDateFrom" name="date_from">
+              </div>
+              <div class="col-md-4">
+                <label for="filterDateTo" class="form-label">Date To</label>
+                <input type="date" class="form-control" id="filterDateTo" name="date_to">
+              </div>
+              <div class="col-md-4">
+                <label for="filterStatus" class="form-label">Status</label>
+                <select class="form-select" id="filterStatus" name="status">
+                  <option value="">All</option>
+                  <option value="reported">Reported</option>
+                  <option value="verified">Verified</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="false_alarm">False Alarm</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="filterLocation" class="form-label">Location</label>
+                <input type="text" class="form-control" id="filterLocation" name="location" placeholder="Enter Location">
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary" id="generateReportSubmitBtn">
+                  <i class="fas fa-file-alt me-2"></i>Generate Report
+                </button>
+              </div>
+            </form>
+            <hr>
+            <div id="reportResults" style="max-height: 400px; overflow-y: auto;">
+              <!-- Report results will be inserted here -->
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-primary" id="exportPdfBtn">
+              <i class="fas fa-file-pdf me-2"></i>Export PDF
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="exportCsvBtn">
+              <i class="fas fa-file-csv me-2"></i>Export CSV
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="adminModalLabel">Add Admin</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="adminForm">
+            <input type="hidden" id="admin_id" name="admin_id">
+            <div class="mb-3">
+              <label for="admin_email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="admin_email" name="admin_email" required>
+            </div>
+            <div class="mb-3">
+              <label for="admin_password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="admin_password" name="admin_password" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveAdminBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Generate Report -->
+  <div class="modal fade" id="generateReportModal" tabindex="-1" aria-labelledby="generateReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="generateReportModalLabel">Generate Incident Report</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reportForm" class="row g-3">
+            <div class="col-md-4">
+              <label for="filterCaseType" class="form-label">Case Type</label>
+              <select class="form-select" id="filterCaseType" name="case_type">
+                <option value="">All</option>
+                <option value="Theft">Theft</option>
+                <option value="Burglary">Burglary</option>
+                <option value="Assault">Assault</option>
+                <option value="Vandalism">Vandalism</option>
+                <option value="Fraud">Fraud</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="filterUserId" class="form-label">User ID</label>
+              <input type="number" class="form-control" id="filterUserId" name="user_id" placeholder="Enter User ID">
+            </div>
+            <div class="col-md-4">
+              <label for="filterUserName" class="form-label">User Name</label>
+              <input type="text" class="form-control" id="filterUserName" name="user_name" placeholder="Enter User Name">
+            </div>
+            <div class="col-md-4">
+              <label for="filterOfficerName" class="form-label">Law Enforcement Name</label>
+              <input type="text" class="form-control" id="filterOfficerName" name="officer_name" placeholder="Enter Officer Name">
+            </div>
+            <div class="col-md-4">
+              <label for="filterDateFrom" class="form-label">Date From</label>
+              <input type="date" class="form-control" id="filterDateFrom" name="date_from">
+            </div>
+            <div class="col-md-4">
+              <label for="filterDateTo" class="form-label">Date To</label>
+              <input type="date" class="form-control" id="filterDateTo" name="date_to">
+            </div>
+            <div class="col-md-4">
+              <label for="filterStatus" class="form-label">Status</label>
+              <select class="form-select" id="filterStatus" name="status">
+                <option value="">All</option>
+                <option value="reported">Reported</option>
+                <option value="verified">Verified</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="false_alarm">False Alarm</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="filterLocation" class="form-label">Location</label>
+              <input type="text" class="form-control" id="filterLocation" name="location" placeholder="Enter Location">
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary" id="generateReportSubmitBtn">
+                <i class="fas fa-file-alt me-2"></i>Generate Report
+              </button>
+            </div>
+          </form>
+          <hr>
+          <div id="reportResults" style="max-height: 400px; overflow-y: auto;">
+            <!-- Report results will be inserted here -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-primary" id="exportPdfBtn">
+            <i class="fas fa-file-pdf me-2"></i>Export PDF
+          </button>
+          <button type="button" class="btn btn-outline-primary" id="exportCsvBtn">
+            <i class="fas fa-file-csv me-2"></i>Export CSV
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal for Create/Edit Incident -->
   <div class="modal fade" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -126,6 +1737,10 @@
                 <option value="resolved">Resolved</option>
                 <option value="false_alarm">False Alarm</option>
               </select>
+            </div>
+            <div class="mb-3">
+              <label for="notes" class="form-label">Case Notes</label>
+              <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
             </div>
           </form>
         </div>
@@ -193,710 +1808,626 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
-  <div class="col-md-2 d-md-block sidebar">
-    <div class="text-center mb-4">
-      <h3 class="text-white">Admin</h3>
-    </div>
-    <ul class="nav flex-column">
-      <li class="nav-item">
-        <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
-          <i class="fas fa-tachometer-alt"></i> Dashboard
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#incidents" data-bs-toggle="tab">
-          <i class="fas fa-exclamation-triangle"></i> Incidents
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#users" data-bs-toggle="tab">
-          <i class="fas fa-users"></i> Users
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#rewards" data-bs-toggle="tab">
-          <i class="fas fa-award"></i> Rewards
-        </a>
-      </li>
-      <li class="nav-item mt-5">
-        <a class="nav-link" href="/logout">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <div class="tab-content">
-      <!-- Dashboard Tab -->
-      <div class="tab-pane fade show active" id="dashboard">
-        <h2 class="mb-4">Admin Dashboard</h2>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="card text-white bg-primary">
-              <div class="card-body">
-                <h5 class="card-title">Total Incidents</h5>
-                <p class="card-text display-4">{{ incident_count if incident_count else 0 }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card text-white bg-success">
-              <div class="card-body">
-                <h5 class="card-title">Total Users</h5>
-                <p class="card-text display-4">{{ user_count if user_count else 0 }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card text-white bg-warning">
-              <div class="card-body">
-                <h5 class="card-title">Pending Rewards</h5>
-                <p class="card-text display-4">{{ pending_rewards if pending_rewards else 0 }}</p>
-              </div>
-            </div>
-          </div>
+  <!-- View Incident Modal -->
+  <div class="modal fade" id="viewIncidentModal" tabindex="-1" aria-labelledby="viewIncidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewIncidentModalLabel">Incident Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
-        <div class="row mt-4">
-          <div class="col-md-12">
-            <div class="card">
-              <div class="card-header">
-                <h5>Recent Incidents</h5>
+          <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Incident Information</h6>
+              <div class="mb-3">
+                <label class="form-label">ID:</label>
+                <p class="form-control-static" id="view_incident_id"></p>
               </div>
-              <div class="card-body">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Crime Type</th>
-                      <th>Location</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for incident, user in incidents[:5] %}
-                    <tr>
-                      <td>{{ incident.id }}</td>
-                      <td>{{ incident.crime_type }}</td>
-                      <td>{{ incident.address if incident.address else 'Unknown location' }}</td>
-                      <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
-                      <td>
-                        <span class="status-badge status-{{ incident.status }}">
-                          {{ incident.status|capitalize }}
-                        </span>
-                      </td>
-                    </tr>
-                    {% endfor %}
-                    {% if not incidents %}
-                    <tr>
-                      <td colspan="5" class="text-center">No incidents to display</td>
-                    </tr>
-                    {% endif %}
-                  </tbody>
-                </table>
+              <div class="mb-3">
+                <label class="form-label">Crime Type:</label>
+                <p class="form-control-static" id="view_crime_type"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Description:</label>
+                <p class="form-control-static" id="view_description"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Address:</label>
+                <p class="form-control-static" id="view_address"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Case Notes:</label>
+                <p class="form-control-static" id="view_notes"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Evidence</label>
+                <div id="view_evidence" class="d-flex flex-wrap gap-3"></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Status:</label>
+                <p class="form-control-static" id="view_status"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Created At:</label>
+                <p class="form-control-static" id="view_created_at"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Latitude:</label>
+                <p class="form-control-static" id="view_latitude"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Longitude:</label>
+                <p class="form-control-static" id="view_longitude"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Assigned Officer:</label>
+                <p class="form-control-static" id="view_assigned_officer"></p>
+              </div>
+            </div>
+          </div>
+          <hr>
+          <h6>Reported By</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Name:</label>
+                <p class="form-control-static" id="view_user_name"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <p class="form-control-static" id="view_user_email"></p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Phone:</label>
+                <p class="form-control-static" id="view_user_phone"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Address:</label>
+                <p class="form-control-static" id="view_user_address"></p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Incidents Tab -->
-      <div class="tab-pane fade" id="incidents">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2>Incident Management</h2>
-          <button type="button" class="btn btn-primary" id="createIncidentBtn">
-            <i class="fas fa-plus"></i> Create New Incident
-          </button>
-        </div>
-        
-        <div class="card">
-          <div class="card-body">
-            <table class="table table-striped" id="incidents-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>User</th>
-                  <th>Crime Type</th>
-                  <th>Location</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for incident, user in incidents %}
-                <tr data-incident-id="{{ incident.id }}">
-                  <td>{{ incident.id }}</td>
-                  <td>{{ user.name if user.name else 'Unknown' }} ({{ user.email }})</td>
-                  <td>{{ incident.crime_type }}</td>
-                  <td>{{ incident.address if incident.address else 'Unknown location' }}</td>
-                  <td>{{ incident.created_at.strftime('%Y-%m-%d') }}</td>
-                  <td>
-                    <span class="status-badge status-{{ incident.status }}">
-                      {{ incident.status|capitalize }}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-sm btn-warning edit-incident-btn">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-danger delete-incident-btn">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                      {% if incident.status == 'reported' %}
-                      <button type="button" class="btn btn-sm btn-success verify-incident-btn">
-                        <i class="fas fa-check"></i>
-                      </button>
-                      {% endif %}
-                    </div>
-                  </td>
-                </tr>
-                {% endfor %}
-                {% if not incidents %}
-                <tr>
-                  <td colspan="7" class="text-center">No incidents to display</td>
-                </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Users Tab -->
-      <div class="tab-pane fade" id="users">
-        <h2 class="mb-4">User Management</h2>
-        
-        <div class="card">
-          <div class="card-body">
-            <table class="table table-striped" id="users-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Address</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for user in users %}
-                <tr data-user-id="{{ user.id }}">
-                  <td>{{ user.id }}</td>
-                  <td>{{ user.name }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.phone }}</td>
-                  <td>{{ user.address }}</td>
-                  <td>
-                    <span class="status-badge status-active">
-                      Active
-                    </span>
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-sm btn-warning edit-user-btn">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-danger delete-user-btn">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-secondary toggle-user-status-btn">
-                        <i class="fas fa-power-off"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                {% endfor %}
-                {% if not users %}
-                <tr>
-                  <td colspan="7" class="text-center">No users to display</td>
-                </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Rewards Tab -->
-      <div class="tab-pane fade" id="rewards">
-        <h2 class="mb-4">Rewards Management</h2>
-        
-        <div class="card">
-          <div class="card-body">
-            <table class="table table-striped" id="rewards-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>User</th>
-                  <th>Reward Type</th>
-                  <th>Points Cost</th>
-                  <th>Voucher Code</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for voucher in vouchers %}
-                <tr data-voucher-id="{{ voucher.id }}">
-                  <td>{{ voucher.id }}</td>
-                  <td>{{ voucher.user.name if voucher.user and voucher.user.name else 'Unknown' }} ({{ voucher.user.email if voucher.user else 'N/A' }})</td>
-                  <td>{{ voucher.reward_type }}</td>
-                  <td>{{ voucher.points_cost }}</td>
-                  <td>{{ voucher.voucher_code }}</td>
-                  <td>
-                    {% if voucher.is_approved %}
-                      <span class="status-badge status-approved">Approved</span>
-                    {% elif voucher.is_redeemed %}
-                      <span class="status-badge status-active">Redeemed</span>
-                    {% else %}
-                      <span class="status-badge status-pending">Pending</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      {% if not voucher.is_approved and not voucher.is_redeemed %}
-                      <button type="button" class="btn btn-sm btn-success approve-reward-btn">
-                        <i class="fas fa-check"></i>
-                      </button>
-                      <button type="button" class="btn btn-sm btn-danger reject-reward-btn">
-                        <i class="fas fa-times"></i>
-                      </button>
-                      {% else %}
-                      <button type="button" class="btn btn-sm btn-secondary" disabled>
-                        <i class="fas fa-check"></i> Processed
-                      </button>
-                      {% endif %}
-                    </div>
-                  </td>
-                </tr>
-                {% endfor %}
-                {% if not vouchers %}
-                <tr>
-                  <td colspan="7" class="text-center">No vouchers to display</td>
-                </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
+
 
   <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF and autoTable for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  <script src="{{ url_for('static', filename='js/admin_reports.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin_crud.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin_rewards.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/user_crud.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/incident_crud.js') }}"></script>
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Toast notification system
-      function showToast(message, type = 'info') {
-        const toastContainer = document.getElementById('toast-container') || createToastContainer();
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type} border-0`;
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const body = document.body;
+
+      // Load saved mode from localStorage
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode === 'enabled') {
+        body.classList.add('dark-mode');
+        if (darkModeToggle) {
+          darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+      }
+
+      if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+          body.classList.toggle('dark-mode');
+          if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          } else {
+            localStorage.setItem('darkMode', 'disabled');
+            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          }
+        });
+      }
+
+      // Mobile menu toggle
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const sidebar = document.querySelector('.sidebar');
+
+      if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', function() {
+          sidebar.classList.toggle('active');
+        });
+      }
+
+      // Community Chat Functionality
+      const socket = io();
+      let selectedUserId = null;
+      let users = [];
+      
+      // DOM Elements
+      const userList = document.getElementById('userList');
+      const userSearchInput = document.getElementById('userSearchInput');
+      const chatMessages = document.getElementById('chatMessages');
+      const messageInput = document.getElementById('messageInput');
+      const sendMessageBtn = document.getElementById('sendMessageBtn');
+      const currentChatUser = document.getElementById('currentChatUser');
+      const refreshUsersBtn = document.getElementById('refreshUsersBtn');
+
+      // Join admin room
+      socket.emit('join_admin_room');
+
+      // Load users who have sent messages
+      function loadUsers() {
+        fetch('/api/chat/users')
+          .then(response => response.json())
+          .then(data => {
+            users = data;
+            renderUserList(data);
+          })
+          .catch(error => {
+            console.error('Error loading users:', error);
+          });
+      }
+
+      // Render user list
+      function renderUserList(users) {
+        userList.innerHTML = '';
         
-        toast.innerHTML = `
-          <div class="d-flex">
-            <div class="toast-body">
-              ${message}
+        if (users.length === 0) {
+          userList.innerHTML = `
+            <div class="text-center p-4 text-muted">
+              <i class="fas fa-users-slash mb-2"></i>
+              <p>No users have started conversations yet</p>
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          `;
+          return;
+        }
+        
+        users.forEach(user => {
+          const userElement = document.createElement('div');
+          userElement.className = `user-item ${selectedUserId === user.user_id ? 'active' : ''}`;
+          userElement.dataset.userId = user.user_id;
+          
+          // Get first letter of username for avatar
+          const avatarLetter = user.username ? user.username.charAt(0).toUpperCase() : 'U';
+          
+          userElement.innerHTML = `
+            <div class="user-avatar" style="background-color: ${getRandomColor()}">
+              ${avatarLetter}
+            </div>
+            <div class="user-info">
+              <div class="user-name">${user.username || 'Unknown User'}</div>
+              <div class="user-last-message">${user.last_message || 'No messages yet'}</div>
+            </div>
+            <div class="user-time">${formatTime(user.last_message_time)}</div>
+            ${user.unread_count > 0 ? `<div class="unread-badge">${user.unread_count}</div>` : ''}
+          `;
+          
+          userElement.addEventListener('click', () => selectUser(user.user_id, user.username));
+          userList.appendChild(userElement);
+        });
+      }
+
+      // Select a user to chat with
+      function selectUser(userId, username) {
+        selectedUserId = userId;
+        currentChatUser.textContent = username || 'Unknown User';
+        messageInput.disabled = false;
+        sendMessageBtn.disabled = false;
+        
+        // Update active state in user list
+        document.querySelectorAll('.user-item').forEach(item => {
+          item.classList.toggle('active', item.dataset.userId === userId.toString());
+        });
+        
+        // Load chat history
+        loadChatHistory(userId);
+        
+        // Mark messages as read
+        markMessagesAsRead(userId);
+      }
+
+      // Load chat history with selected user
+      function loadChatHistory(userId) {
+        fetch(`/api/chat/history/${userId}`)
+          .then(response => response.json())
+          .then(messages => {
+            renderMessages(messages);
+          })
+          .catch(error => {
+            console.error('Error loading chat history:', error);
+          });
+      }
+
+      // Render messages in chat area
+      function renderMessages(messages) {
+        chatMessages.innerHTML = '';
+        
+        if (messages.length === 0) {
+          chatMessages.innerHTML = `
+            <div class="text-center p-4 text-muted">
+              <i class="fas fa-comment-slash mb-2"></i>
+              <p>No messages yet</p>
+              <p class="small">Start the conversation with this user</p>
+            </div>
+          `;
+          return;
+        }
+        
+        messages.forEach(message => {
+          const messageElement = document.createElement('div');
+          messageElement.className = `message ${message.is_admin ? 'message-outgoing' : 'message-incoming'}`;
+          
+          const formattedTime = formatTime(message.timestamp);
+          
+          messageElement.innerHTML = `
+            <div class="message-bubble">
+              <div class="message-sender">${message.is_admin ? 'You' : message.username || 'User'}</div>
+              <div class="message-text">${message.message}</div>
+              <div class="message-time">${formattedTime}</div>
+            </div>
+          `;
+          
+          chatMessages.appendChild(messageElement);
+        });
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Mark messages as read
+      function markMessagesAsRead(userId) {
+        fetch(`/api/chat/mark_as_read/${userId}`, {
+          method: 'POST'
+        })
+        .then(response => {
+          if (response.ok) {
+            // Update unread count in UI
+            const userItem = document.querySelector(`.user-item[data-user-id="${userId}"]`);
+            if (userItem) {
+              const unreadBadge = userItem.querySelector('.unread-badge');
+              if (unreadBadge) {
+                unreadBadge.remove();
+              }
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error marking messages as read:', error);
+        });
+      }
+
+      // Send message
+      function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message || !selectedUserId) return;
+        
+        socket.emit('admin_send_message', {
+          user_id: selectedUserId,
+          message: message
+        });
+        
+        // Add message to UI immediately
+        const newMessage = {
+          id: Date.now(),
+          user_id: selectedUserId,
+          username: currentChatUser.textContent,
+          message: message,
+          timestamp: new Date().toISOString(),
+          is_admin: true
+        };
+        
+        // Create a temporary message element
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message message-outgoing';
+        messageElement.innerHTML = `
+          <div class="message-bubble">
+            <div class="message-sender">You</div>
+            <div class="message-text">${message}</div>
+            <div class="message-time">Just now</div>
           </div>
         `;
         
-        toastContainer.appendChild(toast);
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        
-        // Auto-remove toast after it's hidden
-        toast.addEventListener('hidden.bs.toast', function() {
-          toast.remove();
-        });
-      }
-      
-      function createToastContainer() {
-        const container = document.createElement('div');
-        container.id = 'toast-container';
-        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        document.body.appendChild(container);
-        return container;
-      }
-
-      // Create Incident Modal Handler
-      const incidentModal = new bootstrap.Modal(document.getElementById('incidentModal'));
-      const userModal = new bootstrap.Modal(document.getElementById('userModal'));
-      const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-      
-      // Create New Incident Button
-      document.getElementById('createIncidentBtn').addEventListener('click', function() {
-        // Reset form
-        document.getElementById('incidentForm').reset();
-        document.getElementById('incident_id').value = '';
-        document.getElementById('incidentModalLabel').textContent = 'Create New Incident';
-        
-        // Change save button handler
-        document.getElementById('saveIncidentBtn').onclick = createIncident;
-        
-        // Show modal
-        incidentModal.show();
-      });
-      
-      // Create Incident Function
-      function createIncident() {
-        const formData = {
-          crime_type: document.getElementById('crime_type').value,
-          description: document.getElementById('description').value,
-          latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
-          longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
-          address: document.getElementById('address').value,
-          status: document.getElementById('status').value
-        };
-        
-        // Add user_id if provided
-        const userId = document.getElementById('user_id').value;
-        if (userId) {
-          formData.user_id = parseInt(userId);
+        // If no messages yet, clear the "no messages" placeholder
+        if (chatMessages.querySelector('.text-center')) {
+          chatMessages.innerHTML = '';
         }
         
-        fetch('/admin/create_incident', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            incidentModal.hide();
-            showToast('Incident created successfully', 'success');
-            setTimeout(() => location.reload(), 1000);
-          } else {
-            showToast('Error creating incident: ' + data.message, 'danger');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          showToast('Error creating incident', 'danger');
-        });
+        chatMessages.appendChild(messageElement);
+        messageInput.value = '';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       }
-      
-      // Edit Incident Buttons
-      document.querySelectorAll('.edit-incident-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const incidentId = row.getAttribute('data-incident-id');
+
+      // Receive new message
+      socket.on('new_message', (message) => {
+        // If message is from the currently selected user
+        if (message.user_id === selectedUserId) {
+          // Create message element
+          const messageElement = document.createElement('div');
+          messageElement.className = 'message message-incoming';
           
-          fetch(`/admin/get_incident/${incidentId}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              // Populate form
-              document.getElementById('incident_id').value = data.incident.id;
-              document.getElementById('crime_type').value = data.incident.crime_type;
-              document.getElementById('description').value = data.incident.description;
-              document.getElementById('latitude').value = data.incident.latitude;
-              document.getElementById('longitude').value = data.incident.longitude;
-              document.getElementById('address').value = data.incident.address;
-              document.getElementById('status').value = data.incident.status;
-              
-              // Change modal title and save button handler
-              document.getElementById('incidentModalLabel').textContent = 'Edit Incident';
-              document.getElementById('saveIncidentBtn').onclick = updateIncident;
-              
-              // Show modal
-              incidentModal.show();
+          const formattedTime = formatTime(message.timestamp);
+          
+          messageElement.innerHTML = `
+            <div class="message-bubble">
+              <div class="message-sender">${message.username || 'User'}</div>
+              <div class="message-text">${message.message}</div>
+              <div class="message-time">${formattedTime}</div>
+            </div>
+          `;
+          
+          // If no messages yet, clear the "no messages" placeholder
+          if (chatMessages.querySelector('.text-center')) {
+            chatMessages.innerHTML = '';
+          }
+          
+          chatMessages.appendChild(messageElement);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+          // Update unread count for this user in the list
+          const userItem = document.querySelector(`.user-item[data-user-id="${message.user_id}"]`);
+          if (userItem) {
+            let unreadBadge = userItem.querySelector('.unread-badge');
+            if (unreadBadge) {
+              const currentCount = parseInt(unreadBadge.textContent);
+              unreadBadge.textContent = currentCount + 1;
             } else {
-              showToast('Error fetching incident: ' + data.message, 'danger');
+              unreadBadge = document.createElement('div');
+              unreadBadge.className = 'unread-badge';
+              unreadBadge.textContent = '1';
+              userItem.appendChild(unreadBadge);
             }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showToast('Error fetching incident details', 'danger');
-          });
-        });
+            
+            // Update last message preview
+            const lastMessagePreview = userItem.querySelector('.user-last-message');
+            if (lastMessagePreview) {
+              lastMessagePreview.textContent = message.message.length > 30 
+                ? message.message.substring(0, 30) + '...' 
+                : message.message;
+            }
+            
+            // Update timestamp
+            const timeElement = userItem.querySelector('.user-time');
+            if (timeElement) {
+              timeElement.textContent = formatTime(message.timestamp);
+            }
+          }
+        }
+      });
+
+      // Event listeners
+      sendMessageBtn.addEventListener('click', sendMessage);
+      messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
       });
       
-      // Update Incident Function
-      function updateIncident() {
-        const incidentId = document.getElementById('incident_id').value;
-        const formData = {
-          crime_type: document.getElementById('crime_type').value,
-          description: document.getElementById('description').value,
-          latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
-          longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
-          address: document.getElementById('address').value,
-          status: document.getElementById('status').value
-        };
+      refreshUsersBtn.addEventListener('click', loadUsers);
+      
+      userSearchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.user-item').forEach(item => {
+          const userName = item.querySelector('.user-name').textContent.toLowerCase();
+          item.style.display = userName.includes(searchTerm) ? '' : 'none';
+        });
+      });
+
+      // Helper functions
+      function formatTime(timestamp) {
+        if (!timestamp) return '';
         
-        fetch(`/admin/update_incident/${incidentId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            incidentModal.hide();
-            showToast('Incident updated successfully', 'success');
-            setTimeout(() => location.reload(), 1000);
-          } else {
-            showToast('Error updating incident: ' + data.message, 'danger');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          showToast('Error updating incident', 'danger');
-        });
-      }
-      
-      // Delete Incident Buttons
-      document.querySelectorAll('.delete-incident-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const incidentId = row.getAttribute('data-incident-id');
-          
-          // Setup delete confirmation
-          document.getElementById('deleteModalLabel').textContent = 'Delete Incident';
-          document.getElementById('confirmDeleteBtn').onclick = function() {
-            deleteIncident(incidentId);
-          };
-          
-          // Show delete confirmation modal
-          deleteModal.show();
-        });
-      });
-      
-      // Delete Incident Function
-      function deleteIncident(id) {
-        fetch(`/admin/delete_incident/${id}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            deleteModal.hide();
-            showToast('Incident deleted successfully', 'success');
-            setTimeout(() => location.reload(), 1000);
-          } else {
-            showToast('Error deleting incident: ' + (data.error || data.message), 'danger');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          showToast('Error deleting incident', 'danger');
-        });
-      }
-      
-      // Verify Incident Buttons
-      document.querySelectorAll('.verify-incident-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const incidentId = row.getAttribute('data-incident-id');
-          
-          fetch(`/admin/verify_incident/${incidentId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              showToast('Incident verified successfully', 'success');
-              setTimeout(() => location.reload(), 1000);
-            } else {
-              showToast('Error verifying incident: ' + (data.error || data.message), 'danger');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showToast('Error verifying incident', 'danger');
-          });
-        });
-      });
-      
-      // Edit User Buttons
-      document.querySelectorAll('.edit-user-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const userId = row.getAttribute('data-user-id');
-          
-          // Populate form from table row data
-          document.getElementById('edit_user_id').value = userId;
-          document.getElementById('edit_name').value = row.cells[1].textContent;
-          document.getElementById('edit_email').value = row.cells[2].textContent;
-          document.getElementById('edit_phone').value = row.cells[3].textContent;
-          document.getElementById('edit_address').value = row.cells[4].textContent;
-          
-          // Show modal
-          userModal.show();
-        });
-      });
-      
-      // Save User Button
-      document.getElementById('saveUserBtn').addEventListener('click', function() {
-        const userId = document.getElementById('edit_user_id').value;
-        const formData = {
-          name: document.getElementById('edit_name').value,
-          email: document.getElementById('edit_email').value,
-          phone: document.getElementById('edit_phone').value,
-          address: document.getElementById('edit_address').value
-        };
+        const date = new Date(timestamp);
+        const now = new Date();
         
-        fetch(`/admin/users/${userId}/update`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            userModal.hide();
-            showToast('User updated successfully', 'success');
-            setTimeout(() => location.reload(), 1000);
-          } else {
-            showToast('Error updating user: ' + data.message, 'danger');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          showToast('Error updating user', 'danger');
-        });
-      });
-      
-      // Delete User Buttons
-      document.querySelectorAll('.delete-user-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const userId = row.getAttribute('data-user-id');
-          
-          // Setup delete confirmation
-          document.getElementById('deleteModalLabel').textContent = 'Delete User';
-          document.getElementById('confirmDeleteBtn').onclick = function() {
-            deleteUser(userId);
-          };
-          
-          // Show delete confirmation modal
-          deleteModal.show();
-        });
-      });
-      
-      // Delete User Function
-      function deleteUser(userId) {
-        fetch(`/admin/users/${userId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            deleteModal.hide();
-            showToast('User deleted successfully', 'success');
-            setTimeout(() => location.reload(), 1000);
-          } else {
-            showToast('Error deleting user: ' + data.message, 'danger');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          showToast('Error deleting user', 'danger');
-        });
+        if (date.toDateString() === now.toDateString()) {
+          // Today - show time only
+          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (date.getFullYear() === now.getFullYear()) {
+          // This year - show date without year
+          return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        } else {
+          // Older - show full date
+          return date.toLocaleDateString();
+        }
       }
       
-      // Toggle User Status Buttons
-      document.querySelectorAll('.toggle-user-status-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const userId = row.getAttribute('data-user-id');
-          
-          fetch(`/admin/users/${userId}/toggle-status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              showToast('User status updated', 'success');
-              setTimeout(() => location.reload(), 1000);
-            } else {
-              showToast('Error updating user status: ' + data.message, 'danger');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showToast('Error updating user status', 'danger');
-          });
-        });
-      });
+      function getRandomColor() {
+        const colors = [
+          '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#06b6d4',
+          '#8b5cf6', '#ec4899', '#f97316', '#14b8a6', '#0ea5e9'
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      // Initialize chat
+      loadUsers();
       
-      // Approve Reward Buttons
-      document.querySelectorAll('.approve-reward-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const voucherId = row.getAttribute('data-voucher-id');
-          
-          fetch(`/admin/approve_voucher/${voucherId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              showToast('Reward approved successfully', 'success');
-              // Update the row status
-              const statusCell = row.querySelector('td:nth-child(6)');
-              statusCell.innerHTML = '<span class="status-badge status-approved">Approved</span>';
-              
-              // Update action buttons
-              const actionCell = row.querySelector('td:nth-child(7)');
-              actionCell.innerHTML = '<div class="btn-group" role="group"><button type="button" class="btn btn-sm btn-secondary" disabled><i class="fas fa-check"></i> Processed</button></div>';
-            } else {
-              showToast('Error approving reward: ' + data.error, 'danger');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showToast('Error approving reward', 'danger');
-          });
+      // Load chat when tab is shown
+      document.querySelector('a[href="#communitychat"]').addEventListener('shown.bs.tab', function() {
+        loadUsers();
+      });
+    });
+  </script>
+  <script>
+    // Add direct event listener to view buttons to debug click issue
+    document.addEventListener('DOMContentLoaded', () => {
+      const viewButtons = document.querySelectorAll('.view-incident-btn');
+      viewButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('View button clicked for incident id:', button.getAttribute('data-incident-id'));
+          // Manually trigger click event to test if event delegation works
+          button.dispatchEvent(new Event('click'));
         });
       });
-      
-      // Reject Reward Buttons
-      document.querySelectorAll('.reject-reward-btn').forEach(button => {
-        button.addEventListener('click', function() {
-          const row = this.closest('tr');
-          const voucherId = row.getAttribute('data-voucher-id');
-          
-          fetch(`/admin/reject_voucher/${voucherId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              showToast('Reward rejected and points refunded', 'success');
-              // Remove the row
-              row.remove();
-            } else {
-              showToast('Error rejecting reward: ' + data.error, 'danger');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showToast('Error rejecting reward', 'danger');
-          });
+    });
+  </script>
+  <script src="{{ url_for('static', filename='js/law_enforcement_crud.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Helper function to get query parameters as an object
+      function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          incident_status: params.get('incident_status') || '',
+          incident_sort: params.get('incident_sort') || 'desc',
+          incident_search: params.get('incident_search') || '',
+          user_status: params.get('user_status') || '',
+          user_sort: params.get('user_sort') || 'desc',
+          user_search: params.get('user_search') || '',
+          voucher_status: params.get('voucher_status') || '',
+          voucher_sort: params.get('voucher_sort') || 'desc',
+          voucher_search: params.get('voucher_search') || ''
+        };
+      }
+
+      // Helper function to update query parameters and reload page
+      function updateQueryParams(params) {
+        const url = new URL(window.location);
+        Object.keys(params).forEach(key => {
+          if (params[key]) {
+            url.searchParams.set(key, params[key]);
+          } else {
+            url.searchParams.delete(key);
+          }
         });
-      });
+        window.location.href = url.toString();
+      }
+
+      // Incident tab elements
+      const incidentStatusSelect = document.querySelector('#incidents select[aria-label="Filter by status"]');
+      const incidentSortSelect = document.querySelector('#incidents select[aria-label="Sort by date"]');
+      const incidentSearchInput = document.querySelector('#incidents .search-bar input');
+
+      // User tab elements
+      const userStatusSelect = document.querySelector('#users select[aria-label="Filter by status"]');
+      const userSortSelect = document.querySelector('#users select[aria-label="Sort by"]');
+      const userSearchInput = document.querySelector('#users .search-bar input');
+
+      // Rewards tab elements
+      const voucherStatusSelect = document.querySelector('#rewards select[aria-label="Filter by status"]');
+      const voucherSortSelect = document.querySelector('#rewards select[aria-label="Sort by date"]');
+      const voucherSearchInput = document.querySelector('#rewards .search-bar input');
+
+      // Initialize inputs with current query params
+      const params = getQueryParams();
+      if (incidentStatusSelect) incidentStatusSelect.value = params.incident_status;
+      if (incidentSortSelect) incidentSortSelect.value = params.incident_sort;
+      if (incidentSearchInput) incidentSearchInput.value = params.incident_search;
+
+      if (userStatusSelect) userStatusSelect.value = params.user_status;
+      if (userSortSelect) userSortSelect.value = params.user_sort;
+      if (userSearchInput) userSearchInput.value = params.user_search;
+
+      if (voucherStatusSelect) voucherStatusSelect.value = params.voucher_status;
+      if (voucherSortSelect) voucherSortSelect.value = params.voucher_sort;
+      if (voucherSearchInput) voucherSearchInput.value = params.voucher_search;
+
+      // Add event listeners to reload page on change or enter key
+      if (incidentStatusSelect) {
+        incidentStatusSelect.addEventListener('change', () => {
+          params.incident_status = incidentStatusSelect.value;
+          updateQueryParams(params);
+        });
+      }
+      if (incidentSortSelect) {
+        incidentSortSelect.addEventListener('change', () => {
+          params.incident_sort = incidentSortSelect.value;
+          updateQueryParams(params);
+        });
+      }
+      if (incidentSearchInput) {
+        incidentSearchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            params.incident_search = incidentSearchInput.value.trim();
+            updateQueryParams(params);
+          }
+        });
+      }
+
+      if (userStatusSelect) {
+        userStatusSelect.addEventListener('change', () => {
+          params.user_status = userStatusSelect.value;
+          updateQueryParams(params);
+        });
+      }
+      if (userSortSelect) {
+        userSortSelect.addEventListener('change', () => {
+          params.user_sort = userSortSelect.value;
+          updateQueryParams(params);
+        });
+      }
+      if (userSearchInput) {
+        userSearchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            params.user_search = userSearchInput.value.trim();
+            updateQueryParams(params);
+          }
+        });
+      }
+
+      if (voucherStatusSelect) {
+        voucherStatusSelect.addEventListener('change', () => {
+          params.voucher_status = voucherStatusSelect.value;
+          updateQueryParams(params);
+        });
+      }
+      if (voucherSortSelect) {
+        voucherSortSelect.addEventListener('change', () => {
+          params.voucher_sort = voucherSortSelect.value;
+          updateQueryParams(params);
+        });
+      }
+      if (voucherSearchInput) {
+        voucherSearchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            params.voucher_search = voucherSearchInput.value.trim();
+            updateQueryParams(params);
+          }
+        });
+      }
+    });
+  </script>
+  <script>
+    // Dark mode toggle script
+    document.addEventListener('DOMContentLoaded', function() {
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const body = document.body;
+
+      // Load saved mode from localStorage
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode === 'enabled') {
+        body.classList.add('dark-mode');
+        if (darkModeToggle) {
+          darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+      }
+
+      if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+          body.classList.toggle('dark-mode');
+          if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          } else {
+            localStorage.setItem('darkMode', 'disabled');
+            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          }
+        });
+      }
     });
   </script>
 </body>

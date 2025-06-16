@@ -29,12 +29,14 @@
 
         .login-card {
             width: 100%;
-            max-width: 380px;
+            max-width: 440px;
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
+            overflow: visible;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            margin-top: 60px; /* Added space for the logo */
         }
 
         .login-card:hover {
@@ -45,14 +47,49 @@
         .card-header {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
-            padding: 24px;
+            padding: 40px 28px 28px; /* More top padding for logo */
             text-align: center;
+            position: relative;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: -60px; /* Higher position */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border: 5px solid #fff;
+            z-index: 10;
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            padding: 15px; /* Ensures logo fits with padding */
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .logo-container:hover img {
+            transform: scale(1.1) rotate(5deg);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         .card-header h2 {
             font-weight: 600;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             margin-bottom: 4px;
+            margin-top: 10px;
         }
 
         .card-header p {
@@ -61,9 +98,11 @@
         }
 
         .card-body {
-            padding: 28px;
+            padding: 32px;
+            padding-top: 40px;
         }
 
+        /* Rest of your existing styles... */
         .form-group {
             margin-bottom: 20px;
             position: relative;
@@ -104,21 +143,23 @@
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             border: none;
             color: white;
-            font-weight: 500;
-            font-size: 0.9375rem;
+            font-weight: 600;
+            font-size: 1rem;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 8px;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
             background: linear-gradient(135deg, #1d4ed8, #1e40af);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
         }
 
         .btn:active {
@@ -149,63 +190,6 @@
         .auth-link i {
             margin-right: 6px;
             font-size: 0.75rem;
-        }
-
-        .special-login-links {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .special-login-link {
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .special-login-link:hover {
-            background-color: #f3f4f6;
-        }
-
-        .special-login-link a {
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .admin-login-link {
-            background-color: rgba(99, 102, 241, 0.1);
-        }
-
-        .admin-login-link:hover {
-            background-color: rgba(99, 102, 241, 0.2);
-        }
-
-        .admin-login-link a {
-            color: #6366f1;
-        }
-
-        .admin-login-link a:hover {
-            color: #4f46e5;
-        }
-
-        .law-enforcement-login-link {
-            background-color: rgba(220, 38, 38, 0.1);
-        }
-
-        .law-enforcement-login-link:hover {
-            background-color: rgba(220, 38, 38, 0.2);
-        }
-
-        .law-enforcement-login-link a {
-            color: #dc2626;
-        }
-
-        .law-enforcement-login-link a:hover {
-            color: #b91c1c;
         }
 
         .alert {
@@ -244,11 +228,28 @@
             .login-card {
                 border-radius: 0;
                 box-shadow: none;
+                max-width: 100%;
+                margin-top: 50px;
             }
             
             body {
                 padding: 0;
                 background: white;
+            }
+
+            .logo-container {
+                width: 100px;
+                height: 100px;
+                top: -50px;
+            }
+
+            .card-header {
+                padding: 35px 16px 24px;
+            }
+
+            .card-body {
+                padding: 24px 16px;
+                padding-top: 32px;
             }
         }
     </style>
@@ -256,12 +257,15 @@
 <body>
     <div class="login-card">
         <div class="card-header">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo">
+            </div>
             <h2>Welcome Back</h2>
             <p>Login to your Thusang account</p>
         </div>
 
         <div class="card-body">
-            <!-- Flash messages -->
+            <!-- Flash messages and form content remain the same -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -289,19 +293,6 @@
                 </div>
                 
                 <button type="submit" class="btn">Login</button>
-                
-                <div class="special-login-links">
-                    <div class="special-login-link admin-login-link">
-                        <a href="{{ url_for('admin_login') }}">
-                            <i class="fas fa-user-shield"></i> Admin Login
-                        </a>
-                    </div>
-                    <div class="special-login-link law-enforcement-login-link">
-                        <a href="{{ url_for('law_enforcement_login') }}">
-                            <i class="fas fa-badge"></i> Law Enforcement Login
-                        </a>
-                    </div>
-                </div>
             </form>
 
             <div class="auth-links">

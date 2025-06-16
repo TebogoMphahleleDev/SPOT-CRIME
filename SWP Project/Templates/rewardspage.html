@@ -1,662 +1,875 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Rewards | Thusang Safety</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #3b82f6;
-      --primary-dark: #1d4ed8;
-      --accent: #f59e0b;
-      --success: #10b981;
-      --light: #f8fafc;
-      --dark: #1e293b;
-      --gray: #64748b;
-      --light-gray: #e2e8f0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Rewards - Thusang Community Safety</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #e0e7ff;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #111827;
+            --light: #ffffff;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --transition: all 0.3s ease;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f1f5f9;
-      color: var(--dark);
-      line-height: 1.6;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
 
-    /* Header */
-    .reward-header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      padding: 1.5rem;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-    .reward-header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
+        .sidebar {
+            width: 300px;
+            background: var(--light);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            transition: var(--transition);
+            z-index: 1000;
+        }
 
-    .back-button {
-      position: absolute;
-      left: 1.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
 
-    .back-button:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-50%) scale(1.05);
-    }
+        .sidebar-header img {
+            width: 48px;
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
 
-    /* Main Content */
-    .reward-container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 1.5rem;
-    }
+        .sidebar-header img:hover {
+            transform: scale(1.1);
+        }
 
-    /* Points Balance */
-    .points-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      position: relative;
-      overflow: hidden;
-    }
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.025em;
+        }
 
-    .points-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 8px;
-      background: linear-gradient(90deg, var(--accent), var(--success));
-    }
+        .nav-menu {
+            list-style: none;
+        }
 
-    .points-balance {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin: 1rem 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .nav-item {
+            margin-bottom: 0.75rem;
+        }
 
-    .points-balance i {
-      margin-right: 0.5rem;
-      color: var(--accent);
-    }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: var(--gray);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
 
-    .points-label {
-      color: var(--gray);
-      font-size: 0.875rem;
-    }
+        .nav-link i {
+            margin-right: 1rem;
+            width: 24px;
+            text-align: center;
+            font-size: 1.25rem;
+        }
 
-    .progress-container {
-      margin-top: 1.5rem;
-    }
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
 
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--gray);
-    }
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--light);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
 
-    .progress-bar {
-      height: 8px;
-      background: var(--light-gray);
-      border-radius: 4px;
-      overflow: hidden;
-    }
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
 
-    .progress-fill {
-      height: 100%;
-      width: 30%;
-      background: linear-gradient(90deg, var(--primary), var(--success));
-      border-radius: 4px;
-    }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
 
-    /* Reward Options */
-    .section-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--dark);
-      display: flex;
-      align-items: center;
-    }
+        .page-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
 
-    .section-title i {
-      margin-right: 0.5rem;
-      color: var(--primary);
-    }
+        .page-title p {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
 
-    .reward-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
 
-    .reward-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      transition: all 0.3s ease;
-      cursor: pointer;
-      border: 1px solid var(--light-gray);
-      text-align: center;
-    }
+        .back-btn i {
+            margin-right: 0.5rem;
+        }
 
-    .reward-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-      border-color: var(--primary);
-    }
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
 
-    .reward-card.disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      position: relative;
-      overflow: hidden;
-    }
+        /* Rewards Container */
+        .rewards-container {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
 
-    .reward-card.disabled::after {
-      content: 'Need 1000 points';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      color: var(--primary-dark);
-    }
+        .rewards-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
 
-    .reward-icon {
-      width: 60px;
-      height: 60px;
-      background: rgba(59, 130, 246, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1rem;
-      color: var(--primary);
-      font-size: 1.5rem;
-    }
+        .rewards-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
 
-    .reward-title {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
+        /* Points Balance Card */
+        .points-card {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
 
-    .reward-points {
-      color: var(--accent);
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
+        .points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
 
-    .reward-description {
-      color: var(--gray);
-      font-size: 0.875rem;
-      margin-bottom: 1rem;
-    }
+        .points-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
 
-    .redeem-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
-    }
+        .points-balance {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
 
-    .redeem-btn:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-    }
+        .points-balance i {
+            margin-right: 0.5rem;
+            color: var(--accent);
+        }
 
-    .redeem-btn:disabled {
-      background: var(--gray);
-      cursor: not-allowed;
-    }
+        .progress-container {
+            margin-top: 1.5rem;
+        }
 
-    /* Reward History */
-    .history-list {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
 
-    .history-item {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--light-gray);
-      display: flex;
-      align-items: center;
-    }
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-    .history-item:last-child {
-      border-bottom: none;
-    }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
 
-    .history-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(16, 185, 129, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 1rem;
-      color: var(--success);
-    }
+        /* Rewards Grid */
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
 
-    .history-content {
-      flex: 1;
-    }
+        .reward-card {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--gray-light);
+        }
 
-    .history-title {
-      font-weight: 500;
-      margin-bottom: 0.25rem;
-    }
+        .reward-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
 
-    .history-date {
-      color: var(--gray);
-      font-size: 0.75rem;
-    }
+        .reward-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .history-points {
-      font-weight: 600;
-      color: var(--success);
-    }
+        .reward-card.disabled::after {
+            content: 'Need more points';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
 
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      color: var(--gray);
-    }
+        .reward-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
 
-    .empty-state i {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      color: var(--light-gray);
-    }
+        .reward-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
 
-    /* Footer */
-    .reward-footer {
-      text-align: center;
-      padding: 1.5rem;
-      margin-top: 2rem;
-      color: var(--gray);
-      font-size: 0.875rem;
-    }
+        .reward-points {
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
 
-    .reward-footer a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-    }
+        .reward-description {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
 
-    .reward-footer a:hover {
-      text-decoration: underline;
-    }
+        .redeem-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary);
+            color: var(--light);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
 
-    .reward-footer i {
-      margin-right: 0.5rem;
-    }
-    
-    /* Status Badges */
-    .status-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
+        .redeem-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
 
-    .status-pending {
-      background-color: #fef3c7;
-      color: #92400e;
-    }
+        .redeem-btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+        }
 
-    .status-verified {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
+        /* Vouchers Section */
+        .vouchers-section {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
 
-    .status-approved {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
 
-    /* Responsive */
-    @media (max-width: 480px) {
-      .points-balance {
-        font-size: 2rem;
-      }
-      
-      .reward-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+        .section-title i {
+            margin-right: 0.75rem;
+            color: var(--primary);
+        }
+
+        .vouchers-list {
+            list-style: none;
+        }
+
+        .voucher-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .voucher-item:hover {
+            border-color: var(--gray);
+        }
+
+        .voucher-info {
+            flex: 1;
+        }
+
+        .voucher-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--dark);
+        }
+
+        .voucher-details {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        .voucher-points {
+            font-weight: 600;
+            color: var(--danger);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-verified {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-approved {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--gray-light);
+        }
+
+        /* Alert */
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .alert.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .alert-success {
+            background-color: var(--secondary);
+        }
+
+        .alert-error {
+            background-color: var(--danger);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            color: var(--primary-dark);
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 280px;
+                transform: translateX(-280px);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .rewards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="reward-header">
-    <button class="back-button" onclick="window.location.href='/dashboard'">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <h1>Your Rewards</h1>
-  </header>
-
-  <div class="reward-container">
-    <!-- Points Balance -->
-  <div class="points-card">
-      <p class="points-label">Your current balance</p>
-      <div class="points-balance">
-        <i class="fas fa-coins"></i>
-        <span>{{ user.points if user and user.points else 0 }}</span>
-      </div>
-      
-      <div class="progress-container">
-        <div class="progress-label">
-          <span>0 points</span>
-          <span>2,000 points for next reward</span>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo" class="logo-img">
+                <h2>Thusang Safety</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('report_incident') }}" class="nav-link">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Report Incident</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('crime_map') }}" class="nav-link">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Crime Map</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('rewards') }}" class="nav-link active">
+                        <i class="fas fa-award"></i>
+                        <span>Rewards</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('communitychat') }}" class="nav-link">
+                        <i class="fas fa-comments"></i>
+                        <span>Community Chat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('profile') }}" class="nav-link">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: {{ (user.points / 2000) * 100 if user and user.points else 0 }}%"></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Redeem Options -->
-    <h2 class="section-title">
-      <i class="fas fa-gift"></i>
-      <span>Available Rewards</span>
-    </h2>
-    
-    <div class="reward-grid">
-      {% for reward in reward_options %}
-      <div class="reward-card {% if user.points < reward.points %}disabled{% endif %}">
-        <div class="reward-icon">
-          {% if 'Shoprite' in reward.title %}
-          <i class="fas fa-shopping-bag"></i>
-          {% elif 'Takealot' in reward.title %}
-          <i class="fas fa-box"></i>
-          {% else %}
-          <i class="fas fa-money-bill-wave"></i>
-          {% endif %}
-        </div>
-        <h3 class="reward-title">{{ reward.title }}</h3>
-        <div class="reward-points">{{ reward.points }} points</div>
-        <p class="reward-description">{{ reward.description }}</p>
-        <button class="redeem-btn" 
-                data-reward-id="{{ reward.id }}" 
-                data-title="{{ reward.title }}" 
-                data-points="{{ reward.points }}"
-                {% if user.points < reward.points %}disabled{% endif %}>
-          {% if user.points < reward.points %}Not Enough Points{% else %}Redeem Now{% endif %}
-        </button>
-      </div>
-      {% endfor %}
-    </div>
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <i class="fas fa-bars menu-toggle" id="menu-toggle"></i>
+            <div class="page-title">
+                <h1>My Rewards</h1>
+                <p>Welcome, {{ user.name if user and user.name else 'Community Member' }}!</p>
+                <p>Redeem your points for exciting rewards</p>
+            </div>
+                <a href="{{ url_for('dashboard') }}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
 
-    <!-- Reward History -->
-    <h2 class="section-title">
-      <i class="fas fa-history"></i>
-      <span>Your Vouchers</span>
-    </h2>
-    
-    <div class="history-list">
-      {% if vouchers %}
-        {% for voucher in vouchers %}
-        <div class="history-item" style="cursor: pointer;">
-          <div class="history-icon">
-            <i class="fas fa-gift"></i>
-          </div>
-          <div class="history-content">
-            <h4 class="history-title" data-reward-type="{{ voucher.reward_type }}">{{ voucher.reward_type }} 
-              {% if voucher.is_approved %}
-                <span class="status-badge status-approved" data-status="Approved">Approved</span>
-              {% elif voucher.is_redeemed %}
-                <span class="status-badge status-verified" data-status="Redeemed">Redeemed</span>
-              {% else %}
-                <span class="status-badge status-pending" data-status="Pending">Pending</span>
-              {% endif %}
-            </h4>
-            <p class="history-date">{{ voucher.created_at.strftime('%d %b %Y, %H:%M') }}</p>
-            <p data-voucher-code="{{ voucher.voucher_code }}"><strong>Voucher Code:</strong> {{ voucher.voucher_code }}</p>
-          </div>
-          <div class="history-points">-{{ voucher.points_cost }}</div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <i class="fas fa-inbox"></i>
-          <p>No vouchers redeemed yet</p>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <footer class="reward-footer">
-    <a href="#">
-      <i class="fas fa-question-circle"></i>
-      How to earn more points
-    </a>
-  </footer>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Handle redemption
-      document.querySelectorAll('.redeem-btn:not([disabled])').forEach(button => {
-        button.addEventListener('click', function(e) {
-          const rewardId = this.dataset.rewardId;
-          const rewardTitle = this.dataset.title;
-          const pointsCost = parseInt(this.dataset.points, 10);
-          
-          if (confirm(`Are you sure you want to redeem ${rewardTitle} for ${pointsCost} points?`)) {
-            // Display loading state
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            this.disabled = true;
-            
-            // Make API call to redeem reward
-            fetch('/redeem_reward', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                reward_id: rewardId,
-                reward_title: rewardTitle,
-                points_cost: pointsCost
-              })
-            })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                // Show success message with voucher code
-                const successMessage = `
-                  <div style="text-align: center; padding: 20px;">
-                    <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success); margin-bottom: 15px;"></i>
-                    <h2 style="margin-bottom: 15px;">Congratulations!</h2>
-                    <p>You've successfully redeemed ${rewardTitle}.</p>
-                    <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-                      <p style="margin-bottom: 5px; font-weight: bold;">Your Voucher Code:</p>
-                      <h3 style="letter-spacing: 2px; font-family: monospace;">${data.voucher_code}</h3>
-                    </div>
-                    <p>Your new balance: <strong>${data.remaining_points} points</strong></p>
-                    <button onclick="window.location.reload()" style="margin-top: 15px; background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
-                      Continue
-                    </button>
-                  </div>
-                `;
-                
-                // Create modal to display success message
-                const modal = document.createElement('div');
-                modal.style.position = 'fixed';
-                modal.style.top = '0';
-                modal.style.left = '0';
-                modal.style.width = '100%';
-                modal.style.height = '100%';
-                modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
-                modal.style.display = 'flex';
-                modal.style.alignItems = 'center';
-                modal.style.justifyContent = 'center';
-                modal.style.zIndex = '1000';
-                
-                const modalContent = document.createElement('div');
-                modalContent.style.backgroundColor = 'white';
-                modalContent.style.borderRadius = '8px';
-                modalContent.style.width = '90%';
-                modalContent.style.maxWidth = '500px';
-                modalContent.style.maxHeight = '90vh';
-                modalContent.style.overflow = 'auto';
-                modalContent.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
-                
-                modalContent.innerHTML = successMessage;
-                modal.appendChild(modalContent);
-                document.body.appendChild(modal);
-                
-                // Close modal on clicking outside
-                modal.addEventListener('click', function(e) {
-                  if (e.target === modal) {
-                    document.body.removeChild(modal);
-                    window.location.reload();
-                  }
-                });
-              } else {
-                alert(`Error: ${data.error}`);
-                this.innerHTML = 'Redeem Now';
-                this.disabled = false;
-              }
-            })
-            .catch(error => {
-              console.error('Error:', error);
-              alert('An error occurred. Please try again later.');
-              this.innerHTML = 'Redeem Now';
-              this.disabled = false;
-            });
-          }
-        });
-      });
-      
-      // Show voucher details when clicked
-      document.querySelectorAll('.history-item').forEach(item => {
-        item.addEventListener('click', function() {
-          const voucherCode = this.querySelector('[data-voucher-code]')?.dataset.voucherCode;
-          const rewardType = this.querySelector('[data-reward-type]')?.dataset.rewardType;
-          const status = this.querySelector('[data-status]')?.dataset.status;
-          
-          if (voucherCode) {
-            // Show voucher details modal
-            const detailsHtml = `
-              <div style="text-align: center; padding: 20px;">
-                <h2 style="margin-bottom: 15px;">Voucher Details</h2>
-                <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-                  <p style="margin-bottom: 5px; font-weight: bold;">Voucher Code:</p>
-                  <h3 style="letter-spacing: 2px; font-family: monospace;">${voucherCode}</h3>
+            <!-- Rewards Container -->
+            <div class="rewards-container">
+                <div class="rewards-header">
+                    <h1 class="rewards-title">Available Rewards</h1>
                 </div>
-                <p><strong>Type:</strong> ${rewardType}</p>
-                <p><strong>Status:</strong> <span class="status-badge status-${status.toLowerCase()}">${status}</span></p>
-                <p style="margin-top: 15px; font-size: 0.9em;">Present this code when redeeming your reward</p>
-                <button id="copyVoucherBtn" data-code="${voucherCode}" style="margin-top: 15px; background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
-                  <i class="fas fa-copy"></i> Copy Code
-                </button>
-              </div>
-            `;
+
+                <!-- Points Balance Card -->
+                <div class="points-card">
+                    <div class="points-header">
+                        <h3 class="points-title">Your Points Balance</h3>
+                    </div>
+                    <div class="points-balance">
+                        <i class="fas fa-coins"></i>
+                        <span>{{ user.points if user and user.points else 0 }}</span>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>0 points</span>
+                            <span>2,000 points for next reward</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ (user.points / 2000) * 100 if user and user.points else 0 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rewards Grid -->
+                <div class="rewards-grid">
+                    {% for reward in reward_options %}
+                    <div class="reward-card {% if user.points < reward.points %}disabled{% endif %}">
+                        <div class="reward-icon">
+                            {% if 'Shoprite' in reward.title %}
+                            <i class="fas fa-shopping-bag"></i>
+                            {% elif 'Takealot' in reward.title %}
+                            <i class="fas fa-box"></i>
+                            {% else %}
+                            <i class="fas fa-money-bill-wave"></i>
+                            {% endif %}
+                        </div>
+                        <h3 class="reward-title">{{ reward.title }}</h3>
+                        <div class="reward-points">{{ reward.points }} points</div>
+                        <p class="reward-description">{{ reward.description }}</p>
+                        <button class="redeem-btn" 
+                                data-reward-id="{{ reward.id }}" 
+                                data-title="{{ reward.title }}" 
+                                data-points="{{ reward.points }}"
+                                {% if user.points < reward.points %}disabled{% endif %}>
+                            {% if user.points < reward.points %}Not Enough Points{% else %}Redeem Now{% endif %}
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Vouchers Section -->
+            <div class="vouchers-section">
+                <h2 class="section-title">
+                    <i class="fas fa-gift"></i>
+                    <span>Your Vouchers</span>
+                </h2>
+                
+                <ul class="vouchers-list">
+                    {% if vouchers %}
+                        {% for voucher in vouchers %}
+                        <li class="voucher-item" data-voucher-id="{{ voucher.id }}">
+                            <div class="voucher-info">
+                                <h3 class="voucher-name">{{ voucher.reward_type }} 
+                                    {% if voucher.is_approved %}
+                                        <span class="status-badge status-approved">Approved</span>
+                                    {% elif voucher.is_redeemed %}
+                                        <span class="status-badge status-verified">Redeemed</span>
+                                    {% else %}
+                                        <span class="status-badge status-pending">Pending</span>
+                                    {% endif %}
+                                </h3>
+                                <p class="voucher-details">Code: {{ voucher.voucher_code }} • {{ voucher.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+                            </div>
+                            <div class="voucher-points">-{{ voucher.points_cost }}</div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No vouchers redeemed yet</p>
+                        </div>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
             
-            // Create and show modal
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
-            modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
-            modal.style.zIndex = '1000';
-            
-            const modalContent = document.createElement('div');
-            modalContent.style.backgroundColor = 'white';
-            modalContent.style.borderRadius = '8px';
-            modalContent.style.width = '90%';
-            modalContent.style.maxWidth = '500px';
-            modalContent.style.maxHeight = '90vh';
-            modalContent.style.overflow = 'auto';
-            modalContent.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
-            
-            modalContent.innerHTML = detailsHtml;
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-            
-            // Set up copy button functionality
-            const copyBtn = modalContent.querySelector('#copyVoucherBtn');
-            if (copyBtn) {
-              copyBtn.addEventListener('click', function() {
-                const code = this.dataset.code;
-                navigator.clipboard.writeText(code).then(() => {
-                  this.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                  setTimeout(() => {
-                    this.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
-                  }, 2000);
-                });
-              });
-            }
-            
-            // Close modal on clicking outside
-            modal.addEventListener('click', function(e) {
-              if (e.target === modal) {
-                document.body.removeChild(modal);
-              }
+            // Toggle mobile menu
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
             });
-          }
+
+            // Handle redemption
+            document.querySelectorAll('.redeem-btn:not([disabled])').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const rewardId = this.dataset.rewardId;
+                    const rewardTitle = this.dataset.title;
+                    const pointsCost = parseInt(this.dataset.points, 10);
+                    
+                    if (confirm(`Are you sure you want to redeem ${rewardTitle} for ${pointsCost} points?`)) {
+                        // Display loading state
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                        this.disabled = true;
+                        
+                        // Make API call to redeem reward
+                        fetch('/redeem_reward', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                reward_id: rewardId,
+                                reward_title: rewardTitle,
+                                points_cost: pointsCost
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Show success message with voucher code
+                                const successMessage = `
+                                    <div style="text-align: center; padding: 20px;">
+                                        <i class="fas fa-check-circle" style="font-size: 48px; color: var(--secondary); margin-bottom: 15px;"></i>
+                                        <h2 style="margin-bottom: 15px;">Congratulations!</h2>
+                                        <p>You've successfully redeemed ${rewardTitle}.</p>
+                                        <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                                            <p style="margin-bottom: 5px; font-weight: bold;">Your Voucher Code:</p>
+                                            <h3 style="letter-spacing: 2px; font-family: monospace;">${data.voucher_code}</h3>
+                                        </div>
+                                        <p>Your new balance: <strong>${data.remaining_points} points</strong></p>
+                                        <button onclick="window.location.reload()" style="margin-top: 15px; background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                                            Continue
+                                        </button>
+                                    </div>
+                                `;
+                                
+                                // Create modal to display success message
+                                const modal = document.createElement('div');
+                                modal.style.position = 'fixed';
+                                modal.style.top = '0';
+                                modal.style.left = '0';
+                                modal.style.width = '100%';
+                                modal.style.height = '100%';
+                                modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                                modal.style.display = 'flex';
+                                modal.style.alignItems = 'center';
+                                modal.style.justifyContent = 'center';
+                                modal.style.zIndex = '1000';
+                                
+                                const modalContent = document.createElement('div');
+                                modalContent.style.backgroundColor = 'white';
+                                modalContent.style.borderRadius = '8px';
+                                modalContent.style.width = '90%';
+                                modalContent.style.maxWidth = '500px';
+                                modalContent.style.maxHeight = '90vh';
+                                modalContent.style.overflow = 'auto';
+                                modalContent.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+                                
+                                modalContent.innerHTML = successMessage;
+                                modal.appendChild(modalContent);
+                                document.body.appendChild(modal);
+                                
+                                // Close modal on clicking outside
+                                modal.addEventListener('click', function(e) {
+                                    if (e.target === modal) {
+                                        document.body.removeChild(modal);
+                                        window.location.reload();
+                                    }
+                                });
+                            } else {
+                                alert(`Error: ${data.error}`);
+                                this.innerHTML = 'Redeem Now';
+                                this.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred. Please try again later.');
+                            this.innerHTML = 'Redeem Now';
+                            this.disabled = false;
+                        });
+                    }
+                });
+            });
+            
+            // Show voucher details when clicked
+            document.querySelectorAll('.voucher-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const voucherId = this.dataset.voucherId;
+                    const voucherCode = this.querySelector('.voucher-details')?.textContent.split('Code: ')[1].split(' •')[0];
+                    const rewardType = this.querySelector('.voucher-name')?.textContent.split(' ')[0];
+                    const status = this.querySelector('.status-badge')?.textContent;
+                    
+                    if (voucherCode) {
+                        // Show voucher details modal
+                        const detailsHtml = `
+                            <div style="text-align: center; padding: 20px;">
+                                <h2 style="margin-bottom: 15px;">Voucher Details</h2>
+                                <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+                                    <p style="margin-bottom: 5px; font-weight: bold;">Voucher Code:</p>
+                                    <h3 style="letter-spacing: 2px; font-family: monospace;">${voucherCode}</h3>
+                                </div>
+                                <p><strong>Type:</strong> ${rewardType}</p>
+                                <p><strong>Status:</strong> <span class="status-badge status-${status.toLowerCase()}">${status}</span></p>
+                                <p style="margin-top: 15px; font-size: 0.9em;">Present this code when redeeming your reward</p>
+                                <button id="copyVoucherBtn" data-code="${voucherCode}" style="margin-top: 15px; background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-copy"></i> Copy Code
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Create and show modal
+                        const modal = document.createElement('div');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '0';
+                        modal.style.left = '0';
+                        modal.style.width = '100%';
+                        modal.style.height = '100%';
+                        modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                        modal.style.display = 'flex';
+                        modal.style.alignItems = 'center';
+                        modal.style.justifyContent = 'center';
+                        modal.style.zIndex = '1000';
+                        
+                        const modalContent = document.createElement('div');
+                        modalContent.style.backgroundColor = 'white';
+                        modalContent.style.borderRadius = '8px';
+                        modalContent.style.width = '90%';
+                        modalContent.style.maxWidth = '500px';
+                        modalContent.style.maxHeight = '90vh';
+                        modalContent.style.overflow = 'auto';
+                        modalContent.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+                        
+                        modalContent.innerHTML = detailsHtml;
+                        modal.appendChild(modalContent);
+                        document.body.appendChild(modal);
+                        
+                        // Set up copy button functionality
+                        const copyBtn = modalContent.querySelector('#copyVoucherBtn');
+                        if (copyBtn) {
+                            copyBtn.addEventListener('click', function() {
+                                const code = this.dataset.code;
+                                navigator.clipboard.writeText(code).then(() => {
+                                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                                    setTimeout(() => {
+                                        this.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+                                    }, 2000);
+                                });
+                            });
+                        }
+                        
+                        // Close modal on clicking outside
+                        modal.addEventListener('click', function(e) {
+                            if (e.target === modal) {
+                                document.body.removeChild(modal);
+                            }
+                        });
+                    }
+                });
+            });
         });
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>

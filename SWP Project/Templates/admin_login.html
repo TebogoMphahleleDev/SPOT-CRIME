@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Login - Thusang Community Safety Platform</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,21 +11,22 @@
     <style>
         :root {
             --primary: #4f46e5;
-            --primary-dark: #4338ca;
+            --primary-dark: #3730a3;
             --primary-light: #e0e7ff;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --dark: #1e293b;
-            --light: #f8fafc;
-            --gray: #94a3b8;
-            --gray-light: #e2e8f0;
+            --dark: #111827;
+            --light: #ffffff;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --radius-sm: 0.375rem;
             --radius: 0.5rem;
             --radius-lg: 0.75rem;
+            --transition: all 0.3s ease;
         }
 
         * {
@@ -36,39 +37,42 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #f3f4f6;
             color: var(--dark);
             line-height: 1.6;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 1rem;
+            padding: 1.5rem;
             background-image: 
-                radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.1) 0px, transparent 50%),
-                radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%);
+                radial-gradient(at 80% 10%, hsla(189, 100%, 56%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 10% 60%, hsla(355, 100%, 93%, 0.15) 0px, transparent 50%);
+            animation: fadeInBackground 1s ease-out;
         }
 
         .login-card {
             width: 100%;
-            max-width: 28rem;
-            background: white;
+            max-width: 32rem;
+            background: var(--light);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: var(--transition);
             border: 1px solid var(--gray-light);
+            animation: slideUp 0.6s ease-out;
         }
 
         .login-card:hover {
-            transform: translateY(-0.25rem);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-0.5rem);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15);
         }
 
         .card-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 2rem;
+            color: var(--light);
+            padding: 2.5rem 2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -79,31 +83,34 @@
             position: absolute;
             top: -50%;
             right: -50%;
-            width: 100%;
+            width: 120%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            transform: rotate(30deg);
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(45deg);
         }
 
         .card-header h2 {
             font-weight: 700;
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
             position: relative;
+            letter-spacing: 0.025em;
         }
 
         .card-header p {
-            font-size: 0.875rem;
+            font-size: 1rem;
             opacity: 0.9;
             position: relative;
+            max-width: 80%;
+            margin: 0 auto;
         }
 
         .card-body {
-            padding: 2rem;
+            padding: 2.5rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
             position: relative;
         }
 
@@ -113,32 +120,33 @@
             font-weight: 500;
             margin-bottom: 0.5rem;
             color: var(--dark);
+            transition: var(--transition);
         }
 
         .form-control {
             width: 100%;
-            padding: 0.875rem 1rem 0.875rem 3rem;
+            padding: 1rem 1rem 1rem 3.5rem;
             border: 1px solid var(--gray-light);
             border-radius: var(--radius);
             font-size: 1rem;
-            transition: all 0.2s ease;
-            background-color: white;
+            background-color: var(--light);
             color: var(--dark);
+            transition: var(--transition);
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 4px var(--primary-light);
         }
 
         .form-icon {
             position: absolute;
-            left: 1rem;
-            top: 2.7rem;
+            left: 1.25rem;
+            top: 2.75rem;
             color: var(--gray);
             font-size: 1.25rem;
-            transition: all 0.2s ease;
+            transition: var(--transition);
         }
 
         .form-control:focus + .form-icon {
@@ -150,13 +158,13 @@
             padding: 1rem;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
-            color: white;
+            color: var(--light);
             font-weight: 600;
             font-size: 1rem;
             border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 0.5rem;
+            transition: var(--transition);
+            margin-top: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,8 +172,8 @@
         }
 
         .btn:hover {
-            background: linear-gradient(135deg, var(--primary-dark), #3730a3);
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--primary-dark), #312e81);
+            transform: translateY(-2px);
             box-shadow: var(--shadow);
         }
 
@@ -176,7 +184,7 @@
         .auth-links {
             display: flex;
             justify-content: center;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             font-size: 0.875rem;
         }
 
@@ -186,15 +194,14 @@
             font-weight: 500;
             display: inline-flex;
             align-items: center;
-            transition: all 0.2s ease;
-            padding: 0.5rem;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-sm);
         }
 
         .auth-link:hover {
             color: var(--primary-dark);
             background-color: var(--primary-light);
-            text-decoration: none;
         }
 
         .auth-link i {
@@ -202,15 +209,15 @@
             font-size: 0.875rem;
         }
 
-        /* Alert Styles */
         .alert {
-            padding: 1rem;
+            padding: 1rem 1.25rem;
             border-radius: var(--radius);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
             font-size: 0.875rem;
             display: flex;
             align-items: center;
             border: 1px solid transparent;
+            animation: slideIn 0.4s ease-out;
         }
 
         .alert i {
@@ -221,52 +228,85 @@
         .alert-success {
             background-color: #ecfdf5;
             color: #065f46;
-            border-color: #a7f3d0;
+            border-color: #6ee7b7;
         }
 
         .alert-danger {
             background-color: #fef2f2;
             color: #b91c1c;
-            border-color: #fecaca;
+            border-color: #f87171;
         }
 
         .alert-warning {
             background-color: #fffbeb;
             color: #b45309;
-            border-color: #fde68a;
+            border-color: #fcd34d;
         }
 
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo-container img {
+            width: 100px;
+            height: 100px;
+            transition: var(--transition);
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeInBackground {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .login-card {
-            animation: fadeIn 0.5s ease-out;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
+            .login-card {
+                max-width: 95%;
+            }
             .card-header {
-                padding: 1.5rem;
+                padding: 2rem 1.5rem;
             }
             .card-body {
-                padding: 1.5rem;
+                padding: 2rem 1.5rem;
             }
             .card-header h2 {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
+            }
+            .card-header p {
+                font-size: 0.875rem;
+            }
+            .logo-container img {
+                width: 80px;
+                height: 80px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+    </div>
+
     <div class="login-card">
         <div class="card-header">
             <h2>Admin Portal</h2>
-            <p>Login to access admin dashboard</p>
+            <p>Secure access to the admin dashboard</p>
         </div>
-
         <div class="card-body">
             <!-- Flash messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -280,20 +320,20 @@
                 {% endif %}
             {% endwith %}
 
-<form action="/admin_login" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <form action="/admin_login" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="email" class="form-label">Admin Email</label>
                     <i class="fas fa-envelope form-icon"></i>
                     <input type="email" id="email" name="email" class="form-control" placeholder="admin@example.com" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
                     <i class="fas fa-lock form-icon"></i>
                     <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
                 </div>
-                
+
                 <button type="submit" class="btn">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>

@@ -1,279 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>My Profile | Community Safety</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Thusang Community Safety</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #e0e7ff;
+            --secondary: #10b981;
+            --accent: #f59e0b;
             --danger: #ef4444;
-            --danger-dark: #dc2626;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-700: #374151;
-            --gray-900: #111827;
+            --dark: #111827;
+            --light: #ffffff;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
             --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
+            --radius: 0.5rem;
             --radius-lg: 0.75rem;
+            --transition: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #f9fafb;
-            color: var(--gray-900);
-            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: var(--dark);
+            line-height: 1.6;
             min-height: 100vh;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--light);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .sidebar-header img {
+            width: 48px;
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
+
+        .sidebar-header img:hover {
+            transform: scale(1.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.025em;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: var(--gray);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .nav-link i {
+            margin-right: 1rem;
+            width: 24px;
+            text-align: center;
+            font-size: 1.25rem;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--light);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2.5rem;
             display: flex;
             flex-direction: column;
+            gap: 2rem;
         }
-        
-        /* Header */
-        .header {
-            background-color: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow-sm);
+
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-        
-        /* Main content */
-        .main {
-            flex: 1;
-            padding: 2rem;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        /* Profile section */
-        .profile-section {
-            background-color: white;
-            border-radius: var(--radius-md);
-            padding: 2rem;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
             box-shadow: var(--shadow);
-            margin-bottom: 2rem;
         }
-        
+
+        .page-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .page-title p {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .back-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: var(--light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .profile-container {
+            background: var(--light);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
         .profile-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .profile-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .profile-content {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .profile-image-section {
+            flex: 0 0 300px;
+            text-align: center;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--primary-light);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .upload-form {
+            margin-top: 1.5rem;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: var(--light);
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .upload-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
             margin-bottom: 1.5rem;
         }
-        
-        .profile-pic {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: var(--gray-200);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            margin-right: 1.5rem;
+
+        .form-group.full-width {
+            grid-column: span 2;
         }
-        
-        .profile-pic img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-pic .upload-btn {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background-color: var(--primary);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 2px solid white;
-        }
-        
-        .profile-info h2 {
-            font-size: 1.25rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .profile-info p {
-            color: var(--gray-700);
-            font-size: 0.875rem;
-        }
-        
-        /* Form elements */
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-        
-        .form-group label {
+
+        .form-label {
             display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
             margin-bottom: 0.5rem;
-            color: var(--gray-700);
+            font-weight: 600;
+            color: var(--dark);
         }
-        
+
         .form-control {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius-sm);
-            font-size: 0.9375rem;
-            transition: all 0.2s;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
         }
-        
+
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
-        
+
         .form-control[disabled] {
-            background-color: var(--gray-100);
+            background-color: var(--gray-light);
             cursor: not-allowed;
         }
-        
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            font-size: 0.9375rem;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        .save-btn {
+            grid-column: span 2;
+            padding: 1rem;
+            background: var(--primary);
+            color: var(--light);
             border: none;
-            text-decoration: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
         }
-        
-        .btn i {
-            margin-right: 0.5rem;
+
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        .btn-outline:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: var(--danger-dark);
-        }
-        
-        .btn-sm {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8125rem;
-        }
-        
-        /* Emergency contacts */
+
+        /* Emergency Contacts Section */
         .emergency-contacts {
-            background-color: white;
-            border-radius: var(--radius-md);
+            background: var(--light);
+            border-radius: var(--radius-lg);
             padding: 2rem;
             box-shadow: var(--shadow);
-            margin-bottom: 2rem;
         }
-        
+
         .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
             margin-bottom: 1.5rem;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
-        
+
         .contact-list {
             list-style: none;
-            padding: 0;
+            margin-bottom: 1.5rem;
         }
-        
+
         .contact-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
             margin-bottom: 0.75rem;
-            transition: all 0.2s;
+            transition: var(--transition);
         }
-        
+
         .contact-item:hover {
-            border-color: var(--gray-300);
+            border-color: var(--gray);
         }
-        
+
         .contact-info {
             flex: 1;
         }
-        
+
         .contact-name {
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.25rem;
+            color: var(--dark);
         }
-        
+
         .contact-details {
             font-size: 0.875rem;
-            color: var(--gray-700);
+            color: var(--gray);
         }
-        
+
         .contact-actions {
             display: flex;
             gap: 0.5rem;
         }
-        
-        /* Contact form */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        /* Contact Form */
         .contact-form {
             display: none;
             background-color: white;
@@ -281,36 +422,46 @@
             padding: 1.5rem;
             box-shadow: var(--shadow);
             margin-top: 1rem;
-            animation: fadeIn 0.3s ease-out;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+
         .form-actions {
             display: flex;
             gap: 0.75rem;
             margin-top: 1rem;
         }
-        
-        /* Settings */
-        .settings {
-            background-color: white;
-            border-radius: var(--radius-md);
+
+        /* Settings Section */
+        .settings-section {
+            background: var(--light);
+            border-radius: var(--radius-lg);
             padding: 2rem;
             box-shadow: var(--shadow);
         }
-        
-        /* Footer */
-        .footer {
-            padding: 1.5rem;
-            text-align: center;
-            background-color: white;
-            border-top: 1px solid var(--gray-200);
+
+        .logout-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--danger);
+            color: var(--light);
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
         }
-        
+
+        .logout-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
         /* Alert */
         .alert {
             position: fixed;
@@ -326,257 +477,305 @@
             opacity: 0;
             transition: all 0.3s ease;
         }
-        
+
         .alert.show {
             transform: translateY(0);
             opacity: 1;
         }
-        
+
         .alert-success {
-            background-color: var(--success);
+            background-color: var(--secondary);
         }
-        
+
         .alert-error {
             background-color: var(--danger);
         }
-        
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
-            .main {
-                padding: 1rem;
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            color: var(--primary-dark);
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 280px;
+                transform: translateX(-280px);
             }
-            
-            .profile-section,
-            .emergency-contacts,
-            .settings {
-                padding: 1.5rem;
+
+            .sidebar.active {
+                transform: translateX(0);
             }
-            
-            .profile-header {
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .profile-content {
                 flex-direction: column;
-                text-align: center;
+                gap: 2rem;
             }
-            
-            .profile-pic {
-                margin-right: 0;
-                margin-bottom: 1rem;
+
+            .profile-image-section {
+                flex: 0 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-form {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .save-btn {
+                grid-column: span 1;
+            }
+
+            .main-content {
+                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
-        <button class="btn btn-outline btn-sm" onclick="window.history.back()">
-            <i class="fas fa-arrow-left"></i> Back
-        </button>
-    </header>
-
-    <main class="main">
-        <section class="profile-section">
-            <div class="profile-header">
-                <div class="profile-pic">
-                    <img src="{{ url_for('static', filename='images/profile-placeholder.png') }}" alt="Profile picture" id="profileImage">
-                    <div class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                </div>
-                <div class="profile-info">
-                    <h2 id="userName">{{ user.name if user and user.name else 'No Name Set' }}</h2>
-                    <p>Member since <span id="joinDate">{{ user.created_at.strftime('%B %Y') if user and user.created_at else '2023' }}</span></p>
-                </div>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Thusang Logo" class="logo-img">
+                <h2>Thusang Safety</h2>
             </div>
-            
-    <form id="profileForm">
-        <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" class="form-control" value="{{ user.name if user else '' }}" disabled>
-        </div>
-        
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" class="form-control" value="{{ user.email if user else '' }}" disabled>
-        </div>
-        
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" class="form-control" value="{{ user.phone if user else '' }}" disabled>
-        </div>
-        
-        <div class="form-group">
-            <label for="address">Address</label>
-            <input type="text" id="address" class="form-control" placeholder="Enter your address" value="{{ user.address if user else '' }}" disabled>
-        </div>
-        
-        <div class="form-actions">
-            <button type="button" class="btn btn-outline" id="editBtn">
-                <i class="fas fa-edit"></i> Edit Profile
-            </button>
-            <button type="submit" class="btn btn-primary" id="saveBtn" style="display: none;">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
-            <button type="button" class="btn btn-outline" id="cancelBtn" style="display: none;">
-                <i class="fas fa-times"></i> Cancel
-            </button>
-        </div>
-    </form>
-    
-    <section class="emergency-contacts">
-        <div class="section-title">
-            <span><i class="fas fa-address-book"></i> Emergency Contacts</span>
-            <span id="contactCount">{{ user.emergency_contacts|length if user and user.emergency_contacts else 0 }}/5</span>
-        </div>
-        
-        <ul class="contact-list" id="contactList">
-            {% if user and user.emergency_contacts %}
-                {% for contact in user.emergency_contacts %}
-                <li class="contact-item" data-contact-id="{{ contact.id }}">
-                    <div class="contact-info">
-                        <h3 class="contact-name">{{ contact.name }}</h3>
-                        <p class="contact-details">Phone: {{ contact.phone }}</p>
-                        <p class="contact-details">Relationship: {{ contact.relationship }}</p>
-                    </div>
-                    <div class="contact-actions">
-                        <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
-                        <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
-                    </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
                 </li>
-                {% endfor %}
-            {% else %}
-            <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray-700);">
-                <div>No emergency contacts added yet</div>
-            </li>
-            {% endif %}
-        </ul>
-        
-        <button class="btn btn-primary" id="addContactBtn">
-            <i class="fas fa-plus"></i> Add Contact
-        </button>
-        
-        <div class="contact-form" id="contactForm" style="display: none;">
-            <input type="hidden" id="contactId" value="">
-            <div class="form-group">
-                <label for="contactName">Full Name</label>
-                <input type="text" id="contactName" class="form-control" placeholder="Contact's full name">
-            </div>
-            
-            <div class="form-group">
-                <label for="contactPhone">Phone Number</label>
-                <input type="tel" id="contactPhone" class="form-control" placeholder="Contact's phone number">
-            </div>
-            
-            <div class="form-group">
-                <label for="contactRelation">Relationship</label>
-                <input type="text" id="contactRelation" class="form-control" placeholder="e.g. Spouse, Friend">
-            </div>
-            
-            <div class="form-actions">
-                <button type="button" class="btn btn-primary" id="saveContactBtn">
-                    <i class="fas fa-save"></i> Save Contact
-                </button>
-                <button type="button" class="btn btn-outline" id="cancelContactBtn">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-            </div>
-        </div>
-    </section>
-        </section>
-        
-        <section class="emergency-contacts">
-            <div class="section-title">
-                <span><i class="fas fa-address-book"></i> Emergency Contacts</span>
-                <span id="contactCount">{{ user.emergency_contacts|length if user and user.emergency_contacts else 0 }}/5</span>
-            </div>
-            
-            <ul class="contact-list" id="contactList">
-                {% if user and user.emergency_contacts %}
-                    {% for contact in user.emergency_contacts %}
-                    <li class="contact-item" data-contact-id="{{ contact.id }}">
-                        <div class="contact-info">
-                            <h3 class="contact-name">{{ contact.name }}</h3>
-                            <p class="contact-details">Phone: {{ contact.phone }}</p>
-                            <p class="contact-details">Relationship: {{ contact.relationship }}</p>
-                        </div>
-                        <div class="contact-actions">
-                            <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
-                            <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
-                        </div>
-                    </li>
-                    {% endfor %}
-                {% else %}
-                <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray-700);">
-                    <div>No emergency contacts added yet</div>
+                <li class="nav-item">
+                    <a href="{{ url_for('report_incident') }}" class="nav-link">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Report Incident</span>
+                    </a>
                 </li>
-                {% endif %}
+                <li class="nav-item">
+                    <a href="{{ url_for('crime_map') }}" class="nav-link">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Crime Map</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('rewards') }}" class="nav-link">
+                        <i class="fas fa-award"></i>
+                        <span>Rewards</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('communitychat') }}" class="nav-link">
+                        <i class="fas fa-comments"></i>
+                        <span>Community Chat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('profile') }}" class="nav-link active">
+                        <i class="fas fa-user-circle"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
             </ul>
-            
-            <button class="btn btn-primary" id="addContactBtn">
-                <i class="fas fa-plus"></i> Add Contact
-            </button>
-            
-            <div class="contact-form" id="contactForm" style="display: none;">
-                <input type="hidden" id="contactId" value="">
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <i class="fas fa-bars menu-toggle" id="menu-toggle"></i>
+                <div class="page-title">
+                    <h1>My Profile</h1>
+                    <p>Manage your personal information and settings</p>
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Profile Container -->
+            <div class="profile-container">
+                <div class="profile-header">
+                    <h1 class="profile-title">Personal Information</h1>
+                </div>
+
+                <div class="profile-content">
+                    <!-- Profile Image Section -->
+                    <div class="profile-image-section">
+                        <img id="profile-image" src="{{ url_for('uploaded_file', filename=user.profile_image) if user.profile_image else url_for('static', filename='images/profile-placeholder.png') }}" 
+                             alt="Profile Picture" class="profile-image">
+                        
+                        <form id="upload-form" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_profile_image') }}" class="upload-form">
+                            <input type="file" id="profile_image" name="profile_image" accept="image/*" class="file-input" required>
+                            <label for="profile_image" class="upload-btn">
+                                <i class="fas fa-camera"></i> Change Photo
+                            </label>
+                        </form>
+                    </div>
+
+                    <!-- Profile Details Section -->
+                    <div class="profile-details">
+                        <form method="POST" action="{{ url_for('profile') }}" class="profile-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="form-group">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" id="name" name="name" class="form-control" 
+                                       value="{{ user.name or '' }}" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" 
+                                       value="{{ user.email or '' }}" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="text" id="phone" name="phone" class="form-control" 
+                                       value="{{ user.phone or '' }}" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" id="address" name="address" class="form-control" 
+                                       value="{{ user.address or '' }}" disabled>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline" id="editBtn">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </button>
+                                <button type="submit" class="save-btn" id="saveBtn" style="display: none;">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-outline" id="cancelBtn" style="display: none;">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contacts Section -->
+            <div class="emergency-contacts">
+                <h2 class="section-title">
+                    <span><i class="fas fa-address-book"></i> Emergency Contacts</span>
+                    <span id="contactCount">{{ user.emergency_contacts|length if user and user.emergency_contacts else 0 }}/5</span>
+                </h2>
+                
+                <ul class="contact-list" id="contactList">
+                    {% if user and user.emergency_contacts %}
+                        {% for contact in user.emergency_contacts %}
+                        <li class="contact-item" data-contact-id="{{ contact.id }}">
+                            <div class="contact-info">
+                                <h3 class="contact-name">{{ contact.name }}</h3>
+                                <p class="contact-details">Phone: {{ contact.phone }}</p>
+                                <p class="contact-details">Relationship: {{ contact.relationship }}</p>
+                            </div>
+                            <div class="contact-actions">
+                                <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
+                                <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                    <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray);">
+                        <div>No emergency contacts added yet</div>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <button class="upload-btn" id="addContactBtn">
+                    <i class="fas fa-plus"></i> Add Contact
+                </button>
+                
+                <div class="contact-form" id="contactForm" style="display: none;">
+                    <input type="hidden" id="contactId" value="">
+                    <div class="form-group">
+                        <label for="contactName" class="form-label">Full Name</label>
+                        <input type="text" id="contactName" class="form-control" placeholder="Contact's full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactPhone" class="form-label">Phone Number</label>
+                        <input type="tel" id="contactPhone" class="form-control" placeholder="Contact's phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactRelation" class="form-label">Relationship</label>
+                        <input type="text" id="contactRelation" class="form-control" placeholder="e.g. Spouse, Friend">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="save-btn" id="saveContactBtn">
+                            <i class="fas fa-save"></i> Save Contact
+                        </button>
+                        <button type="button" class="btn btn-outline" id="cancelContactBtn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Settings Section -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-cog"></i> Account Settings</h2>
+                
                 <div class="form-group">
-                    <label for="contactName">Full Name</label>
-                    <input type="text" id="contactName" class="form-control" placeholder="Contact's full name">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password">
                 </div>
                 
                 <div class="form-group">
-                    <label for="contactPhone">Phone Number</label>
-                    <input type="tel" id="contactPhone" class="form-control" placeholder="Contact's phone number">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
                 </div>
                 
                 <div class="form-group">
-                    <label for="contactRelation">Relationship</label>
-                    <input type="text" id="contactRelation" class="form-control" placeholder="e.g. Spouse, Friend">
+                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm new password">
                 </div>
                 
-                <div class="form-actions">
-                    <button type="button" class="btn btn-primary" id="saveContactBtn">
-                        <i class="fas fa-save"></i> Save Contact
+                <button class="save-btn" id="changePasswordBtn">
+                    <i class="fas fa-key"></i> Change Password
+                </button>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="logout-btn" id="logoutBtn" onclick="window.location.href='{{ url_for('logout') }}'">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
                     </button>
-                    <button type="button" class="btn btn-outline" id="cancelContactBtn">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
                 </div>
             </div>
-        </section>
-        
-        <section class="settings">
-            <h2 class="section-title"><i class="fas fa-cog"></i> Account Settings</h2>
-            
-            <div class="form-group">
-                <label for="currentPassword">Current Password</label>
-                <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password">
-            </div>
-            
-            <div class="form-group">
-                <label for="newPassword">New Password</label>
-                <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm New Password</label>
-                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm new password">
-            </div>
-            
-            <button class="btn btn-primary" id="changePasswordBtn">
-                <i class="fas fa-key"></i> Change Password
-            </button>
-        </section>
-    </main>
-    
-    <footer class="footer">
-        <button class="btn btn-danger" id="logoutBtn" onclick="window.location.href='{{ url_for('logout') }}'">
-            <i class="fas fa-sign-out-alt"></i> Log Out
-        </button>
-    </footer>
+        </div>
+    </div>
 
     <div id="alertContainer"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
             const profileForm = document.getElementById('profileForm');
             const editBtn = document.getElementById('editBtn');
             const saveBtn = document.getElementById('saveBtn');
@@ -585,8 +784,6 @@
             const emailInput = document.getElementById('email');
             const phoneInput = document.getElementById('phone');
             const addressInput = document.getElementById('address');
-            const userName = document.getElementById('userName');
-            const joinDate = document.getElementById('joinDate');
             const contactList = document.getElementById('contactList');
             const addContactBtn = document.getElementById('addContactBtn');
             const contactForm = document.getElementById('contactForm');
@@ -598,11 +795,18 @@
             const contactRelationInput = document.getElementById('contactRelation');
             const emptyContacts = document.getElementById('emptyContacts');
             const contactCount = document.getElementById('contactCount');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const fileInput = document.getElementById('profile_image');
+            const profileImage = document.getElementById('profile-image');
 
-            // Toggle profile form inputs disabled state
+            // Toggle mobile menu
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+            // Toggle profile form edit mode
             function toggleProfileForm(disabled) {
                 nameInput.disabled = disabled;
-                emailInput.disabled = disabled;
                 phoneInput.disabled = disabled;
                 addressInput.disabled = disabled;
                 if (disabled) {
@@ -616,29 +820,6 @@
                 }
             }
 
-            // Load user profile data
-            function loadUserProfile() {
-                fetch('/api/user/profile')
-                    .then((res) => {
-                        if (!res.ok) throw new Error('Unauthorized');
-                        return res.json();
-                    })
-                    .then((data) => {
-                        nameInput.value = data.name || '';
-                        emailInput.value = data.email || '';
-                        phoneInput.value = data.phone || '';
-                        addressInput.value = data.address || '';
-                        userName.textContent = data.name || 'No Name';
-                        joinDate.textContent = data.joinDate
-                            ? new Date(data.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
-                            : '';
-                        toggleProfileForm(true);
-                    })
-                    .catch(() => {
-                        window.location.href = '/login';
-                    });
-            }
-
             // Edit button click
             editBtn.addEventListener('click', () => {
                 toggleProfileForm(false);
@@ -646,179 +827,199 @@
 
             // Cancel button click
             cancelBtn.addEventListener('click', () => {
-                loadUserProfile();
+                toggleProfileForm(true);
+                // Reset form values if needed
             });
 
-            // Save profile form submit
-            profileForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const updatedData = {
-                    name: nameInput.value,
-                    email: emailInput.value,
-                    phone: phoneInput.value,
-                    address: addressInput.value,
-                };
-                fetch('/api/user/profile', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedData),
-                })
-                    .then((res) => {
-                        if (!res.ok)
-                            return res.json().then((err) => {
-                                throw new Error(err.error || 'Update failed');
-                            });
-                        return res.json();
-                    })
-                    .then(() => {
-                        showAlert('Profile updated successfully!', 'success');
-                        userName.textContent = updatedData.name;
-                        toggleProfileForm(true);
-                    })
-                    .catch((err) => {
-                        showAlert('Failed to update profile: ' + err.message, 'error');
-                    });
-            });
-
-            // Load emergency contacts
-            function loadEmergencyContacts() {
-                fetch('/api/emergency-contacts')
-                    .then((res) => {
-                        if (!res.ok) throw new Error('Failed to load contacts');
-                        return res.json();
-                    })
-                    .then((contacts) => {
-                        contactList.innerHTML = '';
-                        if (contacts.length === 0) {
-                            contactList.innerHTML = `
-                                <li class="contact-item empty-state" id="emptyContacts" style="text-align: center; padding: 2rem; color: var(--gray-700);">
-                                    <div>No emergency contacts added yet</div>
-                                </li>
-                            `;
-                        } else {
-                            contacts.forEach((contact) => {
-                                const li = document.createElement('li');
-                                li.className = 'contact-item';
-                                li.dataset.contactId = contact.id;
-                                li.innerHTML = `
-                                    <div class="contact-info">
-                                        <h3 class="contact-name">${contact.name}</h3>
-                                        <p class="contact-details">Phone: ${contact.phone}</p>
-                                        <p class="contact-details">Relationship: ${contact.relationship}</p>
-                                    </div>
-                                    <div class="contact-actions">
-                                        <button class="btn btn-outline btn-sm edit-contact-btn">Edit</button>
-                                        <button class="btn btn-danger btn-sm delete-contact-btn">Delete</button>
-                                    </div>
-                                `;
-                                contactList.appendChild(li);
-                            });
-                        }
-                        contactCount.textContent = `${contacts.length}/5`;
-                    })
-                    .catch(() => {
-                        showAlert('Failed to load emergency contacts.', 'error');
-                    });
-            }
-
-            // Show contact form for add/edit
-            function showContactForm(edit = false, contact = null) {
-                contactForm.style.display = 'block';
-                if (edit && contact) {
-                    contactIdInput.value = contact.id;
-                    contactNameInput.value = contact.name;
-                    contactPhoneInput.value = contact.phone;
-                    contactRelationInput.value = contact.relationship;
+            // Handle profile image upload
+            fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('profile_image', file);
+            
+            fetch('/api/upload-profile-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Upload failed');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    profileImage.src = data.image_url;
+                    showAlert('Profile image updated successfully!', 'success');
                 } else {
-                    contactIdInput.value = '';
-                    contactNameInput.value = '';
-                    contactPhoneInput.value = '';
-                    contactRelationInput.value = '';
+                    throw new Error(data.error || 'Upload failed');
                 }
-            }
+            })
+            .catch(error => {
+                showAlert('Failed to upload image: ' + error.message, 'error');
+            });
+            });
 
-            // Hide contact form
-            function hideContactForm() {
-                contactForm.style.display = 'none';
+            // Show/hide contact form
+            function toggleContactForm(show, contact = null) {
+                if (show) {
+                    if (contact) {
+                        contactIdInput.value = contact.id;
+                        contactNameInput.value = contact.name;
+                        contactPhoneInput.value = contact.phone;
+                        contactRelationInput.value = contact.relationship;
+                    } else {
+                        contactIdInput.value = '';
+                        contactNameInput.value = '';
+                        contactPhoneInput.value = '';
+                        contactRelationInput.value = '';
+                    }
+                    contactForm.style.display = 'block';
+                } else {
+                    contactForm.style.display = 'none';
+                }
             }
 
             // Add contact button click
             addContactBtn.addEventListener('click', () => {
-                showContactForm(false);
+                toggleContactForm(true);
             });
 
             // Cancel contact form button click
             cancelContactBtn.addEventListener('click', () => {
-                hideContactForm();
+                toggleContactForm(false);
             });
 
             // Save contact button click
             saveContactBtn.addEventListener('click', () => {
-                const id = contactIdInput.value;
-                const method = id ? 'PUT' : 'POST';
-                const url = id
-                    ? `/api/emergency-contacts/${id}`
-                    : '/api/emergency-contacts';
                 const contactData = {
                     name: contactNameInput.value,
                     phone: contactPhoneInput.value,
-                    relationship: contactRelationInput.value,
+                    relationship: contactRelationInput.value
                 };
+                
+                const isEdit = contactIdInput.value !== '';
+                const url = isEdit ? `/api/emergency-contacts/${contactIdInput.value}` : '/api/emergency-contacts';
+                const method = isEdit ? 'PUT' : 'POST';
+                
                 fetch(url, {
                     method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(contactData),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(contactData)
                 })
-                    .then((res) => {
-                        if (!res.ok)
-                            return res.json().then((err) => {
-                                throw new Error(err.error || 'Operation failed');
-                            });
-                        return res.json();
-                    })
-                    .then(() => {
-                        showAlert(`Contact ${id ? 'updated' : 'added'} successfully!`, 'success');
-                        hideContactForm();
-                        loadEmergencyContacts();
-                    })
-                    .catch((err) => {
-                        showAlert('Failed to save contact: ' + err.message, 'error');
-                    });
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to save contact');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showAlert(`Contact ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
+                        toggleContactForm(false);
+                        // Refresh contacts list
+                        window.location.reload();
+                    } else {
+                        throw new Error(data.error || 'Failed to save contact');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error: ' + error.message, 'error');
+                });
             });
 
-            // Contact list event delegation for edit and delete
+            // Handle edit/delete contact buttons
             contactList.addEventListener('click', (e) => {
-                const li = e.target.closest('li.contact-item');
-                if (!li) return;
-                const contactId = li.dataset.contactId;
+                const contactItem = e.target.closest('.contact-item');
+                if (!contactItem) return;
+                
+                const contactId = contactItem.dataset.contactId;
+                
                 if (e.target.classList.contains('edit-contact-btn')) {
                     // Fetch contact details and show form
                     fetch(`/api/emergency-contacts/${contactId}`)
-                        .then((res) => {
-                            if (!res.ok) throw new Error('Failed to fetch contact details');
-                            return res.json();
-                        })
-                        .then((contact) => {
-                            showContactForm(true, contact);
-                        })
-                        .catch(() => {
-                            showAlert('Failed to load contact for editing.', 'error');
-                        });
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to fetch contact');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            toggleContactForm(true, data.contact);
+                        } else {
+                            throw new Error(data.error || 'Failed to fetch contact');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Error: ' + error.message, 'error');
+                    });
                 } else if (e.target.classList.contains('delete-contact-btn')) {
-                    if (!confirm('Are you sure you want to delete this contact?')) return;
-                    fetch(`/api/emergency-contacts/${contactId}`, { method: 'DELETE' })
-                        .then((res) => {
-                            if (!res.ok)
-                                return res.json().then((err) => {
-                                    throw new Error(err.error || 'Delete failed');
-                                });
-                            showAlert('Contact deleted successfully!', 'success');
-                            loadEmergencyContacts();
+                    if (confirm('Are you sure you want to delete this contact?')) {
+                        fetch(`/api/emergency-contacts/${contactId}`, {
+                            method: 'DELETE'
                         })
-                        .catch((err) => {
-                            showAlert('Failed to delete contact: ' + err.message, 'error');
+                        .then(response => {
+                            if (!response.ok) throw new Error('Failed to delete contact');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                showAlert('Contact deleted successfully!', 'success');
+                                // Refresh contacts list
+                                window.location.reload();
+                            } else {
+                                throw new Error(data.error || 'Failed to delete contact');
+                            }
+                        })
+                        .catch(error => {
+                            showAlert('Error: ' + error.message, 'error');
                         });
+                    }
                 }
+            });
+
+            // Change password button click
+            changePasswordBtn.addEventListener('click', () => {
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    showAlert('All password fields are required', 'error');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showAlert('New passwords do not match', 'error');
+                    return;
+                }
+                
+                fetch('/api/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to change password');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Password changed successfully!', 'success');
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmPassword').value = '';
+                    } else {
+                        throw new Error(data.error || 'Failed to change password');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error: ' + error.message, 'error');
+                });
             });
 
             // Show alert function
@@ -840,82 +1041,6 @@
                     }, 300);
                 }, 3000);
             }
-
-            // Change password button
-            document.getElementById('changePasswordBtn').addEventListener('click', function() {
-                const currentPassword = document.getElementById('currentPassword').value;
-                const newPassword = document.getElementById('newPassword').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                
-                if (!currentPassword || !newPassword || !confirmPassword) {
-                    showAlert('All password fields are required', 'error');
-                    return;
-                }
-                
-                if (newPassword !== confirmPassword) {
-                    showAlert('New passwords do not match', 'error');
-                    return;
-                }
-                
-                fetch('/api/change-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        current_password: currentPassword,
-                        new_password: newPassword
-                    })
-                })
-                .then(res => {
-                    if (!res.ok) {
-                        return res.json().then(err => { throw new Error(err.error || 'Password change failed'); });
-                    }
-                    return res.json();
-                })
-                .then(() => {
-                    showAlert('Password changed successfully!', 'success');
-                    document.getElementById('currentPassword').value = '';
-                    document.getElementById('newPassword').value = '';
-                    document.getElementById('confirmPassword').value = '';
-                })
-                .catch(err => {
-                    showAlert(err.message, 'error');
-                });
-            });
-
-            // Handle profile image upload
-            document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                // Create form data for the file upload
-                const formData = new FormData();
-                formData.append('profile_image', file);
-                
-                // Send the file to the server
-                fetch('/api/upload-profile-image', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(function(res) {
-                    if (!res.ok) {
-                        return res.json().then(function(err) { 
-                            throw new Error(err.error || 'Upload failed'); 
-                        });
-                    }
-                    return res.json();
-                })
-                .then(function(data) {
-                    document.getElementById('profileImage').src = data.image_url;
-                    showAlert('Profile image updated!', 'success');
-                })
-                .catch(function(err) {
-                    showAlert('Failed to upload image: ' + err.message, 'error');
-                });
-            });
-
-            // Initial load
-            loadUserProfile();
-            loadEmergencyContacts();
         });
     </script>
 </body>

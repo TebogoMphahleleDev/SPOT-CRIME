@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
+from forms import RequestResetForm, ResetPasswordForm
+from flask_login import current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
@@ -8,15 +10,44 @@ from dotenv import load_dotenv
 import os
 import pymysql
 import requests
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
 from sqlalchemy.orm import scoped_session, sessionmaker
+from datetime import datetime, timezone, timedelta
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from flask_socketio import SocketIO, emit, join_room
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+
+# app.config.from_pyfile('config.py')  # Load normal config
+app.config.from_prefixed_env() 
+app.config.update(
+    MAIL_SERVER=os.getenv('MAIL_SERVER', 'smtp.gmail.com'),
+    MAIL_PORT=int(os.getenv('MAIL_PORT', 587)),
+    MAIL_USE_TLS=os.getenv('MAIL_USE_TLS', 'true').lower() == 'true',
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),  # From .env
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),  # From .env
+    MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER', 'tcpetja@gmail.com'),
+    MAIL_DEBUG=int(os.getenv('MAIL_DEBUG', '0'))
+)
+
+# Initialize SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Initialize Flask-Login
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # ================ CONFIGURATION ================
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -25,7 +56,7 @@ app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-    f"{os.getenv('DB_PASSWORD', 'Mokgaga.082')}@"
+    f"{os.getenv('DB_PASSWORD', '')}@"
     f"{os.getenv('DB_HOST', 'localhost')}:"
     f"{os.getenv('DB_PORT', '3306')}/"
     f"{os.getenv('DB_NAME', 'community_safety')}"
@@ -34,13 +65,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_BINDS'] = {
     'admin': (
         f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-        f"{os.getenv('DB_PASSWORD', 'your_mysql_root_password_here')}@"
+        f"{os.getenv('DB_PASSWORD', '')}@"
         f"{os.getenv('DB_HOST', 'localhost')}:"
         f"{os.getenv('DB_PORT', '3306')}/admin_db"
     ),
     'police': (
         f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-        f"{os.getenv('DB_PASSWORD', 'your_mysql_root_password_here')}@"
+        f"{os.getenv('DB_PASSWORD', '')}@"
         f"{os.getenv('DB_HOST', 'localhost')}:"
         f"{os.getenv('DB_PORT', '3306')}/police_db"
     )
@@ -57,9 +88,10 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS').lower() == 'true'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_USERNAME'] = 'tcpetja@gmail.com'  # Hardcoded email
+app.config['MAIL_PASSWORD'] = 'yfcgqaqngddqqter'  # Hardcoded password
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+app.config['MAIL_DEBUG'] = int(os.getenv('MAIL_DEBUG', '0'))
 
 # File uploads
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -84,11 +116,47 @@ class User(db.Model):
     name = db.Column(db.String(100)) 
     phone = db.Column(db.String(20))
     address = db.Column(db.String(200))
+    profile_image = db.Column(db.String(255), nullable=True)
     points = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     emergency_contacts = db.relationship('EmergencyContact', backref='user', lazy=True, cascade="all, delete-orphan")
     incidents = db.relationship('Incident', backref='user', lazy=True)
+    reset_token = db.Column(db.String(200))
+    reset_token_expiry = db.Column(db.DateTime)
+
+    def get_reset_token(self, expires_sec=3600):
+        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}, salt=app.config['SECURITY_PASSWORD_SALT'])
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, salt=app.config['SECURITY_PASSWORD_SALT'], max_age=3600)['user_id']
+        except Exception:
+            return None
+        return User.query.get(user_id)
+
+class CommunityChatMessage(db.Model):
+    __tablename__ = 'community_chat_messages'
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    username = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    user = db.relationship('User', backref='chat_messages')
+
+class IncidentType(db.Model):
+    __tablename__ = 'incident_types'
+    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
 
 class Admin(db.Model):
     __bind_key__ = 'admin'
@@ -135,6 +203,7 @@ class Incident(db.Model):
     status = db.Column(db.String(50), default='reported')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    assigned_officer_id = db.Column(db.Integer, nullable=True)
     evidence = db.relationship('IncidentEvidence', backref='incident', lazy=True, cascade="all, delete-orphan")
 
 class IncidentEvidence(db.Model):
@@ -174,7 +243,6 @@ class Voucher(db.Model):
     approved_at = db.Column(db.DateTime, nullable=True)
     redeemed_at = db.Column(db.DateTime, nullable=True)
     
-    # Add relationship to User model
     user = db.relationship('User', foreign_keys=[user_id], backref='vouchers')
 
 # ================ HELPER FUNCTIONS ================
@@ -209,14 +277,26 @@ def confirm_token(token, expiration=3600):
 def initialize_database():
     with app.app_context():
         try:
-            # Initialize all databases
             db.create_all()
             
-            # Common user details
+            common_incident_types = [
+                "Gender-Based Violence",
+                "Theft",
+                "Burglary",
+                "Assault",
+                "Vandalism",
+                "Drug Activity"
+            ]
+            for incident_name in common_incident_types:
+                existing_type = IncidentType.query.filter_by(name=incident_name).first()
+                if not existing_type:
+                    new_type = IncidentType(name=incident_name)
+                    db.session.add(new_type)
+            db.session.commit()
+            
             user_email = "tebogo@gmail.com"
             user_password = bcrypt.generate_password_hash("tebogo").decode('utf-8')
 
-            # 1. Main database - Create regular user
             regular_user = User.query.filter_by(email=user_email).first()
             if not regular_user:
                 regular_user = User(
@@ -227,9 +307,8 @@ def initialize_database():
                     address="123 Main St"
                 )
                 db.session.add(regular_user)
-                db.session.commit()  # Commit to get the user ID
+                db.session.commit()
                 
-                # Now add emergency contact with the valid user_id
                 emergency_contact = EmergencyContact(
                     user_id=regular_user.id,
                     name="Emergency Contact",
@@ -238,7 +317,6 @@ def initialize_database():
                 )
                 db.session.add(emergency_contact)
                 
-                # Add a sample incident
                 incident = Incident(
                     crime_type="Theft",
                     description="Stolen phone at the mall",
@@ -249,10 +327,8 @@ def initialize_database():
                     user_id=regular_user.id
                 )
                 db.session.add(incident)
-                
                 db.session.commit()
 
-            # 2. Admin database - Create admin user
             admin_engine = db.engines['admin']
             Admin.metadata.create_all(bind=admin_engine)
             admin_session_maker = sessionmaker(bind=admin_engine)
@@ -268,7 +344,6 @@ def initialize_database():
             finally:
                 admin_session.close()
 
-            # 3. Police database - Create law enforcement user
             police_engine = db.engines['police']
             LawEnforcement.metadata.create_all(bind=police_engine)
             police_session_maker = sessionmaker(bind=police_engine)
@@ -290,7 +365,6 @@ def initialize_database():
             
         except Exception as e:
             print(f"Error during initialization: {e}")
-            # Fallback to SQLite
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///community_safety.db'
             app.config['SQLALCHEMY_BINDS'] = {
                 'admin': 'sqlite:///admin.db',
@@ -304,28 +378,217 @@ def initialize_database():
                 raise
 
 # ================ MIDDLEWARE ================
-@app.before_request
-def security_checks():
-    # Enforce HTTPS in production
-    if not request.is_secure and app.debug is False:
-        return redirect(request.url.replace('http://', 'https://'), 301)
+@app.after_request
+def set_csrf_cookie(response):
+    if request.method == "GET":
+        token = generate_csrf()
+        response.set_cookie('csrf_token', token)
+    return response
+
+# ================ CHAT FUNCTIONALITY ================
+@app.route('/api/chat/users')
+def get_chat_users():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
     
-    # Check database connection
-    try:
-        db.session.execute(db.text('SELECT 1'))
-    except Exception as e:
-        db.session.rollback()
-        try:
-            db.session.remove()
-            db.engine.dispose()
-            db.create_all()
-        except Exception as reconnect_error:
-            return render_template('database_error.html'), 503
+    # Get distinct users who have sent messages
+    users = db.session.query(
+        CommunityChatMessage.user_id,
+        CommunityChatMessage.username
+    ).filter(
+        CommunityChatMessage.user_id.isnot(None)
+    ).distinct().all()
+    
+    user_list = [{'user_id': u.user_id, 'username': u.username} for u in users]
+    return jsonify(user_list)
+
+# API endpoint to get chat history with a specific user
+@app.route('/api/chat/history/<int:user_id>')
+def get_chat_history(user_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    
+    messages = CommunityChatMessage.query.filter(
+        (CommunityChatMessage.user_id == user_id) | 
+        (CommunityChatMessage.is_admin == True)
+    ).order_by(CommunityChatMessage.timestamp.asc()).all()
+    
+    message_list = []
+    for msg in messages:
+        message_list.append({
+            'id': msg.id,
+            'user_id': msg.user_id,
+            'username': msg.username if msg.username else 'Admin',
+            'message': msg.message,
+            'timestamp': msg.timestamp.isoformat(),
+            'is_admin': msg.is_admin
+        })
+    
+    return jsonify(message_list)
+
+# SocketIO event handlers
+@socketio.on('join_admin_room')
+def handle_join_admin_room():
+    if 'admin_id' not in session:
+        return False
+    join_room('admin_room')
+
+@socketio.on('admin_send_message')
+def handle_admin_send_message(data):
+    if 'admin_id' not in session:
+        return False
+    
+    user_id = data.get('user_id')
+    message = data.get('message')
+    
+    if not user_id or not message:
+        return
+    
+    # Save admin message to database
+    chat_message = CommunityChatMessage(
+        user_id=None,  # Null user_id indicates admin message
+        username='Admin',
+        message=message,
+        is_admin=True
+    )
+    db.session.add(chat_message)
+    db.session.commit()
+    
+    # Emit message to admin room and user room
+    emit('new_message', {
+        'id': chat_message.id,
+        'user_id': user_id,
+        'username': 'Admin',
+        'message': message,
+        'timestamp': chat_message.timestamp.isoformat(),
+        'is_admin': True
+    }, room='admin_room')
+    
+    emit('new_message', {
+        'id': chat_message.id,
+        'user_id': user_id,
+        'username': 'Admin',
+        'message': message,
+        'timestamp': chat_message.timestamp.isoformat(),
+        'is_admin': True
+    }, room=f'user_{user_id}')
+
+@socketio.on('user_send_message')
+def handle_user_send_message(data):
+    user_id = data.get('user_id')
+    username = data.get('username')
+    message = data.get('message')
+
+    if not user_id or not message or not username:
+        return
+
+    chat_message = CommunityChatMessage(
+        user_id=user_id,
+        username=username,
+        message=message,
+        is_admin=False
+    )
+    db.session.add(chat_message)
+    db.session.commit()
+
+    emit('new_message', {
+        'id': chat_message.id,
+        'user_id': chat_message.user_id,
+        'username': chat_message.username,
+        'message': chat_message.message,
+        'timestamp': chat_message.timestamp.isoformat(),
+        'is_admin': chat_message.is_admin
+    }, room='admin_room')
+    emit('new_message', {
+        'id': chat_message.id,
+        'user_id': chat_message.user_id,
+        'username': chat_message.username,
+        'message': chat_message.message,
+        'timestamp': chat_message.timestamp.isoformat(),
+        'is_admin': chat_message.is_admin
+    }, room=f'user_{user_id}')
+
+@socketio.on('join_admin_room')
+def join_admin_room():
+    join_room('admin_room')
+
+@socketio.on('join_user_room')
+def join_user_room(data):
+    user_id = data.get('user_id')
+    if user_id:
+        join_room(f'user_{user_id}')
 
 # ================ ROUTES ================
 @app.route('/')
 def home():
     return redirect(url_for('login'))
+
+# API endpoint to get evidence files for an incident
+@app.route('/api/incident_evidence/<int:incident_id>')
+def api_incident_evidence(incident_id):
+    incident = Incident.query.get(incident_id)
+    if not incident:
+        return jsonify({'success': False, 'message': 'Incident not found', 'evidence': []}), 404
+    evidence_list = []
+    for ev in incident.evidence:
+        evidence_list.append({
+            'file_path': ev.file_path,
+            'file_type': ev.file_type
+        })
+    return jsonify({'success': True, 'evidence': evidence_list})
+
+# Emergency Contacts API routes
+@app.route('/api/emergency-contacts', methods=['GET', 'POST'])
+@csrf.exempt
+
+@app.route('/api/emergency-contacts/<int:contact_id>', methods=['GET', 'PUT', 'DELETE'])
+@csrf.exempt
+def emergency_contact(contact_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    contact = EmergencyContact.query.filter_by(id=contact_id, user_id=session['user_id']).first()
+    if not contact:
+        return jsonify({'error': 'Contact not found'}), 404
+    
+    if request.method == 'GET':
+        return jsonify({
+            'success': True,
+            'contact': {
+                'id': contact.id,
+                'name': contact.name,
+                'phone': contact.phone,
+                'relationship': contact.relationship
+            }
+        })
+    
+    elif request.method == 'PUT':
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        try:
+            if 'name' in data:
+                contact.name = data['name']
+            if 'phone' in data:
+                contact.phone = data['phone']
+            if 'relationship' in data:
+                contact.relationship = data['relationship']
+            
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Contact updated successfully'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
+    
+    elif request.method == 'DELETE':
+        try:
+            db.session.delete(contact)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Contact deleted successfully'})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -379,6 +642,7 @@ def login():
             app.logger.error(f"Login error: {str(e)}")
     
     return render_template('login.html')
+
 
 @app.route('/law_enforcement_login', methods=['GET', 'POST'])
 def law_enforcement_login():
@@ -470,60 +734,97 @@ def logout():
     return redirect(url_for('login'))
 
 # Password Reset Routes
+import re
+from itsdangerous import SignatureExpired, BadSignature
+
 @app.route('/reset_password', methods=['GET', 'POST'])
+@csrf.exempt
 def reset_password_request():
     if request.method == 'POST':
         email = request.form['email']
         user = User.query.filter_by(email=email).first()
         if user:
-            token = generate_token(email)
-            reset_url = url_for('reset_password_token', token=token, _external=True)
-            
-            msg = Message('Password Reset Request',
-                          recipients=[email])
-            msg.body = f'''To reset your password, visit the following link:
-{reset_url}
-
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-            try:
-                mail.send(msg)
-                flash('If an account with that email exists, a password reset link has been sent.', 'success')
-            except Exception as e:
-                flash('Failed to send reset email. Please try again later.', 'danger')
-                app.logger.error(f"Failed to send password reset email: {str(e)}")
+            secret_key = os.getenv('SECRET_KEY')
+       
+            serializer = URLSafeTimedSerializer(secret_key)
+            token = serializer.dumps(email, salt='password-reset')
+            user.reset_token = token
+            user.reset_token_expiry = datetime.now(timezone.utc) + timedelta(hours=1)
+            db.session.commit()
+       
+            msg = Message("Password Reset Request",
+                    sender=os.getenv('MAIL_USERNAME'),
+                    recipients=[email])
+            msg.body = f"Reset link: {url_for('reset_password_token', token=token, _external=True)}"
+   
+            mail.send(msg)
+           
+       
+            flash("A password reset link has been sent to your email.", "success")
+            return redirect(url_for('login'))  
         else:
-            flash('If an account with that email exists, a password reset link has been sent.', 'success')
-        
-        return redirect(url_for('login'))
-    
+            flash("No account found with that email address.", "danger")
+           
+       
+   
     return render_template('reset_password.html')
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password_token(token):
-    email = confirm_token(token)
-    if not email:
-        flash('The reset link is invalid or has expired.', 'danger')
+@app.route('/reset_password_token', methods=['GET', 'POST'])
+@csrf.exempt
+def reset_password_token():
+    # Get token from URL parameters
+    token = request.args.get('token')
+   
+   
+    if not token:
+        flash('Invalid reset token', 'danger')
         return redirect(url_for('reset_password_request'))
-    
+ 
+    try:
+        # Verify token validity
+        secret_key = os.getenv('SECRET_KEY')
+        serializer = URLSafeTimedSerializer(secret_key)
+        email = serializer.loads(token, salt='password-reset', max_age=3600)  # 1 hour expiration
+    except (SignatureExpired, BadSignature):
+        flash('The reset link is invalid or has expired', 'danger')
+        return redirect(url_for('reset_password_request'))
+   
+    # Find user by email from token
     user = User.query.filter_by(email=email).first()
-    if not user:
-        flash('Invalid email address.', 'danger')
+    if not user or user.reset_token != token:
+        flash('Invalid reset request', 'danger')
         return redirect(url_for('reset_password_request'))
-    
+   
+    # Check token expiry
+    if user.reset_token_expiry.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        flash('The reset link has expired', 'danger')
+        return redirect(url_for('reset_password_request'))
+   
     if request.method == 'POST':
-        password = request.form['password']
+        new_password = request.form['new_password']
         confirm_password = request.form['confirm_password']
-        
-        if password != confirm_password:
-            flash('Passwords do not match.', 'danger')
-            return redirect(url_for('reset_password_token', token=token))
-        
-        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
-        db.session.commit()
-        flash('Your password has been updated!', 'success')
-        return redirect(url_for('login'))
-    
+       
+        # Validate passwords match
+        if new_password != confirm_password:
+            flash('Passwords do not match', 'danger')
+            return render_template('reset_password_token.html', token=token)
+       
+        try:
+            # Update password and clear reset token
+            hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            user.password = hashed_password
+            user.reset_token = None
+            user.reset_token_expiry = None
+            db.session.commit()
+           
+            flash('Your password has been updated successfully!', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating password', 'danger')
+            app.logger.error(f"Password reset error: {str(e)}")
+   
+    # For GET requests, render the form
     return render_template('reset_password_token.html', token=token)
 
 # User Routes
@@ -554,6 +855,9 @@ def dashboard():
         # Get emergency contacts
         emergency_contacts = EmergencyContact.query.filter_by(user_id=user.id).all()
         
+        # Determine primary contact (first contact or None)
+        primary_contact = emergency_contacts[0] if emergency_contacts else None
+        
         # Calculate reports this month
         from datetime import datetime
         from sqlalchemy import extract
@@ -564,14 +868,14 @@ def dashboard():
             extract('month', Incident.created_at) == now.month
         ).count()
         
-        # Calculate active patrols (assuming a model or method exists)
-        # For now, set to a placeholder value
-        active_patrols = 5  # Placeholder, replace with actual query if available
+        # Placeholder for active patrols count
+        active_patrols = 5 
         
         return render_template('Dashboard.html', 
                                user=user, 
                                recent_incidents=recent_incidents,
                                emergency_contacts=emergency_contacts,
+                               primary_contact=primary_contact,
                                reports_this_month=reports_this_month,
                                active_patrols=active_patrols)
     except Exception as e:
@@ -624,8 +928,8 @@ def user_profile():
             'email': user.email,
             'phone': user.phone,
             'address': user.address,
-            'joinDate': user.created_at.isoformat(),
-            'profilePic': None  # You can implement profile pictures later
+            ' Date': user.created_at.isoformat(),
+            'profilePic': url_for('uploaded_file', filename=user.profile_image) if user.profile_image else None
         })
     elif request.method == 'PUT':
         try:
@@ -651,102 +955,6 @@ def user_profile():
             db.session.rollback()
             return jsonify({'error': str(e)}), 500
 
-@app.route('/api/emergency-contacts', methods=['GET', 'POST'])
-@csrf.exempt
-def emergency_contacts():
-    if 'user_id' not in session:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    if request.method == 'GET':
-        try:
-            contacts = EmergencyContact.query.filter_by(user_id=session['user_id']).all()
-            return jsonify([{
-                'id': contact.id,
-                'name': contact.name,
-                'phone': contact.phone,
-                'relationship': contact.relationship
-            } for contact in contacts])
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
-    
-    elif request.method == 'POST':
-        data = request.get_json()
-        if not data or not all(key in data for key in ['name', 'phone', 'relationship']):
-            return jsonify({'error': 'Missing required fields'}), 400
-        
-        try:
-            # Check if user already has 5 contacts (limit)
-            contact_count = EmergencyContact.query.filter_by(user_id=session['user_id']).count()
-            if contact_count >= 5:
-                return jsonify({'error': 'Maximum of 5 emergency contacts allowed'}), 400
-            
-            contact = EmergencyContact(
-                user_id=session['user_id'],
-                name=data['name'],
-                phone=data['phone'],
-                relationship=data['relationship']
-            )
-            db.session.add(contact)
-            db.session.commit()
-            
-            return jsonify({
-                'success': True,
-                'contact': {
-                    'id': contact.id,
-                    'name': contact.name,
-                    'phone': contact.phone,
-                    'relationship': contact.relationship
-                }
-            })
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
-
-@app.route('/api/emergency-contacts/<int:contact_id>', methods=['GET', 'PUT', 'DELETE'])
-@csrf.exempt
-def emergency_contact(contact_id):
-    if 'user_id' not in session:
-        return jsonify({'error': 'Not logged in'}), 401
-    
-    contact = EmergencyContact.query.filter_by(id=contact_id, user_id=session['user_id']).first()
-    if not contact:
-        return jsonify({'error': 'Contact not found'}), 404
-    
-    if request.method == 'GET':
-        return jsonify({
-            'id': contact.id,
-            'name': contact.name,
-            'phone': contact.phone,
-            'relationship': contact.relationship
-        })
-    
-    elif request.method == 'PUT':
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        
-        try:
-            if 'name' in data:
-                contact.name = data['name']
-            if 'phone' in data:
-                contact.phone = data['phone']
-            if 'relationship' in data:
-                contact.relationship = data['relationship']
-            
-            db.session.commit()
-            return jsonify({'success': True, 'message': 'Contact updated successfully'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
-    
-    elif request.method == 'DELETE':
-        try:
-            db.session.delete(contact)
-            db.session.commit()
-            return jsonify({'success': True, 'message': 'Contact deleted successfully'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
 
 # API endpoint for changing user password
 @app.route('/api/change-password', methods=['POST'])
@@ -799,10 +1007,11 @@ def upload_profile_image():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
         
-        # You could also update a user profile_image field in the database here
-        # user = User.query.get(session['user_id'])
-        # user.profile_image = filename
-        # db.session.commit()
+        # Update user profile_image field in the database
+        user = User.query.get(session['user_id'])
+        if user:
+            user.profile_image = filename
+            db.session.commit()
         
         return jsonify({
             'success': True, 
@@ -824,7 +1033,21 @@ def report_incident():
             # Get form data
             crime_type = request.form.get('incident-type')
             if crime_type == 'other':
-                crime_type = request.form.get('other-crime', 'Unknown')
+                other_crime = request.form.get('other-crime', 'Unknown').strip()
+                crime_type = other_crime
+                
+                # Check if the other_crime already exists in IncidentType
+                existing_type = IncidentType.query.filter_by(name=other_crime).first()
+                if not existing_type:
+                    new_type = IncidentType(name=other_crime)
+                    db.session.add(new_type)
+                    db.session.commit()
+            else:
+                # Map numeric crime_type id to name if digit
+                if crime_type and str(crime_type).isdigit():
+                    incident_type = IncidentType.query.get(int(crime_type))
+                    if incident_type:
+                        crime_type = incident_type.name
             
             description = request.form.get('description', '')
             location = request.form.get('location', '')
@@ -845,6 +1068,30 @@ def report_incident():
             )
             db.session.add(new_incident)
             db.session.commit()
+
+            # Automatic random assignment of officer
+            import random
+            officers = db.session.query(LawEnforcement).all()
+            if officers:
+                assigned_officer = random.choice(officers)
+                new_incident.assigned_officer_id = assigned_officer.id
+                db.session.commit()
+
+            # Emit socketio event to notify law enforcement dashboard
+            from flask_socketio import emit
+            from __main__ import socketio
+            incident_data = {
+                'id': new_incident.id,
+                'crime_type': new_incident.crime_type,
+                'description': new_incident.description,
+                'latitude': new_incident.latitude,
+                'longitude': new_incident.longitude,
+                'address': new_incident.address,
+                'status': new_incident.status,
+                'user_id': new_incident.user_id,
+                'created_at': new_incident.created_at.isoformat() if new_incident.created_at else None
+            }
+            socketio.emit('new_incident', incident_data, broadcast=True)
             
             # Handle file uploads
             if 'media-upload' in request.files:
@@ -875,13 +1122,16 @@ def report_incident():
             
             db.session.commit()
             flash('Incident reported successfully!', 'success')
+            # Redirect to ThankYou Page.html before dashboard
             return redirect(url_for('thank_you_page'))
         
         except Exception as e:
             db.session.rollback()
             flash(f'Error reporting incident: {str(e)}', 'danger')
     
-    return render_template('reportincident.html')
+    # On GET, load incident types from DB
+    incident_types = IncidentType.query.order_by(IncidentType.name).all()
+    return render_template('reportincident.html', incident_types=incident_types)
 
 @app.route('/crime-map')
 def crime_map():
@@ -890,9 +1140,31 @@ def crime_map():
         return redirect(url_for('login'))
     return render_template('crimemapPage.html')
 
+@app.route('/law_enforcement_crime_map')
+def law_enforcement_crime_map():
+    if 'officer_id' not in session:
+        flash("Please log in to access the law enforcement crime map.", "warning")
+        return redirect(url_for('law_enforcement_login'))
+    try:
+        officer = db.session.execute(
+            db.select(LawEnforcement).where(LawEnforcement.id == session['officer_id'])
+        ).scalar_one_or_none()
+        if not officer:
+            flash("Officer not found. Please log in again.", "warning")
+            return redirect(url_for('law_enforcement_login'))
+        incidents = db.session.query(Incident).order_by(Incident.created_at.desc()).all()
+        return render_template('law_enforcement_crimemap.html', incidents=incidents)
+    except Exception as e:
+        app.logger.error(f"Error loading law enforcement crime map: {str(e)}")
+        flash("An error occurred while loading the crime map.", "danger")
+        return redirect(url_for('law_enforcement_dashboard'))
+
 @app.route('/get_crime_data')
 def get_crime_data():
-    crimes = Incident.query.filter_by(status='verified').all()
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify([])  # or return an error if preferred
+    crimes = Incident.query.filter_by(user_id=user_id).all()
     return jsonify([{
         'crime_type': crime.crime_type,
         'description': crime.description,
@@ -971,17 +1243,38 @@ def admin_dashboard():
     # Get all users
     users = User.query.order_by(User.created_at.desc()).all()
     
-    # Get all incidents with reporter info
-    incidents = db.session.query(Incident, User)\
-        .join(User, Incident.user_id == User.id, isouter=True)\
-        .order_by(Incident.created_at.desc())\
-        .all()
+    # Get all incidents with reporter info and evidence
+    incidents_with_users = db.session.query(Incident).options(
+        db.joinedload(Incident.user),
+        db.joinedload(Incident.evidence)
+    ).order_by(Incident.created_at.desc()).all()
+    
+    # Prepare incidents as tuples (incident, user) for template compatibility
+    incidents = [(incident, incident.user) for incident in incidents_with_users]
     
     # Get all vouchers with user info
     vouchers = db.session.query(Voucher)\
         .options(db.joinedload(Voucher.user))\
         .order_by(Voucher.created_at.desc())\
         .all()
+    
+    # Get all admins from admin database
+    admin_engine = db.engines['admin']
+    admin_session_maker = sessionmaker(bind=admin_engine)
+    admin_session = admin_session_maker()
+    try:
+        admins = admin_session.query(Admin).order_by(Admin.created_at.desc()).all()
+    finally:
+        admin_session.close()
+    
+    # Get all law enforcement officers from police database
+    police_engine = db.engines['police']
+    police_session_maker = sessionmaker(bind=police_engine)
+    police_session = police_session_maker()
+    try:
+        officers = police_session.query(LawEnforcement).order_by(LawEnforcement.created_at.desc()).all()
+    finally:
+        police_session.close()
     
     # Get statistics for dashboard cards
     incident_count = Incident.query.count()
@@ -992,6 +1285,8 @@ def admin_dashboard():
                      incidents=incidents,
                      users=users,
                      vouchers=vouchers,
+                     admins=admins,
+                     officers=officers,
                      incident_count=incident_count,
                      user_count=user_count,
                      pending_rewards=pending_rewards,
@@ -1007,9 +1302,16 @@ def admin_create_incident():
     try:
         data = request.json
         
+        crime_type = data.get('crime_type')
+        # Map crime_type id to name if digit
+        if crime_type and str(crime_type).isdigit():
+            incident_type = IncidentType.query.get(int(crime_type))
+            if incident_type:
+                crime_type = incident_type.name
+        
         # Create new incident
         new_incident = Incident(
-            crime_type=data.get('crime_type'),
+            crime_type=crime_type,
             description=data.get('description'),
             latitude=data.get('latitude'),
             longitude=data.get('longitude'),
@@ -1034,6 +1336,214 @@ def admin_create_incident():
         db.session.rollback()
         return jsonify({'error': str(e), 'success': False, 'message': 'Error creating incident'}), 500
 
+# Admin CRUD routes
+
+@app.route('/admin/create_admin', methods=['POST'])
+@csrf.exempt
+def admin_create_admin():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    try:
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        if not email or not password:
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        # Check if email already exists
+        existing = db.session.query(Admin).filter_by(email=email).first()
+        if existing:
+            return jsonify({'success': False, 'message': 'Email already exists'}), 400
+        
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        new_admin = Admin(
+            email=email,
+            password=hashed_password
+        )
+        db.session.add(new_admin)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Admin created successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/get_admin/<int:admin_id>', methods=['GET'])
+@csrf.exempt
+def admin_get_admin(admin_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    admin = db.session.query(Admin).filter_by(id=admin_id).first()
+    if not admin:
+        return jsonify({'success': False, 'message': 'Admin not found'}), 404
+    admin_data = {
+        'id': admin.id,
+        'email': admin.email
+    }
+    return jsonify({'success': True, 'admin': admin_data})
+
+@app.route('/admin/update_admin/<int:admin_id>', methods=['POST'])
+@csrf.exempt
+def admin_update_admin(admin_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    try:
+        data = request.json
+        admin = db.session.query(Admin).filter_by(id=admin_id).first()
+        if not admin:
+            return jsonify({'success': False, 'message': 'Admin not found'}), 404
+        
+        if 'email' in data:
+            # Check if email is unique
+            existing = db.session.query(Admin).filter(Admin.email == data['email'], Admin.id != admin_id).first()
+            if existing:
+                return jsonify({'success': False, 'message': 'Email already exists'}), 400
+            admin.email = data['email']
+        if 'password' in data and data['password']:
+            admin.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Admin updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/delete_admin/<int:admin_id>', methods=['DELETE'])
+@csrf.exempt
+def admin_delete_admin(admin_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    try:
+        admin = db.session.query(Admin).filter_by(id=admin_id).first()
+        if not admin:
+            return jsonify({'success': False, 'message': 'Admin not found'}), 404
+        db.session.delete(admin)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Admin deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# Law Enforcement CRUD routes
+
+@app.route('/admin/create_officer', methods=['POST'])
+@csrf.exempt
+def admin_create_officer():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    try:
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        station = data.get('station')
+        badge_number = data.get('badge_number')
+        if not email or not password or not station or not badge_number:
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+        
+        # Check if email already exists
+        existing = db.session.execute(
+            db.select(LawEnforcement).where(LawEnforcement.email == email)
+        ).scalar_one_or_none()
+        if existing:
+            return jsonify({'success': False, 'message': 'Email already exists'}), 400
+        
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        new_officer = LawEnforcement(
+            email=email,
+            password=hashed_password,
+            station=station,
+            badge_number=badge_number
+        )
+        police_engine = db.engines['police']
+        police_session_maker = sessionmaker(bind=police_engine)
+        police_session = police_session_maker()
+        try:
+            police_session.add(new_officer)
+            police_session.commit()
+        finally:
+            police_session.close()
+        
+        return jsonify({'success': True, 'message': 'Officer created successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/get_officer/<int:officer_id>', methods=['GET'])
+@csrf.exempt
+def admin_get_officer(officer_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    police_engine = db.engines['police']
+    police_session_maker = sessionmaker(bind=police_engine)
+    police_session = police_session_maker()
+    try:
+        officer = police_session.query(LawEnforcement).filter_by(id=officer_id).first()
+        if not officer:
+            return jsonify({'success': False, 'message': 'Officer not found'}), 404
+        officer_data = {
+            'id': officer.id,
+            'email': officer.email,
+            'station': officer.station,
+            'badge_number': officer.badge_number
+        }
+        return jsonify({'success': True, 'officer': officer_data})
+    finally:
+        police_session.close()
+
+@app.route('/admin/update_officer/<int:officer_id>', methods=['POST'])
+@csrf.exempt
+def admin_update_officer(officer_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    police_engine = db.engines['police']
+    police_session_maker = sessionmaker(bind=police_engine)
+    police_session = police_session_maker()
+    try:
+        data = request.json
+        officer = police_session.query(LawEnforcement).filter_by(id=officer_id).first()
+        if not officer:
+            return jsonify({'success': False, 'message': 'Officer not found'}), 404
+        
+        if 'email' in data:
+            # Check if email is unique
+            existing = police_session.query(LawEnforcement).filter(LawEnforcement.email == data['email'], LawEnforcement.id != officer_id).first()
+            if existing:
+                return jsonify({'success': False, 'message': 'Email already exists'}), 400
+            officer.email = data['email']
+        if 'password' in data and data['password']:
+            officer.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        if 'station' in data:
+            officer.station = data['station']
+        if 'badge_number' in data:
+            officer.badge_number = data['badge_number']
+        
+        police_session.commit()
+        return jsonify({'success': True, 'message': 'Officer updated successfully'})
+    except Exception as e:
+        police_session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+    finally:
+        police_session.close()
+
+@app.route('/admin/delete_officer/<int:officer_id>', methods=['DELETE'])
+@csrf.exempt
+def admin_delete_officer(officer_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    police_engine = db.engines['police']
+    police_session_maker = sessionmaker(bind=police_engine)
+    police_session = police_session_maker()
+    try:
+        officer = police_session.query(LawEnforcement).filter_by(id=officer_id).first()
+        if not officer:
+            return jsonify({'success': False, 'message': 'Officer not found'}), 404
+        police_session.delete(officer)
+        police_session.commit()
+        return jsonify({'success': True, 'message': 'Officer deleted successfully'})
+    except Exception as e:
+        police_session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+    finally:
+        police_session.close()
+
 @app.route('/admin/get_incident/<int:id>', methods=['GET'])
 @csrf.exempt
 def admin_get_incident(id):
@@ -1043,6 +1553,18 @@ def admin_get_incident(id):
     incident = Incident.query.get(id)
     if not incident:
         return jsonify({'error': 'Incident not found', 'success': False}), 404
+    
+    user = None
+    if incident.user_id:
+        user_obj = User.query.get(incident.user_id)
+        if user_obj:
+            user = {
+                'id': user_obj.id,
+                'name': user_obj.name,
+                'email': user_obj.email,
+                'phone': user_obj.phone,
+                'address': user_obj.address
+            }
     
     return jsonify({
         'success': True,
@@ -1055,7 +1577,8 @@ def admin_get_incident(id):
             'address': incident.address,
             'status': incident.status,
             'user_id': incident.user_id,
-            'created_at': incident.created_at.isoformat() if incident.created_at else None
+            'created_at': incident.created_at.isoformat() if incident.created_at else None,
+            'user': user
         }
     })
 @app.route('/admin/verify_incident/<int:incident_id>', methods=['POST'])
@@ -1087,7 +1610,13 @@ def admin_update_incident(incident_id):
         
         # Update incident details if provided
         if 'crime_type' in data:
-            incident.crime_type = data['crime_type']
+            crime_type = data['crime_type']
+            # Map crime_type id to name if digit
+            if crime_type and str(crime_type).isdigit():
+                incident_type = IncidentType.query.get(int(crime_type))
+                if incident_type:
+                    crime_type = incident_type.name
+            incident.crime_type = crime_type
         if 'description' in data:
             incident.description = data['description']
         if 'address' in data:
@@ -1138,24 +1667,38 @@ def delete_incident(incident_id):
     db.session.commit()
     return jsonify({'success': True, 'message': 'Incident deleted'})
 
-@app.route('/admin/users/<int:user_id>', methods=['DELETE'])
+@app.route('/admin/users/<int:user_id>', methods=['GET', 'DELETE'])
 @csrf.exempt
-def delete_user(user_id):
+def manage_user(user_id):
     if 'admin_id' not in session:
         return jsonify({'error': 'Not authorized'}), 401
-    
-    try:
+
+    if request.method == 'GET':
         user = User.query.get(user_id)
         if not user:
-            return jsonify({'error': 'User not found'}), 404
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        user_data = {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'phone': user.phone,
+            'address': user.address
+        }
+        return jsonify({'success': True, 'user': user_data})
+
+    elif request.method == 'DELETE':
+        try:
+            user = User.query.get(user_id)
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+            
+            db.session.delete(user)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'User deleted successfully'})
         
-        db.session.delete(user)
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'User deleted successfully'})
-    
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
 
 # Add a new column to User model for is_active status if it doesn't exist
 # This would typically be done via a migration
@@ -1246,12 +1789,52 @@ def law_enforcement_dashboard():
         
         # Get incidents with user data using joinedload
         incidents = db.session.query(Incident).options(
-            db.joinedload(Incident.user)
+            db.joinedload(Incident.user),
+            db.joinedload(Incident.evidence)
         ).order_by(Incident.created_at.desc()).limit(50).all()
+        
+        # Serialize incidents to dicts for JSON serialization in template
+        def serialize_incident(incident):
+            return {
+                'id': incident.id,
+                'crime_type': incident.crime_type,
+                'description': incident.description,
+                'latitude': incident.latitude,
+                'longitude': incident.longitude,
+                'address': incident.address,
+                'status': incident.status,
+                'user': {
+                    'id': incident.user.id if incident.user else None,
+                    'name': incident.user.name if incident.user else 'Unknown',
+                    'email': incident.user.email if incident.user else ''
+                },
+                'assigned_officer': {
+                    'id': incident.assigned_officer_id,
+                    'email': None
+                },
+                'evidence': [{
+                    'file_path': ev.file_path,
+                    'file_type': ev.file_type
+                } for ev in incident.evidence]
+            }
+        
+        # Fetch assigned officer emails for incidents with assigned_officer_id
+        assigned_officer_ids = [inc.assigned_officer_id for inc in incidents if inc.assigned_officer_id]
+        assigned_officers = {}
+        if assigned_officer_ids:
+            officers = db.session.query(LawEnforcement).filter(LawEnforcement.id.in_(assigned_officer_ids)).all()
+            assigned_officers = {officer.id: officer.email for officer in officers}
+        
+        incidents_serialized = []
+        for inc in incidents:
+            inc_dict = serialize_incident(inc)
+            if inc_dict['assigned_officer']['id'] in assigned_officers:
+                inc_dict['assigned_officer']['email'] = assigned_officers[inc_dict['assigned_officer']['id']]
+            incidents_serialized.append(inc_dict)
         
         return render_template('law_enforcement_dashboard.html',
                             officer=officer,
-                            incidents=incidents)
+                            incidents=incidents_serialized)
         
     except Exception as e:
         db.session.rollback()
@@ -1259,7 +1842,54 @@ def law_enforcement_dashboard():
         app.logger.error(f"Law enforcement dashboard error: {str(e)}")
         return redirect(url_for('law_enforcement_login'))
 
+# New route to list officers
+@app.route('/law_enforcement_officers')
+def law_enforcement_officers():
+    if 'officer_id' not in session:
+        flash("Please log in to access officers list.", "danger")
+        return redirect(url_for('law_enforcement_login'))
+    try:
+        officers = db.session.execute(
+            db.select(LawEnforcement).order_by(LawEnforcement.created_at.desc())
+        ).scalars().all()
+        return render_template('law_enforcement_officers.html', officers=officers)
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error loading officers list: {str(e)}", "danger")
+        app.logger.error(f"Law enforcement officers error: {str(e)}")
+        return redirect(url_for('law_enforcement_dashboard'))
+
+# New API endpoint to get officers as JSON
+@app.route('/api/law_enforcement_officers')
+def api_law_enforcement_officers():
+    if 'officer_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    try:
+        officers = db.session.query(LawEnforcement).order_by(LawEnforcement.created_at.desc()).all()
+        officers_list = [{'id': o.id, 'email': o.email, 'station': o.station, 'badge_number': o.badge_number} for o in officers]
+        return jsonify({'success': True, 'officers': officers_list})
+    except Exception as e:
+        app.logger.error(f"Error fetching officers JSON: {str(e)}")
+        return jsonify({'error': 'Failed to fetch officers'}), 500
+
+# New route for law enforcement settings
+@app.route('/law_enforcement_settings')
+def law_enforcement_settings():
+    if 'officer_id' not in session:
+        flash("Please log in to access settings.", "danger")
+        return redirect(url_for('law_enforcement_login'))
+    try:
+        return render_template('law_enforcement_settings.html')
+    except Exception as e:
+        flash(f"Error loading settings: {str(e)}", "danger")
+        app.logger.error(f"Law enforcement settings error: {str(e)}")
+        return redirect(url_for('law_enforcement_dashboard'))
+
+
+# ... existing code ...
+
 @app.route('/officer/assign_case/<int:incident_id>', methods=['POST'])
+@csrf.exempt
 def assign_case(incident_id):
     if 'officer_id' not in session:
         return jsonify({'error': 'Not authorized'}), 401
@@ -1269,13 +1899,23 @@ def assign_case(incident_id):
         return jsonify({'error': 'Incident not found'}), 404
     
     try:
-        incident.assigned_officer_id = session['officer_id']
+        data = request.get_json()
+        officer_id = data.get('officer_id', session['officer_id'])
+        
+        # Validate officer_id exists
+        officer = db.session.execute(
+            db.select(LawEnforcement).where(LawEnforcement.id == officer_id)
+        ).scalar_one_or_none()
+        if not officer:
+            return jsonify({'error': 'Officer not found'}), 404
+        
+        incident.assigned_officer_id = officer_id
         incident.status = 'assigned'
         db.session.commit()
         return jsonify({
             'success': True, 
-            'message': 'Case assigned to you', 
-            'officer_name': session.get('officer_email', 'Officer')
+            'message': f'Case assigned to {officer.email}', 
+            'officer_name': officer.email
         })
     except Exception as e:
         db.session.rollback()
@@ -1413,6 +2053,7 @@ def reject_voucher(voucher_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
 # Community Features
 @app.route('/communitychat')
 def communitychat():
@@ -1421,16 +2062,239 @@ def communitychat():
         return redirect(url_for('login'))
     return render_template('communitychat.html')
 
-@app.route('/rewards')
-def rewards():
+from flask import jsonify
+
+# API endpoint to get list of users who have sent chat messages
+# Renamed to avoid endpoint function name conflict
+@app.route('/api/chat/users')
+def get_chat_users_api():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    # Query distinct users from CommunityChatMessage
+    users = db.session.query(
+        CommunityChatMessage.user_id,
+        CommunityChatMessage.username
+    ).distinct().all()
+    user_list = [{'user_id': u.user_id, 'username': u.username} for u in users]
+    return jsonify(user_list)
+
+# API endpoint to get chat history with a specific user
+# Renamed to avoid endpoint function name conflict
+@app.route('/api/chat/history/<int:user_id>')
+def get_chat_history_api(user_id):
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+    messages = CommunityChatMessage.query.filter(
+        (CommunityChatMessage.user_id == user_id) | 
+        ((CommunityChatMessage.user_id == None) & (CommunityChatMessage.is_admin == True))
+    ).order_by(CommunityChatMessage.timestamp.asc()).all()
+    message_list = []
+    for msg in messages:
+        message_list.append({
+            'id': msg.id,
+            'user_id': msg.user_id,
+            'username': msg.username if msg.username else 'Admin',
+            'message': msg.message,
+            'timestamp': msg.timestamp.isoformat(),
+            'is_admin': msg.is_admin
+        })
+    return jsonify(message_list)
+
+from flask_socketio import join_room, leave_room
+
+@socketio.on('join_admin_room')
+def handle_join_admin_room():
+    if 'admin_id' not in session:
+        return False  # Unauthorized
+    join_room('admin_room')
+
+@socketio.on('admin_send_message')
+def handle_admin_send_message(data):
+    if 'admin_id' not in session:
+        return False  # Unauthorized
+    user_id = data.get('user_id')
+    message = data.get('message')
+    if not user_id or not message:
+        return
+    # Save message to DB
+    chat_msg = CommunityChatMessage(
+        user_id=user_id,
+        username='Admin',
+        message=message,
+        is_admin=True
+    )
+    db.session.add(chat_msg)
+    db.session.commit()
+    # Emit message to admin room and user room
+    emit('new_message', {
+        'id': chat_msg.id,
+        'user_id': user_id,
+        'username': 'Admin',
+        'message': message,
+        'timestamp': chat_msg.timestamp.isoformat(),
+        'is_admin': True
+    }, room='admin_room')
+    emit('new_message', {
+        'id': chat_msg.id,
+        'user_id': user_id,
+        'username': 'Admin',
+        'message': message,
+        'timestamp': chat_msg.timestamp.isoformat(),
+        'is_admin': True
+    }, room=f'user_{user_id}')
+
+@socketio.on('join_user_room')
+def join_user_room(data):
+    user_id = data.get('user_id')
+    if user_id:
+        join_room(f'user_{user_id}')
+
+# API endpoint to get chat messages for logged-in user
+@app.route('/api/chat/messages')
+def get_user_chat_messages():
     if 'user_id' not in session:
-        flash("Please log in to access the rewards page.", "warning")
-        return redirect(url_for('login'))
+        return jsonify({'error': 'Not logged in'}), 401
+    user_id = session['user_id']
+    messages = CommunityChatMessage.query.filter_by(user_id=user_id).order_by(CommunityChatMessage.timestamp.asc()).all()
+    result = []
+    for msg in messages:
+        result.append({
+            'id': msg.id,
+            'user_id': msg.user_id,
+            'username': msg.username,
+            'message': msg.message,
+            'timestamp': msg.timestamp.isoformat(),
+            'is_admin': msg.is_admin
+        })
+    return jsonify(result)
+
+
+# Serve uploaded files
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/thank_you_page')
+def thank_you_page():
+    return render_template('ThankYou Page.html')
+
+from flask import request, jsonify
+
+
+@app.route('/admin/_report', methods=['POST'])
+@csrf.exempt
+def generate_report_obsolete():
+    # This is the older, simpler generate_report function that is now obsolete.
+    # It is renamed to avoid conflict and can be removed later if desired.
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+
+    data = request.get_json()
     
+    # Initialize base query
+    query = db.session.query(Incident).join(User, isouter=True)
+    
+    # Apply filters if they exist in the request
+    if 'case_type' in data and data['case_type']:
+        query = query.filter(Incident.crime_type == data['case_type'])
+    
+    if 'user_id' in data and data['user_id']:
+        query = query.filter(Incident.user_id == data['user_id'])
+    
+    if 'date_from' in data and data['date_from']:
+        query = query.filter(Incident.created_at >= data['date_from'])
+    
+    if 'date_to' in data and data['date_to']:
+        query = query.filter(Incident.created_at <= data['date_to'])
+    
+    if 'status' in data and data['status']:
+        query = query.filter(Incident.status == data['status'])
+    
+    if 'location' in data and data['location']:
+        query = query.filter(Incident.address.ilike(f"%{data['location']}%"))
+    
+    # Execute the query
+    incidents = query.all()
+
+    # If no incidents found, return empty response
+    if not incidents:
+        return jsonify({
+            'success': True,
+            'message': 'No incidents found matching the criteria',
+            'incident_summary': {},
+            'user_activity': {},
+            'officer_performance': {},
+            'reward_vouchers': {}
+        })
+
+    # Incident summary: counts by crime_type and status
+    incident_summary = {}
+    for incident in incidents:
+        ct = incident.crime_type or 'Unknown'
+        if ct not in incident_summary:
+            incident_summary[ct] = {
+                'reported': 0, 
+                'verified': 0, 
+                'resolved': 0, 
+                'false_alarm': 0
+            }
+        status_key = incident.status.lower() if incident.status else 'reported'
+        if status_key not in incident_summary[ct]:
+            incident_summary[ct][status_key] = 0
+        incident_summary[ct][status_key] += 1
+
+    # User activity: count of incidents reported by user
+    user_activity = {}
+    for incident in incidents:
+        uid = incident.user_id
+        if uid:
+            user_activity[uid] = user_activity.get(uid, 0) + 1
+
+    # Officer performance: counts of verified and resolved cases by officer
+    officer_performance = {}
+    for incident in incidents:
+        officer_id = incident.assigned_officer_id
+        if officer_id:
+            if officer_id not in officer_performance:
+                officer_performance[officer_id] = {'verified': 0, 'resolved': 0}
+            status_key = incident.status.lower() if incident.status else ''
+            if status_key == 'verified':
+                officer_performance[officer_id]['verified'] += 1
+            elif status_key == 'resolved':
+                officer_performance[officer_id]['resolved'] += 1
+
+    # Reward vouchers: counts by reward_type and status
+    vouchers_query = db.session.query(Voucher)
+    if 'user_id' in data and data['user_id']:
+        vouchers_query = vouchers_query.filter(Voucher.user_id == data['user_id'])
+    vouchers = vouchers_query.all()
+
+    reward_vouchers = {}
+    for voucher in vouchers:
+        rt = voucher.reward_type or 'Unknown'
+        if rt not in reward_vouchers:
+            reward_vouchers[rt] = {'pending': 0, 'approved': 0, 'redeemed': 0}
+        if voucher.is_redeemed:
+            reward_vouchers[rt]['redeemed'] += 1
+        elif voucher.is_approved:
+            reward_vouchers[rt]['approved'] += 1
+        else:
+            reward_vouchers[rt]['pending'] += 1
+
+    return jsonify({
+        'success': True,
+        'incident_summary': incident_summary,
+        'user_activity': user_activity,
+        'officer_performance': officer_performance,
+        'reward_vouchers': reward_vouchers
+    })
+
+    
+    # Get all vouchers with user info
+    vouchers = db.session.query(Voucher).options(db.joinedload(Voucher.user)).order_by(Voucher.created_at.desc()).all()
+    
+    # Get current user for points display
     user = User.query.get(session['user_id'])
-    
-    # Get user's vouchers
-    vouchers = Voucher.query.filter_by(user_id=session['user_id']).order_by(Voucher.created_at.desc()).all()
     
     # Define available rewards
     reward_options = [
@@ -1456,20 +2320,262 @@ def rewards():
     
     return render_template('rewardspage.html', user=user, vouchers=vouchers, reward_options=reward_options)
 
-# Serve uploaded files
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/rewards')
+def rewards():
+    if 'user_id' not in session:
+        flash("Please log in to access the rewards page.", "warning")
+        return redirect(url_for('login'))
+    # Prepare data for rewards page
+    user = User.query.get(session['user_id'])
+    vouchers = db.session.query(Voucher).options(db.joinedload(Voucher.user)).filter(Voucher.user_id == user.id).order_by(Voucher.created_at.desc()).all()
+    reward_options = [
+        {
+            'id': 1,
+            'title': 'Shoprite R50 Voucher',
+            'points': 500,
+            'description': 'R50 voucher to spend at any Shoprite store'
+        },
+        {
+            'id': 2,
+            'title': 'Takealot R100 Voucher',
+            'points': 1000,
+            'description': 'R100 voucher to spend online at Takealot'
+        },
+        {
+            'id': 3,
+            'title': 'Cash Reward: R200',
+            'points': 2000,
+            'description': 'R200 cash reward via EFT'
+        }
+    ]
+    return render_template('rewardspage.html', user=user, vouchers=vouchers, reward_options=reward_options)
+
+from flask import jsonify, request, session
+from datetime import datetime
+
+@app.route('/admin/generate_report', methods=['POST'])
+@csrf.exempt
+def generate_report():
+    if 'admin_id' not in session:
+        return jsonify({'error': 'Not authorized'}), 401
+
+    try:
+        filters = request.get_json()
+
+        # Query incidents and users from main session
+        query = db.session.query(Incident, User).join(User, Incident.user_id == User.id, isouter=True)
+
+        # Apply filters on incidents and users
+        if filters.get('case_type'):
+            query = query.filter(Incident.crime_type == filters['case_type'])
+
+        if filters.get('user_id'):
+            query = query.filter(Incident.user_id == filters['user_id'])
+
+        if filters.get('user_name'):
+            query = query.filter(User.name.ilike(f"%{filters['user_name']}%"))
+
+        if filters.get('date_from'):
+            try:
+                date_from = datetime.strptime(filters['date_from'], '%m/%d/%Y')
+                query = query.filter(Incident.created_at >= date_from)
+            except ValueError:
+                return jsonify({'error': 'Invalid date_from format. Use mm/dd/yyyy'}), 400
+
+        if filters.get('date_to'):
+            try:
+                date_to = datetime.strptime(filters['date_to'], '%m/%d/%Y')
+                date_to = date_to.replace(hour=23, minute=59, second=59)
+                query = query.filter(Incident.created_at <= date_to)
+            except ValueError:
+                return jsonify({'error': 'Invalid date_to format. Use mm/dd/yyyy'}), 400
+
+        if filters.get('status'):
+            query = query.filter(Incident.status == filters['status'])
+
+        if filters.get('location'):
+            query = query.filter(
+                db.or_(
+                    Incident.address.ilike(f"%{filters['location']}%"),
+                    Incident.latitude.ilike(f"%{filters['location']}%"),
+                    Incident.longitude.ilike(f"%{filters['location']}%")
+                )
+            )
+
+        # Execute query to get incidents and users
+        results = query.order_by(Incident.created_at.desc()).all()
+
+        # If no results, return empty response
+        if not results:
+            return jsonify({
+                'success': True,
+                'message': 'No incidents found matching the criteria',
+                'report_data': {
+                    'incidents': [],
+                    'summary': {},
+                    'statistics': {}
+                }
+            })
+
+        # Fetch officers from police session
+        police_session = scoped_session(sessionmaker(bind=db.engines['police']))
+        officers = police_session.query(LawEnforcement).all()
+        officer_map = {officer.id: officer for officer in officers}
+
+        # Prepare detailed incident data
+        incidents = []
+        for incident, user in results:
+            officer = officer_map.get(incident.assigned_officer_id)
+            incident_data = {
+                'id': incident.id,
+                'crime_type': incident.crime_type,
+                'description': incident.description,
+                'location': {
+                    'latitude': incident.latitude,
+                    'longitude': incident.longitude,
+                    'address': incident.address
+                },
+                'status': incident.status,
+                'created_at': incident.created_at.strftime('%m/%d/%Y %H:%M:%S'),
+                'user': {
+                    'id': user.id if user else None,
+                    'name': user.name if user else 'Anonymous',
+                    'email': user.email if user else None
+                },
+                'officer': {
+                    'id': officer.id if officer else None,
+                    'email': officer.email if officer else None,
+                    'station': officer.station if officer else None,
+                    'badge_number': officer.badge_number if officer else None
+                }
+            }
+            incidents.append(incident_data)
+
+        # Generate summary statistics
+        summary = {
+            'total_incidents': len(results),
+            'by_status': {},
+            'by_crime_type': {},
+            'by_officer': {}
+        }
+
+        for incident, _ in results:
+            status = incident.status or 'unknown'
+            summary['by_status'][status] = summary['by_status'].get(status, 0) + 1
+
+            crime_type = incident.crime_type or 'unknown'
+            summary['by_crime_type'][crime_type] = summary['by_crime_type'].get(crime_type, 0) + 1
+
+            officer = officer_map.get(incident.assigned_officer_id)
+            if officer:
+                officer_key = f"{officer.email} ({officer.station})"
+                summary['by_officer'][officer_key] = summary['by_officer'].get(officer_key, 0) + 1
+
+        resolved_count = sum(1 for i, _ in results if i.status == 'resolved')
+        resolution_rate = (resolved_count / len(results)) * 100 if results else 0
+
+        statistics = {
+            'resolution_rate': round(resolution_rate, 2),
+            'average_response_time': None,
+            'reports_per_day': None
+        }
+
+        return jsonify({
+            'success': True,
+            'report_data': {
+                'incidents': incidents,
+                'summary': summary,
+                'statistics': statistics
+            }
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error generating report: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'An error occurred while generating the report'
+        }), 500
+
+from flask import jsonify, request, session
+import random
+import string
+from datetime import datetime
+
+@app.route('/redeem_reward', methods=['POST'])
+@csrf.exempt
+def redeem_reward():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'User not logged in'}), 401
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    reward_id = data.get('reward_id')
+    reward_title = data.get('reward_title')
+    points_cost = data.get('points_cost')
+    
+    if not reward_id or not reward_title or points_cost is None:
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+    
+    if user.points is None or user.points < points_cost:
+        return jsonify({'success': False, 'error': 'Insufficient points'}), 400
+    
+    try:
+        # Deduct points
+        user.points -= points_cost
+        
+        # Generate unique voucher code
+        def generate_voucher_code(length=8):
+            chars = string.ascii_uppercase + string.digits
+            return ''.join(random.choice(chars) for _ in range(length))
+        
+        voucher_code = generate_voucher_code()
+        
+        # Ensure voucher_code is unique
+        while Voucher.query.filter_by(voucher_code=voucher_code).first():
+            voucher_code = generate_voucher_code()
+        
+        # Create voucher
+        new_voucher = Voucher(
+            user_id=user.id,
+            reward_type=reward_title,
+            points_cost=points_cost,
+            voucher_code=voucher_code,
+            is_approved=False,
+            is_redeemed=False,
+            created_at=datetime.utcnow()
+        )
+        db.session.add(new_voucher)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'voucher_code': voucher_code,
+            'remaining_points': user.points
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 
 if __name__ == '__main__':
-    # Create necessary directories
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    
-    # Initialize database
     initialize_database()
-    
-    # Run application
-    app.run(
+    socketio.run(
+        app,
         host='0.0.0.0',
         port=5000,
         debug=True,

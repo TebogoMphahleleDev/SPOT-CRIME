@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law Enforcement Crime Map - Thusang</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #dbeafe;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --success: #059669;
+            --info: #4f46e5;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 0.5rem;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .map-header {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1000;
+            background: var(--light);
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 360px;
+            transition: var(--transition);
+        }
+
+        .map-header:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .map-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .map-header p {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--light);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .map-legend {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--light);
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 240px;
+            transition: var(--transition);
+        }
+
+        .map-legend:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .map-legend h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+            border-radius: 50%;
+            border: 2px solid var(--light);
+        }
+
+        .legend-label {
+            font-size: 0.875rem;
+            color: var(--dark);
+        }
+
+        .map-filters {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            background: var(--light);
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 280px;
+            transition: var(--transition);
+        }
+
+        .map-filters:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .filter-checkbox input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .filter-checkbox label {
+            font-size: 0.875rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        .leaflet-popup-content {
+            font-size: 0.875rem;
+            max-width: 250px;
+        }
+
+        .leaflet-popup-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .leaflet-popup-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .leaflet-popup-content small {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .map-header {
+                top: 1rem;
+                left: 1rem;
+                right: 1rem;
+                max-width: none;
+            }
+
+            .map-filters {
+                top: auto;
+                bottom: 8rem;
+                right: 1rem;
+                left: 1rem;
+            }
+
+            .map-legend {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="map-header">
+        <h2>Law Enforcement Crime Map</h2>
+        <p>Monitor and analyze reported incidents</p>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="refreshMap()">
+                <i class="fas fa-sync-alt"></i> Refresh Map
+            </button>
+            <button class="btn btn-outline" onclick="window.location.href='/law_enforcement_dashboard'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="map-filters">
+        <div class="filter-group">
+            <span class="filter-label">Crime Types</span>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-theft" checked>
+                <label for="filter-theft">Theft</label>
+            </div>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-burglary" checked>
+                <label for="filter-burglary">Burglary</label>
+            </div>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-assault" checked>
+                <label for="filter-assault">Assault</label>
+            </div>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-gbv" checked>
+                <label for="filter-gbv">GBV</label>
+            </div>
+        </div>
+        <div class="filter-group">
+            <span class="filter-label">Time Range</span>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-24h" checked>
+                <label for="filter-24h">Last 24h</label>
+            </div>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-week" checked>
+                <label for="filter-week">Last week</label>
+            </div>
+            <div class="filter-checkbox">
+                <input type="checkbox" id="filter-month" checked>
+                <label for="filter-month">Last month</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-legend">
+        <h3>Crime Types</h3>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--danger);"></div>
+            <span class="legend-label">Theft</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--primary);"></div>
+            <span class="legend-label">Burglary</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--warning);"></div>
+            <span class="legend-label">Assault</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--info);"></div>
+            <span class="legend-label">GBV</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--gray);"></div>
+            <span class="legend-label">Other</span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const map = L.map('map').setView([-25.731340, 28.218370], 12);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            let allMarkers = [];
+            const crimeColors = {
+                'theft': '#dc2626',
+                'burglary': '#2563eb',
+                'assault': '#d97706',
+                'gbv': '#4f46e5',
+                'other': '#64748b'
+            };
+
+            function loadCrimeData() {
+                fetch('/get_law_enforcement_incidents')
+                    .then(response => response.json())
+                    .then(data => {
+                        allMarkers.forEach(marker => map.removeLayer(marker));
+                        allMarkers = [];
+
+                        data.forEach(crime => {
+                            const marker = L.marker([crime.latitude, crime.longitude], {
+                                crimeType: crime.crime_type.toLowerCase()
+                            }).addTo(map);
+
+                            allMarkers.push(marker);
+
+                            const crimeDate = new Date(crime.timestamp);
+                            const formattedDate = crimeDate.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            marker.bindPopup(`
+                                <h3>${crime.crime_type}</h3>
+                                <p>${crime.description}</p>
+                                <p><small>Reported: ${formattedDate}</small></p>
+                                ${crime.address ? `<p><small>Location: ${crime.address}</small></p>` : ''}
+                            `);
+
+                            const color = crimeColors[crime.crime_type.toLowerCase()] || crimeColors['other'];
+                            marker.setIcon(L.divIcon({
+                                className: 'crime-marker',
+                                html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+                                iconSize: [26, 26],
+                                iconAnchor: [13, 13]
+                            }));
+                        });
+
+                        applyFilters();
+                    })
+                    .catch(error => {
+                        console.error('Error loading crime data:', error);
+                    });
+            }
+
+            function applyFilters() {
+                const theftChecked = document.getElementById('filter-theft').checked;
+                const burglaryChecked = document.getElementById('filter-burglary').checked;
+                const assaultChecked = document.getElementById('filter-assault').checked;
+                const gbvChecked = document.getElementById('filter-gbv').checked;
+
+                allMarkers.forEach(marker => {
+                    const crimeType = marker.options.crimeType;
+
+                    if (
+                        (crimeType === 'theft' && theftChecked) ||
+                        (crimeType === 'burglary' && burglaryChecked) ||
+                        (crimeType === 'assault' && assaultChecked) ||
+                        (crimeType === 'gbv' && gbvChecked)
+                    ) {
+                        if (!map.hasLayer(marker)) {
+                            marker.addTo(map);
+                        }
+                    } else {
+                        if (map.hasLayer(marker)) {
+                            map.removeLayer(marker);
+                        }
+                    }
+                });
+            }
+
+            document.querySelectorAll('.map-filters input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', applyFilters);
+            });
+
+            function refreshMap() {
+                loadCrimeData();
+            }
+
+            loadCrimeData();
+        });
+    </script>
+</body>
+</html>
