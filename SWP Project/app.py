@@ -22,7 +22,7 @@ from flask_socketio import SocketIO, emit, join_room
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='path/to/templates')
 
 # app.config.from_pyfile('config.py')  # Load normal config
 app.config.from_prefixed_env() 
