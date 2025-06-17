@@ -58,6 +58,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_recycle': 1800,
     'pool_pre_ping': True
 }
+db = SQLAlchemy(app)
 
 # File uploads
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
