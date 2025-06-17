@@ -54,33 +54,14 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-    f"{os.getenv('DB_PASSWORD', '')}@"
-    f"{os.getenv('DB_HOST', 'localhost')}:"
-    f"{os.getenv('DB_PORT', '3306')}/"
-    f"{os.getenv('DB_NAME', 'community_safety')}"
-)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_BINDS'] = {
-    'admin': (
-        f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-        f"{os.getenv('DB_PASSWORD', '')}@"
-        f"{os.getenv('DB_HOST', 'localhost')}:"
-        f"{os.getenv('DB_PORT', '3306')}/admin_db"
-    ),
-    'police': (
-        f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-        f"{os.getenv('DB_PASSWORD', '')}@"
-        f"{os.getenv('DB_HOST', 'localhost')}:"
-        f"{os.getenv('DB_PORT', '3306')}/police_db"
-    )
-}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_size': 5,
     'max_overflow': 10,
-    'pool_recycle': 300,
+    'pool_timeout': 30,
+    'pool_recycle': 1800,
     'pool_pre_ping': True
 }
 
@@ -159,7 +140,7 @@ class IncidentType(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
 
 class Admin(db.Model):
-    __bind_key__ = 'admin'
+    #__bind_key__ = 'admin'
     __tablename__ = 'admins'
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
     
@@ -169,7 +150,7 @@ class Admin(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class LawEnforcement(db.Model):
-    __bind_key__ = 'police'
+    #__bind_key__ = 'police'
     __tablename__ = 'officers'
     __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
     
@@ -279,6 +260,7 @@ def initialize_database():
         try:
             db.create_all()
             
+            # Common incident types
             common_incident_types = [
                 "Gender-Based Violence",
                 "Theft",
@@ -294,9 +276,9 @@ def initialize_database():
                     db.session.add(new_type)
             db.session.commit()
             
+            # Sample user
             user_email = "tebogo@gmail.com"
             user_password = bcrypt.generate_password_hash("tebogo").decode('utf-8')
-
             regular_user = User.query.filter_by(email=user_email).first()
             if not regular_user:
                 regular_user = User(
@@ -329,53 +311,31 @@ def initialize_database():
                 db.session.add(incident)
                 db.session.commit()
 
-            admin_engine = db.engines['admin']
-            Admin.metadata.create_all(bind=admin_engine)
-            admin_session_maker = sessionmaker(bind=admin_engine)
-            admin_session = admin_session_maker()
-            try:
-                if not admin_session.query(Admin).filter_by(email=user_email).first():
-                    admin = Admin(
-                        email=user_email,
-                        password=user_password
-                    )
-                    admin_session.add(admin)
-                    admin_session.commit()
-            finally:
-                admin_session.close()
+            # Sample admin
+            if not Admin.query.filter_by(email=user_email).first():
+                admin = Admin(
+                    email=user_email,
+                    password=user_password
+                )
+                db.session.add(admin)
+                db.session.commit()
 
-            police_engine = db.engines['police']
-            LawEnforcement.metadata.create_all(bind=police_engine)
-            police_session_maker = sessionmaker(bind=police_engine)
-            police_session = police_session_maker()
-            try:
-                if not police_session.query(LawEnforcement).filter_by(email=user_email).first():
-                    officer = LawEnforcement(
-                        email=user_email,
-                        password=user_password,
-                        station="Johannesburg Central",
-                        badge_number="JHB1234"
-                    )
-                    police_session.add(officer)
-                    police_session.commit()
-            finally:
-                police_session.close()
+            # Sample officer
+            if not LawEnforcement.query.filter_by(email=user_email).first():
+                officer = LawEnforcement(
+                    email=user_email,
+                    password=user_password,
+                    station="Johannesburg Central",
+                    badge_number="JHB1234"
+                )
+                db.session.add(officer)
+                db.session.commit()
 
             print("Database initialization successful with sample data!")
             
         except Exception as e:
             print(f"Error during initialization: {e}")
-            app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///community_safety.db'
-            app.config['SQLALCHEMY_BINDS'] = {
-                'admin': 'sqlite:///admin.db',
-                'police': 'sqlite:///police.db'
-            }
-            try:
-                db.create_all()
-                print("Using SQLite as fallback database")
-            except Exception as sqlite_error:
-                print(f"SQLite fallback failed: {sqlite_error}")
-                raise
+            raise
 
 # ================ MIDDLEWARE ================
 @app.after_request
