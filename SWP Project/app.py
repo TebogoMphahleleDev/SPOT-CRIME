@@ -8,7 +8,6 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from dotenv import load_dotenv
 import os
-import pymysql
 import requests
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import generate_csrf
@@ -89,7 +88,8 @@ mail = Mail(app)
 # ================ DATABASE MODELS ================
 class User(db.Model):
     __tablename__ = 'users'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -121,7 +121,8 @@ class User(db.Model):
 
 class CommunityChatMessage(db.Model):
     __tablename__ = 'community_chat_messages'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -134,7 +135,8 @@ class CommunityChatMessage(db.Model):
 
 class IncidentType(db.Model):
     __tablename__ = 'incident_types'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
@@ -142,7 +144,8 @@ class IncidentType(db.Model):
 class Admin(db.Model):
     #__bind_key__ = 'admin'
     __tablename__ = 'admins'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -152,7 +155,8 @@ class Admin(db.Model):
 class LawEnforcement(db.Model):
     #__bind_key__ = 'police'
     __tablename__ = 'officers'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -163,7 +167,8 @@ class LawEnforcement(db.Model):
 
 class EmergencyContact(db.Model):
     __tablename__ = 'emergency_contacts'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
@@ -173,7 +178,8 @@ class EmergencyContact(db.Model):
 
 class Incident(db.Model):
     __tablename__ = 'incidents'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     crime_type = db.Column(db.String(100), nullable=False)
@@ -189,7 +195,8 @@ class Incident(db.Model):
 
 class IncidentEvidence(db.Model):
     __tablename__ = 'incident_evidence'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     incident_id = db.Column(db.Integer, db.ForeignKey('incidents.id', ondelete='CASCADE'))
@@ -199,7 +206,8 @@ class IncidentEvidence(db.Model):
 
 class EmergencyAlert(db.Model):
     __tablename__ = 'emergency_alerts'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -210,7 +218,8 @@ class EmergencyAlert(db.Model):
 
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
-    __table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    #__table_args__ = {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+    __table_args__ = {}
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
