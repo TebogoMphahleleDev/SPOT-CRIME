@@ -49,7 +49,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg://{os.getenv('DATABASE_URL').lstrip('postgres://')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL').replace("postgres://", "postgresql+psycopg://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_size': 5,
