@@ -2030,8 +2030,8 @@ def redeem_reward():
             'error': str(e),
             'message': 'An error occurred while redeeming the reward'
         }), 500
-		
-		@app.route('/faq')
+	    
+@app.route('/faq')
 def faq():
     return render_template('faq.html')
 
