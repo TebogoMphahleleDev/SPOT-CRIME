@@ -6,7 +6,7 @@
 
 [deploy]
   # The start command Railway will run to start your app
-  start = "gunicorn app:app --bind 0.0.0.0:$PORT"
+  start = "python app.py"
 
 [env]
   # Environment variables can be listed here (optional if you use Railway UI)
