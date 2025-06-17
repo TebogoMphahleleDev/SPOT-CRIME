@@ -54,14 +54,16 @@ def load_user(user_id):
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
 
-# Database configuration
+
+# Database configuration (Railway-compatible)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"
-    f"{os.getenv('DB_PASSWORD', '')}@"
-    f"{os.getenv('DB_HOST', 'localhost')}:"
-    f"{os.getenv('DB_PORT', '3306')}/"
-    f"{os.getenv('DB_NAME', 'community_safety')}"
+    f"mysql+pymysql://{os.getenv('MYSQLUSER', 'root')}:"  # Railway uses MYSQLUSER
+    f"{os.getenv('MYSQLPASSWORD', '')}@"
+    f"{os.getenv('MYSQLHOST', 'localhost')}:"
+    f"{os.getenv('MYSQLPORT', '3306')}/"
+    f"{os.getenv('MYSQLDATABASE', 'railway')}"
 )
+
 
 app.config['SQLALCHEMY_BINDS'] = {
     'admin': (
@@ -89,8 +91,8 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
 app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS').lower() == 'true'
-app.config['MAIL_USERNAME'] = 'tcpetja@gmail.com'  # Hardcoded email
-app.config['MAIL_PASSWORD'] = 'yfcgqaqngddqqter'  # Hardcoded password
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 app.config['MAIL_DEBUG'] = int(os.getenv('MAIL_DEBUG', '0'))
 
