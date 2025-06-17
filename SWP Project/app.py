@@ -23,6 +23,13 @@ from flask_mysqldb import MySQL
 # Load environment variables
 load_dotenv()
 
+# Debug print to verify environment variables are loaded
+print("DEBUG: MYSQLUSER =", os.getenv("MYSQLUSER"))
+print("DEBUG: MYSQLPASSWORD =", os.getenv("MYSQLPASSWORD"))
+print("DEBUG: MYSQLHOST =", os.getenv("MYSQLHOST"))
+print("DEBUG: MYSQLPORT =", os.getenv("MYSQLPORT"))
+print("DEBUG: MYSQLDATABASE =", os.getenv("MYSQLDATABASE"))
+
 app = Flask(__name__)
 
 # app.config.from_pyfile('config.py')  # Load normal config
@@ -57,11 +64,11 @@ app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
 
 # Database configuration (Railway-compatible)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"mysql+pymysql://{os.getenv('MYSQLUSER', 'root')}:"  # Railway uses MYSQLUSER
-    f"{os.getenv('MYSQLPASSWORD', '')}@"
-    f"{os.getenv('MYSQLHOST', 'localhost')}:"
-    f"{os.getenv('MYSQLPORT', '3306')}/"
-    f"{os.getenv('MYSQLDATABASE', 'railway')}"
+    f"mysql+pymysql://{os.getenv('DB_USER', 'root')}:"  # Use DB_USER for username
+    f"{os.getenv('DB_PASSWORD', '')}@"
+    f"{os.getenv('DB_HOST', 'localhost')}:"
+    f"{os.getenv('DB_PORT', '3306')}/"
+    f"{os.getenv('DB_NAME', 'railway')}"
 )
 
 

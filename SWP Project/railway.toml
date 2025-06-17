@@ -1,0 +1,18 @@
+# railway.toml
+
+[build]
+  # If your Flask app lives in a subdirectory (like "SWP Project"), specify it here
+  # directory = "SWP Project"
+
+[deploy]
+  # The start command Railway will run to start your app
+  start = "gunicorn app:app --bind 0.0.0.0:$PORT"
+
+[env]
+  # Environment variables can be listed here (optional if you use Railway UI)
+  # For example:
+  # MYSQLUSER = "root"
+  # MYSQLPASSWORD = "your_password"
+  # MYSQLHOST = "mysql.railway.internal"
+  # MYSQLPORT = "3306"
+  # MYSQLDATABASE = "railway"
