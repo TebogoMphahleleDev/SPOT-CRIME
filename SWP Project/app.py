@@ -18,6 +18,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from datetime import datetime, timezone, timedelta
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_socketio import SocketIO, emit, join_room
+from flask_mysqldb import MySQL
 
 # Load environment variables
 load_dotenv()
@@ -828,14 +829,16 @@ def reset_password_token():
     return render_template('reset_password_token.html', token=token)
 
 # User Routes
+from sqlalchemy.orm import Session
+from datetime import datetime, timezone
+
 def get_current_user():
     user_id = session.get('user_id')
     if not user_id:
         return None
-    user = db.session.query(User).options(
-        db.joinedload(User.emergency_contacts),
-        db.joinedload(User.incidents)
-    ).get(user_id)
+    # Use Session.get() as per SQLAlchemy 2.0
+    session_obj: Session = db.session
+    user = session_obj.get(User, user_id)
     if user and (not user.name or user.name.strip() == ''):
         user.name = "Community Member"
     return user
@@ -859,9 +862,9 @@ def dashboard():
         primary_contact = emergency_contacts[0] if emergency_contacts else None
         
         # Calculate reports this month
-        from datetime import datetime
+        from datetime import timezone
         from sqlalchemy import extract
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         reports_this_month = db.session.query(Incident).filter(
             Incident.user_id == user.id,
             extract('year', Incident.created_at) == now.year,
@@ -2571,13 +2574,26 @@ def faq():
 def privacy():
     return render_template('privacy.html')
 
+@app.route("/test-railway")
+def test_railway():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT DATABASE();")
+        db = cur.fetchone()
+        return f"Connected to: {db[0]}"
+    except Exception as e:
+        return f"Connection failed: {str(e)}"
+
+
 if __name__ == '__main__':
+    import sys
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     initialize_database()
+    port = int(os.environ.get('PORT', 5000))
     socketio.run(
         app,
         host='0.0.0.0',
-        port=5000,
+        port=port,
         debug=True,
-        ssl_context='adhoc' if os.getenv('USE_HTTPS') == 'true' else None
+        ssl_context=None  # Render.com handles HTTPS termination
     )
